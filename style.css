@@ -1,0 +1,283 @@
+:root {
+    /* Default Colors */
+    --bg-color: #F0EDE5;
+    --text-primary: #242422;
+    --text-secondary: #595955; 
+    
+    /* Project Card Colors */
+    --bg-thumbnail: #dbd4bf;
+    --bg-card: #eceae4;
+    --border-card: #dfdaca;
+    --shadow-color: rgba(0,0,0,0.05);
+
+    --font-primary: "Figtree", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+    /* Typography Scale (Where 1rem = 16px) */
+    --text-xs:   0.875rem; /* 14px */
+    --text-sm:   1rem;     /* 16px */
+    --text-base: 1.25rem;  /* 20px (Base) */
+    --text-lg:   1.5rem;   /* 24px */
+    --text-xl:   1.75rem;  /* 28px */
+    --text-2xl:  2rem;     /* 32px */
+    --text-3xl:  2.5rem;   /* 40px */
+    --text-4xl:  3rem;     /* 48px */
+    --text-5xl:  3.5rem;   /* 56px */
+    --text-6xl:  4rem;     /* 64px */
+    --text-7xl:  4.5rem;   /* 72px */
+    --text-8xl:  5rem;     /* 80px */
+
+    /* Line Heights (Unitless) */
+    --leading-none:   1;      /* For massive hero text (72px+) */
+    --leading-tight:  1.15;   /* For headings (h1, h2, h3) */
+    --leading-snug:   1.3;    /* For subheadings (h4, 24px) */
+    --leading-normal: 1.5;    /* For body text (16px, 20px) */
+    --leading-loose:  1.7;    /* For dense, long-form reading */
+
+    /* Spacing Scale */
+    --space-xs:  0.25rem;   /* 4px  - tiny gaps */
+    --space-sm:  0.5rem;    /* 8px  - tight padding, small margins */
+    --space-md:  1rem;      /* 16px - standard padding, component gaps */
+    --space-lg:  1.5rem;    /* 24px - larger padding, section margins */
+    --space-xl:  2rem;      /* 32px - generous whitespace */
+    --space-2xl: 2.5rem;    /* 40px - even more generous whitespace */
+    --space-3xl: 3rem;      /* 48px - major section breaks */
+    --space-4xl: 4rem;      /* 64px - massive page gaps */
+
+    /* Content Width */
+    --content-margin: 3rem;
+}
+
+/* Dark Mode */
+:root.dark-theme {
+    /* Background & Text */
+    --bg-color: #1C1B1A;
+    --text-primary: #E0DED8;
+    --text-secondary: #9A9893;
+    
+    /* Project Cards */
+    --bg-card: #262523;
+    --border-card: #383632;
+    --bg-thumbnail: #363430;
+    --shadow-color: rgba(0, 0, 0, 0.4);
+}
+
+*, *:before, *:after {
+    box-sizing: border-box;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    /* border: 1px solid red; */
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    html {
+        scroll-behavior: smooth;
+    }
+}
+
+img {
+    max-width: 100%;
+    display: block;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    text-wrap: balance;
+    line-height: var(--leading-tight);
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+ul {
+    list-style: none;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    font-family: var(--font-primary);
+    background-color: var(--bg-color); 
+    font-size: var(--text-base); 
+    line-height: var(--leading-snug);
+    color: var(--text-primary);
+    font-weight: 400;
+}
+.hidden {
+    display: none;
+}
+
+/* Landing Page */
+.section-hero {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding: 16px;
+    min-height: 100vh
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.name {
+    font-weight: 600;
+    font-size: 28px;
+    letter-spacing: -0.08em;
+}
+
+.title {
+    font-size: 1rem;
+    letter-spacing: -0.02em;
+    color: #0071E3;
+}
+
+.nav-container {
+    display: flex;
+    gap: 8px;
+}
+
+.hero-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex-grow: 1;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.hero-text {
+    font-weight: 600;
+    font-size: 2rem;
+}
+
+.scroll-down {
+    display: flex;
+    justify-content: center;
+    padding-bottom: 24px;
+}
+
+/* Work Section */
+.section-work {
+    display: flex;
+    flex-direction: column;
+    padding: 0 16px;
+    gap: 16px;
+}
+
+.work-header {
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.work-description {
+    font-size: 18px;
+}
+
+.work-title {
+    font-size: 16px;
+    color: #0071E3;
+}
+
+.work-card {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding-bottom: 16px;
+    width: 100%;
+    border-bottom: 1px solid var(--text-secondary);
+}
+
+.pill-tag {
+    background-color: #F5F5F7;
+    color: var(--text-secondary);
+    border: 1px solid var(--text-secondary);
+    border-radius: 25px;
+    padding: 4px 16px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.tag-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.work-thumbnail {
+    background-color: var(--text-secondary);
+    width: 100%;
+    aspect-ratio: 16/9;
+    display: flex;
+    justify-content: flex-end;
+    color: var(--bg-color);
+    padding: 8px;
+    border-radius: 10px;
+}
+
+/* Footer */
+.section-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+    padding: 0 16px;
+    padding-top: 32px;
+}
+
+.footer-details {
+    display: flex;
+    justify-content: space-between;
+}
+
+.footer-nav-links {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.footer-right {
+    display: flex;
+    flex-direction: column;
+}
+
+.email-location {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.footer-name {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.bigname {
+    font-weight: 600;
+    font-size: 66px;
+    letter-spacing: -0.08em;
+}
+
+.made-by {
+    padding: 8px;
+    width: 100%;
+    border-top: 1px solid var(--text-secondary);
+    border-bottom: 1px solid var(--text-secondary);
+    text-align: center;
+}
+
+.copyright {
+    padding: 24px 0;
+}
+
+.nav-content {
+    display: flex;
+    gap: 4px;
+}
