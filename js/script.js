@@ -1,3 +1,15 @@
+// Page Fade In: only what's on screen when the page opens eases in; anything further down shows instantly
+function pageTop(el) {
+    let top = 0;
+    for (; el; el = el.offsetParent) top += el.offsetTop; // ignores the fade's slide offset
+    return top;
+}
+
+const screenBottom = window.scrollY + window.innerHeight;
+document.querySelectorAll("[data-fade]").forEach((el) => {
+    if (pageTop(el) >= screenBottom) el.removeAttribute("data-fade");
+});
+
 // Title Fade + Header Stroke
 const heroTitle = document.querySelector('.title');
 const header = document.querySelector('.header');

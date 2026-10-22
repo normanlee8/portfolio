@@ -125,6 +125,38 @@ body {
     font-weight: 400;
 }
 
+/* Page Fade In */
+@keyframes page-fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(24px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* The header stays put between pages; what's on screen when the page opens eases in top to bottom.
+   data-fade sets each element's place in that order (script.js turns it off for anything below the first screen) */
+[data-fade] {
+    /* Starts quick and settles gently into place */
+    animation: page-fade-in 1.4s cubic-bezier(0.33, 1, 0.68, 1) backwards;
+}
+
+[data-fade="1"] { animation-delay: 0.25s; }
+[data-fade="2"] { animation-delay: 0.5s; }
+[data-fade="3"] { animation-delay: 0.75s; }
+[data-fade="4"] { animation-delay: 1s; }
+[data-fade="5"] { animation-delay: 1.25s; }
+[data-fade="6"] { animation-delay: 1.5s; }
+
+@media (prefers-reduced-motion: reduce) {
+    [data-fade] {
+        animation: none;
+    }
+}
+
 .return-top {
     position: fixed;
     bottom: var(--space-xl);
@@ -188,11 +220,13 @@ body {
     height: 1px;
     background-color: var(--text-secondary);
     opacity: 0;
-    transition: opacity 0.2s ease;
+    /* Hide instantly so the line is gone before the title fades back in */
+    transition: none;
 }
 
 .header.scrolled::after {
     opacity: 1;
+    transition: opacity 0.2s ease;
 }
 
 .header.perma-line::after {
@@ -219,7 +253,7 @@ body {
     font-size: var(--text-base);
     letter-spacing: -0.02em;
     color: #0071E3;
-    margin-top: -12px;
+    margin-top: -18px;
     padding-left: 1px;
     position: relative;
     z-index: 101;
@@ -480,6 +514,10 @@ body {
     gap: var(--space-md);
 }
 
+.project-details .content-description {
+    color: #0071E3;
+}
+
 .detail-label {
     font-size: var(--text-md);
     font-weight: 600;
@@ -497,6 +535,32 @@ body {
     padding-bottom: var(--space-md);
     width: 100%;
     border-bottom: 1px solid var(--text-secondary);
+}
+
+/* Card title link: the arrow shows it opens the project */
+.work-link {
+    display: inline-block; /* lets the whole title slide on hover */
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.link-arrow {
+    display: inline-block;
+    margin-left: 0.3em;
+}
+
+.link-arrow svg {
+    width: 0.8em;
+    height: 0.8em;
+    /* Outline the filled icon to thicken its lines */
+    stroke: currentColor;
+    stroke-width: 0.6;
+}
+
+/* Hovering the title or the thumbnail turns the title blue and slides it right */
+.work-card:has(.work-link:hover, .work-thumbnail:hover) .work-link,
+.work-link:focus-visible {
+    color: #0071E3;
+    transform: translateX(4px);
 }
 
 .pill-tag {
@@ -551,6 +615,8 @@ body {
     gap: var(--space-3xl);
     padding: 0 var(--space-md);
     padding-top: var(--space-lg);
+    /* The big name's empty side space runs past the screen edge; clip it so there's no sideways scroll */
+    overflow-x: clip;
 }
 
 .footer-details {
