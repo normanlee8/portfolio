@@ -48,7 +48,7 @@
                 <span>Home</span>
             </a>
 
-            <a href="../../work/work.html" class="menu-item">
+            <a href="../../work/work.html" class="menu-item" aria-current="true">
                 <!-- Briefcase outline -->
                 <svg class="icon-outline" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
                     <path d="M6.5 1A1.5 1.5 0 0 0 5 2.5V3H1.5A1.5 1.5 0 0 0 0 4.5v8A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-8A1.5 1.5 0 0 0 14.5 3H11v-.5A1.5 1.5 0 0 0 9.5 1zm0 1h3a.5.5 0 0 1 .5.5V3H6v-.5a.5.5 0 0 1 .5-.5m1.886 6.914L15 7.151V12.5a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5V7.15l6.614 1.764a1.5 1.5 0 0 0 .772 0M1.5 4h13a.5.5 0 0 1 .5.5v1.616L8.129 7.948a.5.5 0 0 1-.258 0L1 6.116V4.5a.5.5 0 0 1 .5-.5"/>
@@ -102,39 +102,41 @@
                 <p>2026</p>
             </div>
             <h1 class="work-header">Extending Apple Sports with Team Schedules and Results</h1>
-            <div class="tag-container">
-                <span class="pill-tag">PROTOTYPING</span>
-                <span class="pill-tag">0 TO 1</span>
-                <span class="pill-tag">USER RESEARCH</span>
-                <span class="pill-tag">RESPONSIVE WEB DESIGN</span>
-                <span class="pill-tag">PHYSICAL UX</span>
-            </div>
             <p class="work-description">Designing a way to browse a team’s upcoming and past games in the app, keeping fans from switching platforms while preserving its simplicity</p>
-            <dl class="project-details">
-                <div class="detail-item">
-                    <dt class="detail-label">Role</dt>
-                    <dd class="content-description">Designer</dd>
+            <div class="project-meta">
+                <dl class="project-details">
+                    <div class="detail-item">
+                        <dt class="detail-label">Role</dt>
+                        <dd class="content-description">Designer</dd>
+                    </div>
+                    <div class="detail-item">
+                        <dt class="detail-label">Duration</dt>
+                        <dd class="content-description">Mar 2026 - Apr 2026</dd>
+                    </div>
+                    <div class="detail-item">
+                        <dt class="detail-label">Tools</dt>
+                        <dd class="content-description">Figma</dd>
+                    </div>
+                    <div class="detail-item">
+                        <dt class="detail-label">Team</dt>
+                        <dd class="content-description">Solo Project</dd>
+                    </div>
+                </dl>
+                <div class="tag-container project-tags">
+                    <span class="pill-tag">PROTOTYPING</span>
+                    <span class="pill-tag">0 TO 1</span>
+                    <span class="pill-tag">USER RESEARCH</span>
+                    <span class="pill-tag">RESPONSIVE WEB DESIGN</span>
+                    <span class="pill-tag">PHYSICAL UX</span>
                 </div>
-                <div class="detail-item">
-                    <dt class="detail-label">Duration</dt>
-                    <dd class="content-description">Mar 2026 - Apr 2026</dd>
-                </div>
-                <div class="detail-item">
-                    <dt class="detail-label">Tools</dt>
-                    <dd class="content-description">Figma</dd>
-                </div>
-                <div class="detail-item">
-                    <dt class="detail-label">Team</dt>
-                    <dd class="content-description">Solo Project</dd>
-                </div>
-            </dl>
+            </div>
         </div>
         <div class="section-item" data-fade="1">
             <h2 class="section-header">Overview</h2>
             <p class="section-content">Groovy is an online platform designed to simplify the dance journey for  aspiring dancers in vibrant cities like Los Angeles. It provides a  personalized and intuitive experience, helping users discover their  preferred dance genres and easily connect with local studios for  professional training. Groovy streamlines the process of exploring and  immersing oneself in the world of dance, making it effortless to groove  to your own beat.</p>
         </div>
         <div class="section-item" data-fade="2">
-            <h2 class="section-header">Overview</h2>
+            <h2 class="section-header">Description</h2>
             <p class="section-content">Groovy is an online platform designed to simplify the dance journey for  aspiring dancers in vibrant cities like Los Angeles. It provides a  personalized and intuitive experience, helping users discover their  preferred dance genres and easily connect with local studios for  professional training. Groovy streamlines the process of exploring and  immersing oneself in the world of dance, making it effortless to groove  to your own beat.</p>
         </div>
     </div>
@@ -206,7 +208,9 @@
         </div>
         <div class="footer-name">
             <div class="bigname">
-                <p>NORMANLEE</p>
+                <a href="../../index.html">
+                    <p>NORMANLEE</p>
+                </a>
             </div>
             <div class="made-by">
                 <p>Made by</p>
@@ -216,6 +220,38 @@
             </div>
         </div>
     </div>
+
+    <!-- Page Navigation: back button + section menu with scroll progress -->
+    <nav class="page-nav" aria-label="Page">
+        <!-- Goes back in history; the link is the fallback when there's no previous page on this site -->
+        <a href="../../work/work.html" class="page-nav-back" aria-label="Go back">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
+            </svg>
+        </a>
+        <div class="page-nav-sections">
+            <!-- Opens upward inside the same panel; the list is filled by script.js from the page's section headers -->
+            <div class="section-menu hidden" id="section-menu">
+                <div class="section-menu-inner">
+                    <p class="section-menu-title">On this page</p>
+                    <ul class="section-list"></ul>
+                </div>
+            </div>
+            <button type="button" class="section-toggle" aria-expanded="false" aria-controls="section-menu">
+                <span class="progress-ring" aria-hidden="true">
+                    <svg viewBox="0 0 36 36">
+                        <circle class="progress-track" cx="18" cy="18" r="15.9155"/>
+                        <circle class="progress-fill" cx="18" cy="18" r="15.9155"/>
+                    </svg>
+                    <span class="progress-percent">0%</span>
+                </span>
+                <span class="section-label">Scroll Down</span>
+                <svg class="section-chevron" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708z"/>
+                </svg>
+            </button>
+        </div>
+    </nav>
 
     <!-- Copy-email toast -->
     <div class="toast" id="toast" role="status" aria-live="polite">

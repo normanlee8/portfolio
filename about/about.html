@@ -61,7 +61,7 @@
                 <span>Work</span>
             </a>
 
-            <a href="../about/about.html" class="menu-item">
+            <a href="../about/about.html" class="menu-item" aria-current="page">
                 <!-- About Icon -->
                 <svg class="icon-outline" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
                     <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0m4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4m-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10s-3.516.68-4.168 1.332c-.678.678-.83 1.418-.832 1.664z"/>
@@ -262,7 +262,9 @@
         </div>
         <div class="footer-name">
             <div class="bigname">
-                <p>NORMANLEE</p>
+                <a href="../index.html">
+                    <p>NORMANLEE</p>
+                </a>
             </div>
             <div class="made-by">
                 <p>Made by</p>
@@ -272,6 +274,38 @@
             </div>
         </div>
     </div>
+
+    <!-- Page Navigation: back button + section menu with scroll progress -->
+    <nav class="page-nav" aria-label="Page">
+        <!-- Goes back in history; the link is the fallback when there's no previous page on this site -->
+        <a href="../index.html" class="page-nav-back" aria-label="Go back">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
+            </svg>
+        </a>
+        <div class="page-nav-sections">
+            <!-- Opens upward inside the same panel; the list is filled by script.js from the page's section headers -->
+            <div class="section-menu hidden" id="section-menu">
+                <div class="section-menu-inner">
+                    <p class="section-menu-title">On this page</p>
+                    <ul class="section-list"></ul>
+                </div>
+            </div>
+            <button type="button" class="section-toggle" aria-expanded="false" aria-controls="section-menu">
+                <span class="progress-ring" aria-hidden="true">
+                    <svg viewBox="0 0 36 36">
+                        <circle class="progress-track" cx="18" cy="18" r="15.9155"/>
+                        <circle class="progress-fill" cx="18" cy="18" r="15.9155"/>
+                    </svg>
+                    <span class="progress-percent">0%</span>
+                </span>
+                <span class="section-label">Scroll Down</span>
+                <svg class="section-chevron" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708z"/>
+                </svg>
+            </button>
+        </div>
+    </nav>
 
     <!-- Copy-email toast -->
     <div class="toast" id="toast" role="status" aria-live="polite">

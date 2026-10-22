@@ -3,6 +3,7 @@
     --bg-color: #F3F0E9;
     --text-primary: #1C1B19;
     --text-secondary: #5F5C55;
+    --accent-color: #0071E3; /* blue for links, hover and progress */
 
     /* Project Card Colors */
     --bg-thumbnail: #E0D9C6;
@@ -150,6 +151,7 @@ body {
 [data-fade="4"] { animation-delay: 1s; }
 [data-fade="5"] { animation-delay: 1.25s; }
 [data-fade="6"] { animation-delay: 1.5s; }
+[data-fade="7"] { animation-delay: 1.75s; }
 
 @media (prefers-reduced-motion: reduce) {
     [data-fade] {
@@ -230,7 +232,7 @@ body {
 }
 
 .header::after {
-    background-color: #0071E3;
+    background-color: var(--accent-color);
     transform-origin: left;
     transform: scaleX(var(--scroll-progress, 0)); /* set by script.js */
 }
@@ -268,13 +270,13 @@ body {
 
 .name a:hover,
 .name a:focus-visible {
-    color: #0071E3;
+    color: var(--text-secondary);
 }
 
 .title {
     font-size: var(--text-base);
     letter-spacing: -0.02em;
-    color: #0071E3;
+    color: var(--accent-color);
     margin-top: -16px;
     padding-left: 1px;
     position: relative;
@@ -407,7 +409,7 @@ body {
     border-radius: 10px;
     background: none;
     font: inherit;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--text-primary);
     cursor: pointer;
     text-align: left;
@@ -420,6 +422,11 @@ body {
     background-color: var(--bg-thumbnail);
 }
 
+/* The current page (aria-current): bolder text and a filled icon (below), no background */
+.menu-item[aria-current] {
+    font-weight: 600;
+}
+
 .menu-item svg {
     flex-shrink: 0;
 }
@@ -430,12 +437,14 @@ body {
 }
 
 .menu-item:hover .icon-outline,
-.menu-item:focus-visible .icon-outline {
+.menu-item:focus-visible .icon-outline,
+.menu-item[aria-current] .icon-outline {
     display: none;
 }
 
 .menu-item:hover .icon-fill,
-.menu-item:focus-visible .icon-fill {
+.menu-item:focus-visible .icon-fill,
+.menu-item[aria-current] .icon-fill {
     display: block;
 }
 
@@ -485,6 +494,49 @@ body {
     text-align: center;
 }
 
+/* Location line above the headline */
+.hero-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    color: var(--text-secondary);
+    font-size: var(--text-xs);
+    font-weight: 500;
+}
+
+.status-dot {
+    position: relative;
+    flex-shrink: 0;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: #34C759;
+}
+
+/* A ring that grows and fades out of the dot, so it looks live */
+.status-dot::after {
+    content: "";
+    position: absolute;
+    /* Drawn at its full size (2x the dot) and scaled down at the start, so it stays sharp;
+       scaling a tiny 6px circle up looks chunky and choppy */
+    inset: -3px;
+    border-radius: 50%;
+    background-color: inherit;
+    animation: dot-ping 2.4s cubic-bezier(0, 0, 0.2, 1) infinite;
+    will-change: transform, opacity;
+}
+
+@keyframes dot-ping {
+    from {
+        transform: scale(0.5);
+        opacity: 0.6;
+    }
+    to {
+        transform: scale(1);
+        opacity: 0;
+    }
+}
+
 .hero-text {
     font-size: var(--text-3xl);
 }
@@ -495,10 +547,42 @@ body {
     font-weight: 500;
 }
 
+/* Link to the work cards; only the arrow is clickable, not the whole row */
 .scroll-down {
     display: flex;
     justify-content: center;
-    padding-bottom: var(--space-sm);
+    align-self: center;
+    padding: var(--space-xs) var(--space-xs) var(--space-sm);
+    transition: color 0.2s ease;
+}
+
+.scroll-down:hover,
+.scroll-down:focus-visible {
+    color: var(--text-secondary);
+}
+
+/* Gentle bounce to invite scrolling. It runs on a span, not the SVG: Firefox can only hand
+   HTML element animations to the graphics card, so a bouncing SVG drops frames there */
+.scroll-down-bounce {
+    display: block;
+    animation: arrow-bounce 1.8s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+    will-change: transform;
+}
+
+@keyframes arrow-bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(7px);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .scroll-down-bounce,
+    .status-dot::after {
+        animation: none;
+    }
 }
 
 
@@ -532,6 +616,29 @@ body {
     color: var(--text-secondary);
 }
 
+/* Home and Work cards (the ones with a title link): a slightly heavier description */
+.work-card:has(.work-link) .work-description {
+    font-weight: 500;
+}
+
+/* Project page: details on the left, pills stacked on the right, both starting at "Role" */
+.project-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--space-md);
+}
+
+.project-tags {
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+/* Keep each pill on one line; the details column wraps instead */
+.project-tags .pill-tag {
+    white-space: nowrap;
+}
+
 .project-details {
     display: flex;
     flex-direction: column;
@@ -539,7 +646,7 @@ body {
 }
 
 .project-details .content-description {
-    color: #0071E3;
+    color: var(--accent-color);
 }
 
 .detail-label {
@@ -549,7 +656,7 @@ body {
 
 .work-title {
     font-size: var(--text-base);
-    color: #0071E3;
+    color: var(--accent-color);
 }
 
 .work-card {
@@ -592,7 +699,7 @@ body {
    doesn't move, so the title can't slide out from under the cursor and flicker */
 .work-header:hover .work-link,
 .work-link:focus-visible {
-    color: #0071E3;
+    color: var(--accent-color);
     left: 4px;
 }
 
@@ -601,7 +708,7 @@ body {
     color: var(--text-secondary);
     border: 1px solid var(--text-secondary);
     border-radius: 25px;
-    padding: 0 var(--space-md);
+    padding: 0 var(--space-sm);
     font-size: var(--text-2xs);
     font-weight: 500;
 }
@@ -621,6 +728,13 @@ body {
     color: var(--bg-color);
     padding: var(--space-sm);
     border-radius: 10px;
+}
+
+/* Year in the corner: trim the line spacing and the font's built-in space above the digits,
+   so the gap above them matches the gap on the right */
+.work-thumbnail p {
+    line-height: 1;
+    margin-top: -0.09em;
 }
 
 .section-item {
@@ -742,6 +856,265 @@ body {
     }
 }
 
+/* Page Navigation (About + project pages): back button and section menu fixed at the bottom */
+.page-nav {
+    --page-nav-height: 56px;
+    position: fixed;
+    left: 50%;
+    bottom: var(--space-lg);
+    z-index: 998;
+    display: flex;
+    align-items: flex-end; /* the back button stays at the bottom while the panel grows */
+    gap: var(--space-sm);
+    width: min(480px, calc(100% - 2 * var(--space-md)));
+    transform: translateX(-50%);
+}
+
+/* Room so the bar never covers the end of the page */
+body:has(.page-nav) {
+    padding-bottom: calc(var(--page-nav-height, 56px) + var(--space-lg) + var(--space-md));
+}
+
+/* The toast sits above the bar, at full width, since there's no return-to-top button here */
+body:has(.page-nav) .toast {
+    bottom: calc(56px + var(--space-lg) + var(--space-sm));
+    max-width: min(360px, calc(100vw - 2 * var(--space-lg)));
+}
+
+.page-nav-back,
+.page-nav-sections {
+    border: 1px solid var(--text-primary);
+    background-color: var(--bg-card);
+    color: var(--text-primary);
+    box-shadow: 0 8px 24px var(--shadow-color);
+}
+
+.page-nav-back {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: var(--page-nav-height);
+    height: var(--page-nav-height);
+    border-radius: 50%;
+    transition: background-color 0.15s ease;
+}
+
+/* Section pill and its menu are one panel: closed it's a pill, open it grows upward into a rounded box */
+.page-nav-sections {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    border-radius: calc(var(--page-nav-height) / 2);
+    transition: border-radius 0.3s ease, background-color 0.15s ease;
+}
+
+.page-nav-sections:has(.section-toggle[aria-expanded="true"]) {
+    border-radius: 20px;
+}
+
+.section-toggle {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    width: 100%;
+    height: calc(var(--page-nav-height) - 2px); /* the panel's border makes up the rest */
+    position: relative;
+    padding: 0 var(--space-md) 0 var(--space-sm);
+    border: none;
+    background: none;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+}
+
+/* Same hover as the menu items. Closed, the whole pill tints, so it stays one color */
+.page-nav-back:hover,
+.page-nav-back:focus-visible,
+.page-nav-sections:has(.section-toggle[aria-expanded="false"]:hover),
+.page-nav-sections:has(.section-toggle[aria-expanded="false"]:focus-visible) {
+    background-color: var(--bg-thumbnail);
+}
+
+/* Open, the panel keeps one color; the chevron dims to show the row closes the menu */
+.section-toggle[aria-expanded="true"]:hover .section-chevron,
+.section-toggle[aria-expanded="true"]:focus-visible .section-chevron {
+    color: var(--text-secondary);
+}
+
+/* Divider between the list and the progress row, inset from the edges; only when open */
+.section-toggle::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: var(--space-md);
+    right: var(--space-md);
+    height: 1px;
+    background-color: var(--border-card);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.section-toggle[aria-expanded="true"]::before {
+    opacity: 1;
+}
+
+/* Progress ring: the blue arc fills clockwise as the page scrolls (set by script.js) */
+.progress-ring {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+}
+
+.progress-ring svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg); /* start the arc at 12 o'clock */
+}
+
+.progress-track,
+.progress-fill {
+    fill: none;
+    stroke-width: 2.5;
+}
+
+.progress-track {
+    stroke: color-mix(in srgb, var(--text-secondary) 30%, transparent);
+}
+
+/* The circle's length is 100, so the dash length is the percentage */
+.progress-fill {
+    stroke: var(--accent-color);
+    stroke-dasharray: 0 100;
+}
+
+.progress-percent {
+    font-size: 0.6875rem; /* 11px so "100%" fits inside the ring */
+    font-weight: 600;
+    letter-spacing: -0.02em;
+}
+
+.section-label {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-align: left;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: var(--text-md);
+    font-weight: 600;
+}
+
+.section-chevron {
+    flex-shrink: 0;
+    transition: transform 0.25s ease;
+}
+
+.section-toggle[aria-expanded="true"] .section-chevron {
+    transform: rotate(180deg);
+}
+
+/* Section menu: sits above the toggle inside the panel. The grid row animates
+   from 0 to the list's full height, so the panel grows smoothly */
+.section-menu {
+    display: grid;
+    grid-template-rows: 1fr;
+    overflow: hidden;
+    transition: grid-template-rows 0.3s ease, opacity 0.25s ease, visibility 0.3s;
+}
+
+.section-menu.hidden {
+    grid-template-rows: 0fr;
+    opacity: 0;
+    visibility: hidden;
+}
+
+.section-menu-inner {
+    min-height: 0;
+    padding: var(--space-sm);
+    transition: padding 0.3s ease;
+}
+
+/* Collapse the padding too, or it'd keep the closed panel taller than the pill */
+.section-menu.hidden .section-menu-inner {
+    padding-block: 0;
+}
+
+.section-menu-title {
+    /* Left padding = item padding + dot + gap, so it lines up with the item names */
+    padding: var(--space-xs) var(--space-md) var(--space-sm) calc(var(--space-md) + 6px + var(--space-sm));
+    color: var(--text-secondary);
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.section-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.section-list button {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    width: 100%;
+    padding: 10px var(--space-md);
+    border: none;
+    border-radius: 12px;
+    background: none;
+    color: var(--text-primary);
+    font: inherit;
+    font-weight: 500;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+/* Dot beside every item, so the text lines up; it's only filled for the current section */
+.section-list button::before {
+    content: "";
+    flex-shrink: 0;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: transparent;
+}
+
+.section-list button:hover,
+.section-list button:focus-visible {
+    background-color: var(--bg-thumbnail);
+}
+
+/* The section you're currently in: blue dot and bolder text, like the current page in the hamburger menu */
+.section-list button[aria-current="true"] {
+    font-weight: 600;
+}
+
+.section-list button[aria-current="true"]::before {
+    background-color: var(--accent-color);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .section-menu,
+    .section-chevron,
+    .page-nav-sections {
+        transition: none;
+    }
+}
+
 .footer-name {
     display: flex;
     flex-direction: column;
@@ -756,6 +1129,15 @@ body {
     padding-right: 0.09em;
     line-height: var(--leading-none);
     white-space: nowrap;
+}
+
+.bigname a {
+    transition: color 0.2s ease;
+}
+
+.bigname a:hover,
+.bigname a:focus-visible {
+    color: var(--text-secondary);
 }
 
 .made-by {
@@ -852,7 +1234,7 @@ body {
     border-radius: 9999px;
     height: 154px;
     width: 154px;
-    background-color: #0071E3;
+    background-color: var(--accent-color);
 }
 
 .about-me {

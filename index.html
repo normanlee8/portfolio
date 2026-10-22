@@ -36,7 +36,7 @@
             </button>
         </div>
         <div class="expanded-menu hidden" id="menu">
-            <a href="./index.html" class="menu-item">
+            <a href="./index.html" class="menu-item" aria-current="page">
                 <!-- Home Icon -->
                 <svg class="icon-outline" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
                     <path d="M8.354 1.146a.5.5 0 0 0-.708 0l-6 6A.5.5 0 0 0 1.5 7.5v7a.5.5 0 0 0 .5.5h4.5a.5.5 0 0 0 .5-.5v-4h2v4a.5.5 0 0 0 .5.5H14a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-.146-.354L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293zM2.5 14V7.707l5.5-5.5 5.5 5.5V14H10v-4a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5v4z"/>
@@ -100,17 +100,24 @@
             <p>User Experience Designer</p>
         </div>
         <div class="hero-section">
-            <h1 class="hero-text" data-fade="1">Designing paths of<br> least resistance.</h1>
-            <p class="hero-description" data-fade="2">Strip away the noise. Focus on what matters most. Every interaction feels natural, intuitive, and perfectly clear.</p>
+            <p class="hero-eyebrow" data-fade="1"><span class="status-dot" aria-hidden="true"></span>San Francisco, CA</p>
+            <h1 class="hero-text" data-fade="2">Designing paths of<br> least resistance.</h1>
+            <p class="hero-description" data-fade="3">Strip away the noise. Focus on what matters most. Every interaction feels natural, intuitive, and perfectly clear.</p>
         </div>
-        <div class="scroll-down" data-fade="3">
-            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-chevron-down" viewBox="0 0 16 16">
-                <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708"/>
-            </svg>
-        </div>
+        <a href="#work" class="scroll-down" data-fade="4" aria-label="Scroll to work">
+            <span class="scroll-down-bounce">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-chevron-down" viewBox="0 0 16 16" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708"/>
+                </svg>
+            </span>
+        </a>
     </div>
-    <div class="section-work" data-fade="4">
+    <div class="section-work" id="work" data-fade="5">
         <div class="work-card card-first">
+            <!-- Same link as the title, so it's skipped by keyboard and screen readers -->
+            <a href="./projects/apple-sports/apple-sports.html" class="work-thumbnail" tabindex="-1" aria-hidden="true">
+                <p>2026</p>
+            </a>
             <h2 class="work-header">
                 <a href="./projects/apple-sports/apple-sports.html" class="work-link">Extending Apple Sports with Team Schedules and Results<span class="link-arrow" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8"/></svg></span></a>
             </h2>
@@ -123,12 +130,12 @@
                 <span class="pill-tag">RESPONSIVE WEB DESIGN</span>
                 <span class="pill-tag">PHYSICAL UX</span>
             </div>
-            <!-- Same link as the title, so it's skipped by keyboard and screen readers -->
-            <a href="./projects/apple-sports/apple-sports.html" class="work-thumbnail" tabindex="-1" aria-hidden="true">
-                <p>2026</p>
-            </a>
         </div>
         <div class="work-card">
+            <!-- Same link as the title, so it's skipped by keyboard and screen readers -->
+            <a href="./projects/apple-sports/apple-sports.html" class="work-thumbnail" tabindex="-1" aria-hidden="true">
+                <p>2026</p>
+            </a>
             <h2 class="work-header">
                 <a href="./projects/apple-sports/apple-sports.html" class="work-link">Extending Apple Sports with Team Schedules and Results<span class="link-arrow" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8"/></svg></span></a>
             </h2>
@@ -141,12 +148,12 @@
                 <span class="pill-tag">RESPONSIVE WEB DESIGN</span>
                 <span class="pill-tag">PHYSICAL UX</span>
             </div>
-            <!-- Same link as the title, so it's skipped by keyboard and screen readers -->
-            <a href="./projects/apple-sports/apple-sports.html" class="work-thumbnail" tabindex="-1" aria-hidden="true">
-                <p>2026</p>
-            </a>
         </div>
         <div class="work-card">
+            <!-- Same link as the title, so it's skipped by keyboard and screen readers -->
+            <a href="./projects/apple-sports/apple-sports.html" class="work-thumbnail" tabindex="-1" aria-hidden="true">
+                <p>2026</p>
+            </a>
             <h2 class="work-header">
                 <a href="./projects/apple-sports/apple-sports.html" class="work-link">Extending Apple Sports with Team Schedules and Results<span class="link-arrow" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8"/></svg></span></a>
             </h2>
@@ -159,13 +166,9 @@
                 <span class="pill-tag">RESPONSIVE WEB DESIGN</span>
                 <span class="pill-tag">PHYSICAL UX</span>
             </div>
-            <!-- Same link as the title, so it's skipped by keyboard and screen readers -->
-            <a href="./projects/apple-sports/apple-sports.html" class="work-thumbnail" tabindex="-1" aria-hidden="true">
-                <p>2026</p>
-            </a>
         </div>
     </div>
-    <div class="section-footer" data-fade="5">
+    <div class="section-footer" data-fade="6">
         <div class="footer-details">
             <div class="footer-nav-links">
                 <a href="#" class="resume nav-content">
@@ -231,7 +234,9 @@
         </div>
         <div class="footer-name">
             <div class="bigname">
-                <p>NORMANLEE</p>
+                <a href="./index.html">
+                    <p>NORMANLEE</p>
+                </a>
             </div>
             <div class="made-by">
                 <p>Made by</p>
