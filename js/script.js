@@ -12,13 +12,17 @@ document.querySelectorAll("[data-fade]").forEach((el) => {
 
 // Title Fade + Header Stroke
 const heroTitle = document.querySelector('.title');
+// Fade the arrow itself, not its wrapper, so it doesn't fight the wrapper's fade-in
+const scrollDownArrow = document.querySelector('.scroll-down svg');
 const header = document.querySelector('.header');
 const FADE_DISTANCE = 8; // px of scroll to fully fade out
+const ARROW_FADE_DISTANCE = 200; // px of scroll for the arrow to fully fade out
 
 function updateOnScroll() {
     const progress = Math.min(window.scrollY / FADE_DISTANCE, 1);
     heroTitle.style.opacity = 1 - progress;
     header.classList.toggle('scrolled', progress === 1);
+    scrollDownArrow.style.opacity = 1 - Math.min(window.scrollY / ARROW_FADE_DISTANCE, 1);
 }
 
 // Only the home page has a hero title; other pages use .perma-line instead
@@ -26,6 +30,17 @@ if (heroTitle) {
     window.addEventListener('scroll', updateOnScroll, { passive: true });
     updateOnScroll(); // correct state if the page loads already scrolled
 }
+
+// Scroll Progress: the header line fills left to right as the page scrolls
+function updateScrollProgress() {
+    const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+    const progress = scrollable > 0 ? Math.min(window.scrollY / scrollable, 1) : 0;
+    header.style.setProperty('--scroll-progress', progress);
+}
+
+window.addEventListener('scroll', updateScrollProgress, { passive: true });
+window.addEventListener('resize', updateScrollProgress);
+updateScrollProgress();
 
 // Theme Toggle
 const themeToggleBtn = document.querySelector(".theme-toggle-btn");
