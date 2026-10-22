@@ -1,15 +1,31 @@
 :root {
-    /* Default Colors */
-    --bg-color: #F3F0E9;
-    --text-primary: #1C1B19;
-    --text-secondary: #5F5C55;
-    --accent-color: #0071E3; /* blue for links, hover and progress */
+    /* Default Colors: a soft, slightly warm light gray (not bright white) with near-black text */
+    --bg-color: #ECEAE5;
+    --text-primary: #2B2A27;   /* 12:1 on the background */
+    --text-secondary: #615E58; /* 5.4:1 on the background */
 
-    /* Project Card Colors */
-    --bg-thumbnail: #E0D9C6;
-    --bg-card: #FAF8F3;
-    --border-card: #DCD5C5;
-    --shadow-color: rgba(28, 27, 25, 0.06);
+    /* Surfaces: cards and menus sit a step lighter than the page; hover a clear step darker */
+    --bg-thumbnail: #DCD8D0;   /* hover backgrounds */
+    --bg-card: #F4F3EF;        /* cards, menus, bottom bar */
+    --border-card: #D9D6CF;
+    --bg-project: #7A7771;     /* project thumbnails: a medium gray */
+    --text-on-project: #ECEAE5; /* off-white year on thumbnails, same in both modes */
+    --shadow-color: rgba(43, 42, 39, 0.1);
+
+    /* Pill tags: light gray with darker gray text (5.8:1) and a barely-there border */
+    --bg-pill: #E0DDD6;
+    --text-pill: #54514B;
+    --border-pill: #DCD9D2;
+
+    /* Accent palette: vivid but readable as text (4.5:1+) on the background,
+       with a brighter version for dark mode below */
+    --color-blue:   #0963D3;
+    --color-green:  #0F7A39;
+    --color-purple: #7E3FE6;
+    --color-orange: #AB4C07;
+    --color-pink:   #C22A66;
+
+    --accent-color: var(--color-blue); /* links, hover and progress */
 
     --font-primary: "Figtree", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 
@@ -53,24 +69,35 @@
     --header-height: 56px;
 
     /* Header Blur */
-    --header-bg: rgba(243, 240, 233, 0.7);
+    --header-bg: rgba(236, 234, 229, 0.8);
 }
 
 /* Dark Mode */
 :root.dark-theme {
-    /* Background & Text */
-    --bg-color: #1A1917;
-    --text-primary: #ECE9E2;
-    --text-secondary: #A8A49B;
+    /* Background & Text: a mid charcoal gray, not black, with soft off-white text */
+    --bg-color: #2A2A28;
+    --text-primary: #ECEAE5;   /* 12:1 on the background */
+    --text-secondary: #AEABA4; /* 6.3:1 on the background */
 
-    /* Project Cards */
-    --bg-card: #252421;
-    --border-card: #3A3833;
-    --bg-thumbnail: #34322E;
-    --shadow-color: rgba(0, 0, 0, 0.4);
+    /* Surfaces: each step up is a little lighter */
+    --bg-card: #333331;
+    --border-card: #4A4945;
+    --bg-thumbnail: #46443F;
+    --bg-project: #5C5B57;
+    --bg-pill: #403F3C;
+    --text-pill: #CFCCC5;
+    --border-pill: #444340;
+    --shadow-color: rgba(0, 0, 0, 0.3);
+
+    /* Accent palette, brightened for gray; all readable as text here (5:1+) */
+    --color-blue:   #4D9BFF;
+    --color-green:  #38D27A;
+    --color-purple: #B47EFF;
+    --color-orange: #FF9F45;
+    --color-pink:   #FF6EA8;
 
     /* Header Blur */
-    --header-bg: rgba(26, 25, 23, 0.7);
+    --header-bg: rgba(42, 42, 40, 0.8);
 }
 
 html {
@@ -510,7 +537,7 @@ body {
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background-color: #34C759;
+    background-color: var(--color-green);
 }
 
 /* A ring that grows and fades out of the dot, so it looks live */
@@ -656,7 +683,20 @@ body {
 
 .work-title {
     font-size: var(--text-base);
-    color: var(--accent-color);
+    color: var(--card-accent);
+}
+
+/* Each card's accent colors its role line and title hover; blue unless a color class is added */
+.work-card {
+    --card-accent: var(--accent-color);
+}
+
+.work-card.card-purple {
+    --card-accent: var(--color-purple);
+}
+
+.work-card.card-orange {
+    --card-accent: var(--color-orange);
 }
 
 .work-card {
@@ -695,20 +735,20 @@ body {
     stroke-width: 0.6;
 }
 
-/* Hovering the title turns it blue and slides it right. The hover sits on the heading, which
-   doesn't move, so the title can't slide out from under the cursor and flicker */
+/* Hovering the title turns it the card's accent color and slides it right. The hover sits on the
+   heading, which doesn't move, so the title can't slide out from under the cursor and flicker */
 .work-header:hover .work-link,
 .work-link:focus-visible {
-    color: var(--accent-color);
+    color: var(--card-accent);
     left: 4px;
 }
 
 .pill-tag {
-    background-color: var(--bg-card);
-    color: var(--text-secondary);
-    border: 1px solid var(--text-secondary);
+    background-color: var(--bg-pill);
+    color: var(--text-pill);
+    border: 1px solid var(--border-pill);
     border-radius: 25px;
-    padding: 0 var(--space-sm);
+    padding: 0 12px;
     font-size: var(--text-2xs);
     font-weight: 500;
 }
@@ -720,12 +760,12 @@ body {
 }
 
 .work-thumbnail {
-    background-color: var(--text-secondary);
+    background-color: var(--bg-project);
     width: 100%;
     aspect-ratio: 16/9;
     display: flex;
     justify-content: flex-end;
-    color: var(--bg-color);
+    color: var(--text-on-project);
     padding: var(--space-sm);
     border-radius: 10px;
 }
@@ -837,7 +877,7 @@ body {
 .toast svg {
     flex-shrink: 0;
     margin-top: 2px; /* centers the 20px icon on the first text line */
-    color: #30A46C;
+    color: var(--color-green);
 }
 
 .toast-title {

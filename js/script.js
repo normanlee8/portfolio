@@ -217,13 +217,13 @@ if (pageNav) {
         progressFill.style.strokeDasharray = `${progress * 100} 100`;
 
         // Current section: the last header that has passed a third of the way down the screen.
-        // At the very end it's the last section, even if its header can't scroll that far up
+        // At the very end no section is current, so the menu shows no dot or bold item
         const line = window.innerHeight / 3;
         let current = -1;
         sectionHeaders.forEach((h, i) => {
             if (h.getBoundingClientRect().top <= line) current = i;
         });
-        if (atEnd && sectionHeaders.length) current = sectionHeaders.length - 1;
+        if (atEnd) current = -1;
 
         if (atEnd) sectionLabel.textContent = "The End";
         else sectionLabel.textContent = current >= 0 ? sectionHeaders[current].textContent.trim() : "Scroll Down";
