@@ -387,7 +387,8 @@ body {
 
     z-index: 9999;
     transform-origin: top right;
-    transition: opacity 0.15s ease, transform 0.15s ease;
+    /* visibility switches at the end of a fade-out, so the menu stays visible while it fades */
+    transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s;
 }
 
 .expanded-menu.hidden {
@@ -734,9 +735,10 @@ body {
     color: var(--text-secondary);
 }
 
+/* Small screens: stay bottom right, but narrow enough to sit beside the 48px return-to-top button */
 @media (max-width: 480px) {
     .toast {
-        bottom: calc(var(--space-xl) + 48px + var(--space-sm));
+        max-width: calc(100vw - 2 * var(--space-lg) - 48px - var(--space-sm));
     }
 }
 
