@@ -96,22 +96,25 @@
     </div>
 
     <!-- About -->
-    <div class="section-photo" data-fade="0">
-        <div class="photo"></div>
-    </div>
-    
-    <div class="about-me" data-fade="1">
-        <h1 class="greeting">Hello, I'm Norman!</h1>
-        <p class="section-content">I am a UX designer based in California. I graduated from UC San Diego this Spring, where I majored in Cognitive Science with a specialization in Interaction Design, with minors in Computer Science and Design.</p>
-        <p class="section-content">As a designer, I'm interested in specializing in design systems, where I can use my knowledge of design and development  to create a cohesive and consistent foundation for the user experience  of products.</p>
-        <!-- Placeholder link: replace "#" with the resume PDF path -->
-        <a href="#" class="download-resume">
-            <p>Download Full Resume (PDF)</p>
-            <!-- Down Arrow -->
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
-                <path fill-rule="evenodd" d="M8 1a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L7.5 13.293V1.5A.5.5 0 0 1 8 1"/>
-            </svg>
-        </a>
+    <!-- Photo and intro: stacked on phones, side by side from 768px -->
+    <div class="about-intro">
+        <div class="section-photo" data-fade="0">
+            <div class="photo"></div>
+        </div>
+
+        <div class="about-me" data-fade="1">
+            <h1 class="greeting">Hello, I'm Norman!</h1>
+            <p class="section-content">I am a UX designer based in California. I graduated from UC San Diego this Spring, where I majored in Cognitive Science with a specialization in Interaction Design, with minors in Computer Science and Design.</p>
+            <p class="section-content">As a designer, I'm interested in specializing in design systems, where I can use my knowledge of design and development  to create a cohesive and consistent foundation for the user experience  of products.</p>
+            <!-- Placeholder link: replace "#" with the resume PDF path -->
+            <a href="#" class="download-resume">
+                <p>Download Full Resume (PDF)</p>
+                <!-- Down Arrow -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M8 1a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L7.5 13.293V1.5A.5.5 0 0 1 8 1"/>
+                </svg>
+            </a>
+        </div>
     </div>
 
     <div class="section-resume">
@@ -130,7 +133,7 @@
         <div class="resume-item" data-fade="3">
             <h2 class="resume-header">Experience</h2>
             <div class="resume-content">
-                <h3 class="content-label">Contractor @ Handshake AI</h3>
+                <h3 class="content-label">Contractor <span class="keep-together">@ Handshake AI</span></h3>
                 <p class="content-description">May 2026 - Present &middot; Remote</p>
             </div>
             <div class="resume-content">
@@ -140,7 +143,7 @@
                 </p>
             </div>
             <div class="resume-content">
-                <h3 class="content-label">Dell Campus Representative @ 2020 Companies</h3>
+                <h3 class="content-label">Dell Campus Representative <span class="keep-together">@ 2020 Companies</span></h3>
                 <p class="content-description">Mar 2024 - Nov 2024 &middot; La Jolla, CA</p>
             </div>
             <div class="resume-content">

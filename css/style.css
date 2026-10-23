@@ -29,16 +29,18 @@
 
     --font-primary: "Figtree", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 
-    /* Typography Scale (Where 1rem = 16px) */
+    /* Typography Scale (Where 1rem = 16px). The common sizes are fluid: they grow in a straight
+       line from their phone size at a 393px-wide screen to their desktop size at 1280px, then stop */
+    --text-logo: 1.75rem;   /* 28px, fixed so the name always fits the 56px header */
     --text-3xs:  0.6875rem; /* 11px */
-    --text-2xs:  0.75rem;   /* 12px */
-    --text-xs:   0.875rem;  /* 14px */
-    --text-base: 1rem;      /* 16px (Base) */
-    --text-md:   1.125rem;  /* 18px */
-    --text-lg:   1.25rem;   /* 20px */
-    --text-xl:   1.5rem;    /* 24px */
-    --text-2xl:  1.75rem;   /* 28px */
-    --text-3xl:  2rem;      /* 32px */
+    --text-2xs: clamp(0.75rem, 0.7223rem + 0.1127vw, 0.8125rem); /* 12 → 13px */
+    --text-xs: clamp(0.875rem, 0.8473rem + 0.1127vw, 0.9375rem); /* 14 → 15px */
+    --text-base: clamp(1rem, 0.9723rem + 0.1127vw, 1.0625rem); /* 16 → 17px (Base) */
+    --text-md: clamp(1.125rem, 1.0696rem + 0.2255vw, 1.25rem); /* 18 → 20px */
+    --text-lg: clamp(1.25rem, 1.1669rem + 0.3382vw, 1.4375rem); /* 20 → 23px */
+    --text-xl: clamp(1.5rem, 1.3339rem + 0.6764vw, 1.875rem); /* 24 → 30px */
+    --text-2xl: clamp(1.75rem, 1.4731rem + 1.1274vw, 2.375rem); /* 28 → 38px */
+    --text-3xl: clamp(2rem, 1.5569rem + 1.8038vw, 3rem); /* 32 → 48px */
     --text-4xl:  2.5rem;    /* 40px */
     --text-5xl:  3rem;      /* 48px */
     --text-6xl:  3.5rem;    /* 56px */
@@ -63,15 +65,15 @@
     --tracking-tight: -0.02em; /* Small text that needs to sit snug */
     --tracking-wide:   0.06em; /* Uppercase labels */
 
-    /* Spacing Scale */
+    /* Spacing Scale: xs and sm stay fixed for tight UI; md and up grow from 393px to 1280px like the type */
     --space-xs:  0.25rem;   /* 4px  - tiny gaps */
     --space-sm:  0.5rem;    /* 8px  - tight padding, small margins */
-    --space-md:  1rem;      /* 16px - standard padding, component gaps */
-    --space-lg:  1.5rem;    /* 24px - larger padding, section margins */
-    --space-xl:  2rem;      /* 32px - generous whitespace */
-    --space-2xl: 2.5rem;    /* 40px - even more generous whitespace */
-    --space-3xl: 3rem;      /* 48px - major section breaks */
-    --space-4xl: 4rem;      /* 64px - massive page gaps */
+    --space-md: clamp(1rem, 0.7785rem + 0.9019vw, 1.5rem); /* 16 → 24px - standard padding, component gaps */
+    --space-lg: clamp(1.5rem, 1.2785rem + 0.9019vw, 2rem); /* 24 → 32px - larger padding, section margins */
+    --space-xl: clamp(2rem, 1.5569rem + 1.8038vw, 3rem); /* 32 → 48px - generous whitespace */
+    --space-2xl: clamp(2.5rem, 1.8354rem + 2.7057vw, 4rem); /* 40 → 64px - even more generous whitespace */
+    --space-3xl: clamp(3rem, 2.1139rem + 3.6077vw, 5rem); /* 48 → 80px - major section breaks */
+    --space-4xl: clamp(4rem, 2.6708rem + 5.4115vw, 7rem); /* 64 → 112px - massive page gaps */
 
     /* Content Width */
     --content-margin: 3rem;
@@ -305,7 +307,7 @@ body {
 
 .name {
     font-weight: var(--weight-semibold);
-    font-size: var(--text-2xl);
+    font-size: var(--text-logo);
     letter-spacing: var(--tracking-logo);
 }
 
@@ -582,8 +584,9 @@ body {
     }
 }
 
+/* Grows with both width and height (whichever is tighter), so short, wide screens don't get a giant headline */
 .hero-text {
-    font-size: var(--text-3xl);
+    font-size: clamp(2rem, 0.75rem + min(5vw, 6svh), 3.5rem);
 }
 
 .hero-description {
@@ -648,7 +651,7 @@ body {
 
 .card-first {
     border-top: 1px solid var(--text-secondary);
-    padding-top: 16px;
+    padding-top: var(--space-md);
 }
 
 /* Card titles are h2s; on a project page the same class is the page's h1 title */
@@ -1260,10 +1263,12 @@ body:has(.page-nav) .toast {
     padding: var(--space-md);
 }
 
+/* Grows with the screen: 154px on phones up to 320px, never wider than its column */
 .photo {
     border-radius: 9999px;
-    height: 154px;
-    width: 154px;
+    width: clamp(9.625rem, 25vw, 20rem);
+    max-width: 100%;
+    aspect-ratio: 1;
     background-color: var(--accent-color);
 }
 
@@ -1345,8 +1350,145 @@ body:has(.page-nav) .toast {
     font-size: var(--text-lg);
 }
 
+/* Words that shouldn't be split across lines, like "@ Handshake AI"; a wrap happens before them instead */
+.keep-together {
+    white-space: nowrap;
+}
+
 .content-description {
     color: var(--text-secondary);
 }
 
 /* Continue the styling for about page */
+/* ===== Tablet and up (768px+) ===== */
+@media (min-width: 768px) {
+    /* Gap between the left (one third) and right (two thirds) columns on the project and About pages */
+    :root {
+        --column-gap: 4rem; /* 64px */
+    }
+
+    /* Header: the hamburger goes away and the menu becomes a row of links, styled like the footer
+       links (icon + name; the icon fills and the name underlines on hover). The same menu markup
+       is reused, so it's shown here even while script.js marks it "hidden" */
+    .nav-container {
+        display: none;
+    }
+
+    .expanded-menu,
+    .expanded-menu.hidden {
+        position: static;
+        flex-direction: row;
+        align-items: center;
+        gap: var(--space-lg);
+        min-width: 0;
+        padding: 0;
+        background: none;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+        opacity: 1;
+        visibility: visible;
+        transform: none;
+        pointer-events: auto;
+        transition: none;
+    }
+
+    .menu-item {
+        width: auto;
+        padding: 0;
+        border-radius: 0;
+    }
+
+    .menu-item:hover,
+    .menu-item:focus-visible {
+        background: none;
+    }
+
+    .menu-item > span {
+        position: relative;
+    }
+
+    .menu-item > span::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        height: 1px;
+        background-color: var(--text-secondary);
+        transform-origin: right;
+        transform: scaleX(0);
+        transition: transform 0.3s ease-out;
+    }
+
+    .menu-item:hover > span::after,
+    .menu-item:focus-visible > span::after {
+        transform-origin: left;
+        transform: scaleX(1);
+    }
+
+    /* Project page sections: heading in the left third, text in the right two thirds,
+       both starting at the section's top line */
+    .section-item {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+        column-gap: var(--column-gap);
+        align-items: start;
+    }
+
+    .section-item > .section-header {
+        grid-column: 1;
+        grid-row: 1;
+    }
+
+    /* Any paragraphs, images, etc. stack in the right column */
+    .section-item > :not(.section-header) {
+        grid-column: 2;
+    }
+
+    /* About page intro: photo in the left third, greeting and bio in the right two thirds */
+    .about-intro {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+        column-gap: var(--column-gap);
+        align-items: start;
+        padding: var(--space-md);
+    }
+
+    .about-intro .section-photo,
+    .about-intro .about-me {
+        padding: 0;
+    }
+
+    /* About page resume: section headings stay full width; entries use the same thirds */
+    .resume-item {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+        column-gap: var(--column-gap);
+    }
+
+    .resume-header {
+        grid-column: 1 / -1;
+    }
+
+    /* Single entries (Skills, Fun): label on the left, value on the right, sharing the columns */
+    .resume-content {
+        grid-column: 1 / -1;
+        display: grid;
+        grid-template-columns: subgrid;
+        column-gap: var(--column-gap); /* its own 8px gap would otherwise shift the right column left */
+    }
+
+    /* Paired entries (Education, Experience): the title and dates block sits on the left...
+       (the next block starts with something other than a label heading, so it's that entry's details) */
+    .resume-content:has(+ .resume-content > :first-child:not(h3)) {
+        grid-column: 1;
+        display: flex;
+    }
+
+    /* ...and the details block that follows it (it has no label of its own) sits on the right */
+    .resume-content:not(:has(.content-label)) {
+        grid-column: 2;
+        display: flex;
+    }
+}
