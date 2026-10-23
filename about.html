@@ -24,7 +24,7 @@
     <!-- Header -->
     <div class="header perma-line">
         <div class="name">
-            <a href="/">NORMANLEE</a>
+            <a href="/"><span class="name-chevron" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/></svg></span>NORMANLEE</a>
         </div>
         <div class="nav-container">
             <button class="hamburger-menu" aria-label="Toggle menu" aria-expanded="false">
@@ -48,18 +48,27 @@
                 <span>Home</span>
             </a>
 
-            <a href="/work" class="menu-item">
-                <!-- Briefcase outline -->
-                <svg class="icon-outline" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M6.5 1A1.5 1.5 0 0 0 5 2.5V3H1.5A1.5 1.5 0 0 0 0 4.5v8A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-8A1.5 1.5 0 0 0 14.5 3H11v-.5A1.5 1.5 0 0 0 9.5 1zm0 1h3a.5.5 0 0 1 .5.5V3H6v-.5a.5.5 0 0 1 .5-.5m1.886 6.914L15 7.151V12.5a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5V7.15l6.614 1.764a1.5 1.5 0 0 0 .772 0M1.5 4h13a.5.5 0 0 1 .5.5v1.616L8.129 7.948a.5.5 0 0 1-.258 0L1 6.116V4.5a.5.5 0 0 1 .5-.5"/>
-                </svg>
-                <!-- Briefcase fill -->
-                <svg class="icon-fill" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M6.5 1A1.5 1.5 0 0 0 5 2.5V3H1.5A1.5 1.5 0 0 0 0 4.5v1.384l7.614 2.03a1.5 1.5 0 0 0 .772 0L16 5.884V4.5A1.5 1.5 0 0 0 14.5 3H11v-.5A1.5 1.5 0 0 0 9.5 1zm0 1h3a.5.5 0 0 1 .5.5V3H6v-.5a.5.5 0 0 1 .5-.5"/>
-                    <path d="M0 12.5A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5V6.85L8.129 8.947a.5.5 0 0 1-.258 0L0 6.85z"/>
-                </svg>
-                <span>Work</span>
-            </a>
+            <div class="nav-dropdown">
+                <a href="/work" class="menu-item">
+                    <!-- Briefcase outline -->
+                    <svg class="icon-outline" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M6.5 1A1.5 1.5 0 0 0 5 2.5V3H1.5A1.5 1.5 0 0 0 0 4.5v8A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-8A1.5 1.5 0 0 0 14.5 3H11v-.5A1.5 1.5 0 0 0 9.5 1zm0 1h3a.5.5 0 0 1 .5.5V3H6v-.5a.5.5 0 0 1 .5-.5m1.886 6.914L15 7.151V12.5a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5V7.15l6.614 1.764a1.5 1.5 0 0 0 .772 0M1.5 4h13a.5.5 0 0 1 .5.5v1.616L8.129 7.948a.5.5 0 0 1-.258 0L1 6.116V4.5a.5.5 0 0 1 .5-.5"/>
+                    </svg>
+                    <!-- Briefcase fill -->
+                    <svg class="icon-fill" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M6.5 1A1.5 1.5 0 0 0 5 2.5V3H1.5A1.5 1.5 0 0 0 0 4.5v1.384l7.614 2.03a1.5 1.5 0 0 0 .772 0L16 5.884V4.5A1.5 1.5 0 0 0 14.5 3H11v-.5A1.5 1.5 0 0 0 9.5 1zm0 1h3a.5.5 0 0 1 .5.5V3H6v-.5a.5.5 0 0 1 .5-.5"/>
+                        <path d="M0 12.5A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5V6.85L8.129 8.947a.5.5 0 0 1-.258 0L0 6.85z"/>
+                    </svg>
+                    <span>Work</span>
+                </a>
+                <div class="project-menu">
+                    <div class="project-menu-panel">
+                        <a href="/apple-sports" class="project-menu-item">Extending Apple Sports with Team Schedules and Results</a>
+                        <a href="/apple-sports" class="project-menu-item">Rethinking Trip Planning for Bay Area Transit Riders</a>
+                        <a href="/apple-sports" class="project-menu-item">Designing a Hands-Free Cooking Mode for Recipe Apps</a>
+                    </div>
+                </div>
+            </div>
 
             <a href="/about" class="menu-item" aria-current="page">
                 <!-- About Icon -->
@@ -203,6 +212,9 @@
 
     <!-- Footer -->
     <div class="section-footer" data-fade="6">
+        <div class="footer-thanks">
+            <p>Thanks for stopping by!</p>
+        </div>
         <div class="footer-details">
             <div class="footer-nav-links">
                 <a href="#" class="resume nav-content">
@@ -262,6 +274,10 @@
 
                     <div class="location nav-content">
                         <p>San Francisco, CA</p>
+                    </div>
+
+                    <div class="location local-time nav-content" hidden>
+                        <p><span id="local-time"></span> PT</p>
                     </div>
                 </div>
             </div>
