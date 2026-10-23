@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About - Norman Lee</title>
+    <title>Extending Apple Sports with Team Schedules and Results - Norman Lee</title>
     <!-- Load Theme -->
     <script>
         {
@@ -14,17 +14,17 @@
             }
         }
     </script>
-    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="/css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
-    <script src="../js/script.js" defer></script>
+    <script src="/js/script.js" defer></script>
 </head>
 <body>
     <!-- Header -->
     <div class="header perma-line">
         <div class="name">
-            <a href="../index.html">NORMANLEE</a>
+            <a href="/">NORMANLEE</a>
         </div>
         <div class="nav-container">
             <button class="hamburger-menu" aria-label="Toggle menu" aria-expanded="false">
@@ -36,7 +36,7 @@
             </button>
         </div>
         <div class="expanded-menu hidden" id="menu">
-            <a href="../index.html" class="menu-item">
+            <a href="/" class="menu-item">
                 <!-- Home outline -->
                 <svg class="icon-outline" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
                     <path d="M8.354 1.146a.5.5 0 0 0-.708 0l-6 6A.5.5 0 0 0 1.5 7.5v7a.5.5 0 0 0 .5.5h4.5a.5.5 0 0 0 .5-.5v-4h2v4a.5.5 0 0 0 .5.5H14a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-.146-.354L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293zM2.5 14V7.707l5.5-5.5 5.5 5.5V14H10v-4a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5v4z"/>
@@ -48,7 +48,7 @@
                 <span>Home</span>
             </a>
 
-            <a href="../work/work.html" class="menu-item">
+            <a href="/work" class="menu-item" aria-current="true">
                 <!-- Briefcase outline -->
                 <svg class="icon-outline" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
                     <path d="M6.5 1A1.5 1.5 0 0 0 5 2.5V3H1.5A1.5 1.5 0 0 0 0 4.5v8A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-8A1.5 1.5 0 0 0 14.5 3H11v-.5A1.5 1.5 0 0 0 9.5 1zm0 1h3a.5.5 0 0 1 .5.5V3H6v-.5a.5.5 0 0 1 .5-.5m1.886 6.914L15 7.151V12.5a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5V7.15l6.614 1.764a1.5 1.5 0 0 0 .772 0M1.5 4h13a.5.5 0 0 1 .5.5v1.616L8.129 7.948a.5.5 0 0 1-.258 0L1 6.116V4.5a.5.5 0 0 1 .5-.5"/>
@@ -61,7 +61,7 @@
                 <span>Work</span>
             </a>
 
-            <a href="../about/about.html" class="menu-item" aria-current="page">
+            <a href="/about" class="menu-item">
                 <!-- About Icon -->
                 <svg class="icon-outline" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
                     <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0m4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4m-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10s-3.516.68-4.168 1.332c-.678.678-.83 1.418-.832 1.664z"/>
@@ -95,114 +95,74 @@
         </div>
     </div>
 
-    <!-- About -->
-    <div class="about-intro">
-        <div class="section-photo" data-fade="0">
-            <img class="photo" src="https://images.unsplash.com/photo-1792434740207-ca4feec854d7?q=80&w=735&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D" alt="Portrait of Norman Lee">
+    <!-- Work -->
+    <div class="section-work">
+        <div class="work-card" data-fade="0">
+            <div class="work-thumbnail">
+                <img src="https://images.unsplash.com/photo-1504450758481-7338eba7524a?w=1200&q=75&auto=format&fit=crop" alt="">
+                <p>2026</p>
+            </div>
+            <h1 class="work-header">Extending Apple Sports with Team Schedules and Results</h1>
+            <div class="tag-container">
+                <span class="pill-tag">PROTOTYPING</span>
+                <span class="pill-tag">0 TO 1</span>
+                <span class="pill-tag">USER RESEARCH</span>
+                <span class="pill-tag">RESPONSIVE WEB DESIGN</span>
+                <span class="pill-tag">PHYSICAL UX</span>
+            </div>
+            <dl class="project-details">
+                <div class="detail-item">
+                    <dt class="detail-label">Role</dt>
+                    <dd class="content-description">Designer</dd>
+                </div>
+                <div class="detail-item">
+                    <dt class="detail-label">Duration</dt>
+                    <dd class="content-description">Mar 2026 - Apr 2026</dd>
+                </div>
+                <div class="detail-item">
+                    <dt class="detail-label">Tools</dt>
+                    <dd class="content-description">Figma</dd>
+                </div>
+                <div class="detail-item">
+                    <dt class="detail-label">Team</dt>
+                    <dd class="content-description">Solo Project</dd>
+                </div>
+            </dl>
         </div>
-
-        <div class="about-me" data-fade="1">
-            <h1 class="greeting">Hello, I'm Norman!</h1>
-            <p class="section-content">I am a UX designer based in California. I graduated from UC San Diego this Spring, where I majored in Cognitive Science with a specialization in Interaction Design, with minors in Computer Science and Design.</p>
-            <p class="section-content">As a designer, I'm interested in specializing in design systems, where I can use my knowledge of design and development  to create a cohesive and consistent foundation for the user experience  of products.</p>
-            <!-- Placeholder link: replace "#" with the resume PDF path -->
-            <a href="#" class="download-resume">
-                <p>Download Full Resume (PDF)</p>
-                <!-- Down Arrow -->
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
-                    <path fill-rule="evenodd" d="M8 1a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L7.5 13.293V1.5A.5.5 0 0 1 8 1"/>
-                </svg>
-            </a>
+        <div class="section-item" data-fade="1">
+            <h2 class="section-header">Overview</h2>
+            <p class="section-content">Apple Sports is built for speed: open it, see the score, close it. That focus is its strength, but it stops at today. Fans who want to know when their team plays next, or how the last five games went, have to leave for ESPN or a league app. This concept adds a team page with upcoming games and recent results, without giving up the quick, glanceable feel that makes the app worth keeping.</p>
         </div>
-    </div>
-
-    <div class="section-resume">
-        <div class="resume-item" data-fade="2">
-            <h2 class="resume-header">Education</h2>
-            <div class="resume-content">
-                <h3 class="content-label">University of California, San Diego</h3>
-                <p class="content-description">Sep 2021 - Dec 2024 &middot; La Jolla, CA</p>
-            </div>
-            <div class="resume-content">
-                <strong class="content-description">B.S. Cognitive Science (Interaction Design)</strong>
-                <p class="content-description">Minor in Computer Science</p>
-            </div>
+        <div class="section-item" data-fade="2">
+            <h2 class="section-header">Problem</h2>
+            <p class="section-content">The app answers “what’s happening right now?” very well, and almost nothing else. Following a team means remembering game times yourself or bouncing between apps, so many fans stop opening Apple Sports at all once a game ends. The challenge was to add a sense of time to the app, past and future, while keeping every screen as light as the scoreboard it already is.</p>
         </div>
-        
-        <div class="resume-item" data-fade="3">
-            <h2 class="resume-header">Experience</h2>
-            <div class="resume-content">
-                <h3 class="content-label">Contractor <span class="keep-together">@ Handshake AI</span></h3>
-                <p class="content-description">May 2026 - Present &middot; Remote</p>
-            </div>
-            <div class="resume-content">
-                <p class="content-description"><strong>Provided</strong> in-depth technical knowledge of Dell hardware and software, educating customers on product features and specifications.
-                    <br> <strong>Assisted</strong> customers in troubleshooting technical issues with Dell and non-Dell devices, offering solutions and guidance on next steps.
-                    <br> <strong>Helped</strong> students, parents, and faculty select computers and accessories tailored to their specific needs, including academic requirements, budgets, and performance expectations.
-                </p>
-            </div>
-            <div class="resume-content">
-                <h3 class="content-label">Dell Campus Representative <span class="keep-together">@ 2020 Companies</span></h3>
-                <p class="content-description">Mar 2024 - Nov 2024 &middot; La Jolla, CA</p>
-            </div>
-            <div class="resume-content">
-                <p class="content-description"><strong>Provided</strong> in-depth technical knowledge of Dell hardware and software, educating customers on product features and specifications.
-                    <br> <strong>Assisted</strong> customers in troubleshooting technical issues with Dell and non-Dell devices, offering solutions and guidance on next steps.
-                    <br> <strong>Helped</strong> students, parents, and faculty select computers and accessories tailored to their specific needs, including academic requirements, budgets, and performance expectations.
-                </p>
-            </div>
+        <div class="section-item" data-fade="3">
+            <h2 class="section-header">Research</h2>
+            <p class="section-content">I interviewed eight sports fans who follow between one and four teams, and asked each of them to walk through how they had checked on their team that week. I also mapped how ESPN, theScore, and the official league apps present schedules, noting what each one shows first and how many taps it takes to reach the next game.</p>
+            <p class="section-content">Every fan checked the score on the day of a game, but most checked the schedule only a few times a week, usually to plan around it: when to leave work, whether to book a bar, or if a game clashed with something else.</p>
         </div>
-
-        <div class="resume-item" data-fade="4">
-            <h2 class="resume-header">Skills</h2>
-            <div class="resume-content">
-                <h3 class="content-label">Design</h3>
-                <p class="content-description">UX/UI Design, Interaction Design, Prototyping, Branding, Wireframing, Design Systems, Visual Design, Information Architecture, Graphic Design, Motion Design, Storyboarding</p>
-            </div>
-            <div class="resume-content">
-                <h3 class="content-label">Tools</h3>
-                <p class="content-description">Figma, Adobe XD, Photoshop, Illustrator, After Effects, Notion, VS Code, GitHub, Google Suite, Microsoft Suite</p>
-            </div>
-            <div class="resume-content">
-                <h3 class="content-label">Coding</h3>
-                <p class="content-description">HTML, CSS, JavaScript, Java, Python, Git, C++, C, Assembly, MatLab, Bootstrap, Pandas, NumPy</p>
-            </div>
-            <div class="resume-content">
-                <h3 class="content-label">Research</h3>
-                <p class="content-description">Usability Testing, User Interviews, Journey Maps, A/B Testing, Surveys,  Competitive Analysis, Personas, Heuristic Evaluation, Data Analysis</p>
-            </div>
-            <div class="resume-content">
-                <h3 class="content-label">Language</h3>
-                <p class="content-description">English (Native)<br> Cantonese (Intermediate)</p>
-            </div>
+        <div class="section-item" data-fade="4">
+            <h2 class="section-header">Key Insights</h2>
+            <p class="section-content">Fans think about the next game, not the whole season. A full calendar was rarely what they wanted; the next one or two games, with the time in their own time zone and where to watch, covered nearly every need. Results worked the same way: a team’s last five games told the story better than a standings table, and a simple win or loss mark was enough to see the trend at a glance.</p>
         </div>
-        <div class="resume-item" data-fade="5">
-            <h2 class="resume-header">Fun</h2>
-            <div class="resume-content">
-                <h3 class="content-label">Go-to Boba Order</h3>
-                <p class="content-description">Jasmine Milk Tea</p>
-            </div>
-            <div class="resume-content">
-                <h3 class="content-label">Best Bromance in Television History</h3>
-                <p class="content-description">Psych (you know that's right)</p>
-            </div>
-            <div class="resume-content">
-                <h3 class="content-label">My Youth in Gaming</h3>
-                <p class="content-description">Team Fortress 2<br> MapleStory</p>
-            </div>
-            <div class="resume-content">
-                <h3 class="content-label">Hometown Sports Fan</h3>
-                <p class="content-description">Niners<br> Warriors<br> Giants</p>
-            </div>
-            <div class="resume-content resume-last">
-                <h3 class="content-label">Last Meal</h3>
-                <p class="content-description">Bun Bo Hue</p>
-            </div>
+        <div class="section-item" data-fade="5">
+            <h2 class="section-header">Design Process</h2>
+            <p class="section-content">I started with paper sketches of three directions: a scrolling season calendar, a card for each game, and a single team page split into “Next” and “Recent.” Quick tests with five fans favored the team page, since it answered both questions on one screen without any filters or tabs to learn.</p>
+            <p class="section-content">From there I built the screens in Figma using Apple’s own type, spacing, and colors, so the new pages would feel native rather than bolted on. I kept the team page reachable from any score tile with a single tap, and added a widget that shows the next game on the Home Screen.</p>
+        </div>
+        <div class="section-item" data-fade="6">
+            <h2 class="section-header">Final Design</h2>
+            <p class="section-content">Tapping a team opens a page with its next game pinned at the top, showing the opponent, time, and broadcast. Below it, the last five results read as a row of wins and losses, and each game opens to the same box score fans already know. The rest of the season sits in a compact list further down for anyone who wants it, out of the way for everyone else.</p>
+        </div>
+        <div class="section-item" data-fade="7">
+            <h2 class="section-header">Reflection</h2>
+            <p class="section-content">The hardest part was deciding what to leave out. Standings, player stats, and news all came up in interviews, and each would have made the page heavier. Holding the line on “next game and recent results” kept the concept true to the app. If I took it further, I would test the Home Screen widget over a full week of games and look at how fans following several teams switch between them.</p>
         </div>
     </div>
 
     <!-- Footer -->
-    <div class="section-footer" data-fade="6">
+    <div class="section-footer" data-fade="7">
         <div class="footer-details">
             <div class="footer-nav-links">
                 <a href="#" class="resume nav-content">
@@ -268,7 +228,7 @@
         </div>
         <div class="footer-name">
             <div class="bigname">
-                <a href="../index.html">
+                <a href="/">
                     <p>NORMANLEE</p>
                 </a>
             </div>
@@ -297,7 +257,7 @@
 
     <!-- Page Navigation -->
     <nav class="page-nav" aria-label="Page">
-        <a href="../index.html" class="page-nav-back" aria-label="Go back">
+        <a href="/work" class="page-nav-back" aria-label="Go back">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
                 <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
             </svg>

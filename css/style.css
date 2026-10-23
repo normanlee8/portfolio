@@ -682,8 +682,10 @@ body {
     cursor: pointer;
 }
 
+/* project titles wrap normally, not balanced */
 .work-header {
     font-size: var(--text-xl);
+    text-wrap: wrap;
 }
 
 h1.work-header {
