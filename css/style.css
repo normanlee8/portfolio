@@ -3,6 +3,7 @@
     --bg-color: #ECEAE5;
     --text-primary: #2B2A27;   /* 12:1 on the background */
     --text-secondary: #615E58; /* 5.4:1 on the background */
+    --line-faint: color-mix(in srgb, var(--text-secondary) 30%, transparent); /* light lines: header track, Work page box */
 
     /* Surfaces: cards and menus sit a step lighter than the page; hover a clear step darker */
     --bg-thumbnail: #DCD8D0;   /* hover backgrounds */
@@ -81,6 +82,10 @@
     /* Header Height */
     --header-height: 56px;
 
+    /* Left edge of the page content, for fixed buttons: the page margin, plus the empty space on
+       each side once the page is capped at 1440px (100% here is the window width) */
+    --page-edge: max(var(--space-md), calc((100% - 1440px) / 2 + var(--space-md)));
+
     /* Header Blur */
     --header-bg: rgba(236, 234, 229, 0.8);
 }
@@ -152,6 +157,20 @@ p {
     text-wrap: pretty;
 }
 
+/* Hidden on screen but still read by screen readers and search engines (e.g. a page's h1).
+   !important so it wins over the element's own class, like .page-header's padding */
+.visually-hidden {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    margin: -1px !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    clip-path: inset(50%) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
 a {
     text-decoration: none;
     color: inherit;
@@ -161,7 +180,10 @@ ul {
     list-style: none;
 }
 
+/* The page stops growing at 1440px and centers; the background still fills the window */
 body {
+    max-width: 1440px;
+    margin-inline: auto;
     min-height: 100dvh;
     display: flex;
     flex-direction: column;
@@ -209,7 +231,7 @@ body {
 .return-top {
     position: fixed;
     bottom: var(--space-xl);
-    left: var(--space-lg);
+    left: max(var(--space-lg), calc((100% - 1440px) / 2 + var(--space-lg))); /* follows the centered page */
     z-index: 999;
     display: flex;
     align-items: center;
@@ -275,7 +297,7 @@ body {
 }
 
 .header::before {
-    background-color: color-mix(in srgb, var(--text-secondary) 30%, transparent);
+    background-color: var(--line-faint);
 }
 
 .header::after {
@@ -654,6 +676,11 @@ body {
     padding-top: var(--space-md);
 }
 
+/* Work page cards open their project from anywhere on the card (script.js) */
+.work-grid .work-card {
+    cursor: pointer;
+}
+
 /* Card titles are h2s; on a project page the same class is the page's h1 title */
 .work-header {
     font-size: var(--text-xl);
@@ -840,7 +867,7 @@ h1.work-header {
 /* Toast */
 .toast {
     position: fixed;
-    right: var(--space-lg);
+    right: max(var(--space-lg), calc((100% - 1440px) / 2 + var(--space-lg))); /* follows the centered page */
     bottom: var(--space-xl);
     z-index: 1000;
     display: flex;
@@ -887,6 +914,12 @@ h1.work-header {
     .toast {
         max-width: calc(100vw - 2 * var(--space-lg) - 48px - var(--space-sm));
     }
+}
+
+/* Wide-screen sections list and return-to-top button (project + About pages): only shown from 1440px */
+.page-toc,
+.toc-top {
+    display: none;
 }
 
 /* Page Navigation (About + project pages): back button and section menu fixed at the bottom */
@@ -1020,7 +1053,7 @@ body:has(.page-nav) .toast {
 }
 
 .progress-track {
-    stroke: color-mix(in srgb, var(--text-secondary) 30%, transparent);
+    stroke: var(--line-faint);
 }
 
 /* The circle's length is 100, so the dash length is the percentage */
@@ -1490,5 +1523,309 @@ body:has(.page-nav) .toast {
     .resume-content:not(:has(.content-label)) {
         grid-column: 2;
         display: flex;
+    }
+}
+
+/* ===== Desktop (968px+) ===== */
+@media (min-width: 968px) {
+    /* Landing page cards and the project page header (the card whose title is the page's h1):
+       project info in the left third, thumbnail in the right two thirds.
+       The info column never drops below 320px, so the pills fit in two rows instead of a ragged stack.
+       The last row takes any spare height, so the info stays together at the top */
+    #work .work-card,
+    .work-card:has(> h1.work-header) {
+        display: grid;
+        grid-template-columns: minmax(20rem, 1fr) minmax(0, 2fr);
+        grid-template-rows: auto auto auto 1fr;
+        column-gap: var(--column-gap);
+        row-gap: var(--space-md);
+        align-items: start;
+    }
+
+    #work .work-card > :not(.work-thumbnail),
+    .work-card:has(> h1.work-header) > :not(.work-thumbnail) {
+        grid-column: 1;
+    }
+
+    #work .work-thumbnail,
+    .work-card:has(> h1.work-header) > .work-thumbnail {
+        grid-column: 2;
+        grid-row: 1 / -1;
+    }
+
+    /* Work page: three vertical slices that fill the screen below the header, divided by thin lines.
+       Hovering a slice widens it a little (the others narrow to make room), darkens it,
+       and zooms its thumbnail slightly */
+    /* Work page heading: a header row above the slices. Its bottom line spans the same width as the
+       header's line, and the slice dividers start from it, so heading and slices read as one table */
+    .page-header {
+        margin: 0 var(--space-md);
+        padding: var(--space-lg) 0;
+        border-bottom: 1px solid var(--line-faint);
+    }
+
+    /* The slices sit inside the page margins, closed off by a line on each side and along the bottom,
+       so every line ends where the header's line does. The lines belong to the cards (left on the first,
+       right on each, bottom on all) so they fade in with them */
+    .work-grid {
+        container-type: inline-size; /* lets the cards size their content from the grid's width (cqi) */
+        display: flex;
+        flex-direction: row;
+        gap: 0;
+        padding: 0;
+        margin: 0 var(--space-md);
+        /* Fill the screen below the header and the heading row (its text, padding and line) */
+        min-height: calc(100svh - var(--header-height) - var(--text-2xl) * 1.15 - 2 * var(--space-lg) - 1px);
+    }
+
+    .work-grid .work-card {
+        flex: 1 1 0;
+        min-width: 0;
+        width: auto;
+        padding: var(--space-xl) var(--space-md) var(--space-lg);
+        border-bottom: 1px solid var(--line-faint);
+        border-right: 1px solid var(--line-faint);
+        transition: flex-grow 0.4s ease, background-color 0.4s ease;
+    }
+
+    .work-grid .work-card:first-child {
+        border-left: 1px solid var(--line-faint);
+    }
+
+    /* Content stays at its normal (un-hovered) width, a third of the grid minus padding and the line.
+       A widening slice gains a little empty space, and a narrowing one lets its content use a few
+       pixels of its side padding, so no text reflows or moves on hover */
+    .work-grid .work-card > * {
+        --slice-content: calc(100cqi / 3 - 2 * var(--space-md) - 1px);
+        width: var(--slice-content);
+        flex-shrink: 0;
+    }
+
+    /* The thumbnail is the exception: it widens and narrows with its slice, at a fixed height
+       (the normal 16:9 height), so the text below it never moves */
+    .work-grid .work-card > .work-thumbnail {
+        width: auto;
+        height: calc(var(--slice-content) * 9 / 16);
+        aspect-ratio: auto;
+    }
+
+    /* Titles keep their shrink-to-text width (for the hover area), up to the same limit */
+    .work-grid .work-card > .work-header {
+        width: max-content;
+        max-width: var(--slice-content);
+    }
+
+    .work-grid .work-card:hover,
+    .work-grid .work-card:focus-within {
+        flex-grow: 1.1;
+        background-color: var(--bg-thumbnail); /* the site's hover color, a step darker than the page */
+    }
+
+    /* The pills' gray nearly matches the hover color, so they switch to the page color to stay visible */
+    .work-grid .work-card:hover .pill-tag,
+    .work-grid .work-card:focus-within .pill-tag {
+        background-color: var(--bg-color);
+    }
+
+    .work-grid .work-thumbnail {
+        transition: transform 0.4s ease;
+    }
+
+    .work-grid .work-card:hover .work-thumbnail,
+    .work-grid .work-card:focus-within .work-thumbnail {
+        transform: scale(1.02);
+    }
+}
+
+/* Reduced motion: the Work slices change instantly on hover instead of animating */
+@media (min-width: 968px) and (prefers-reduced-motion: reduce) {
+    .work-grid .work-card,
+    .work-grid .work-thumbnail {
+        transition: none;
+    }
+}
+
+/* ===== Wide (1440px+) ===== */
+@media (min-width: 1440px) {
+    /* Project and About pages: the bottom bar gives way to a list of sections beside the sections
+       themselves, plus a return-to-top button in the bottom-left corner. The header area above
+       (the project's thumbnail and details, the About photo and bio) stays full width */
+    :root {
+        --toc-width: 14rem; /* the list's column, including the space before the sections */
+    }
+
+    .page-nav {
+        display: none;
+    }
+
+    body:has(.page-nav) {
+        padding-bottom: 0;
+    }
+
+    body:has(.page-nav) .toast {
+        bottom: var(--space-xl);
+    }
+
+    /* The sections' container (marked by script.js): the list in a narrow first column and the
+       sections in the second. Anything else in it, like the project header card, spans both */
+    .toc-host {
+        display: grid;
+        grid-template-columns: var(--toc-width) minmax(0, 1fr);
+        column-gap: 0;
+    }
+
+    .toc-host > * {
+        grid-column: 1 / -1;
+    }
+
+    .toc-host > .section-item,
+    .toc-host > .resume-item {
+        grid-column: 2;
+    }
+
+    /* The list starts level with the first section heading, then sticks under the header
+       until the sections end, so it never reaches the footer. --toc-offset is any space added above
+       the list to line it up (About); it's taken off when stuck, so every page sticks at the same height */
+    .toc-host > .page-toc {
+        display: block;
+        grid-column: 1;
+        align-self: start;
+        position: sticky;
+        top: calc(var(--header-height) + var(--space-lg) - var(--toc-offset, 0px));
+        padding-top: var(--toc-offset, 0px);
+        padding-right: var(--space-lg);
+    }
+
+    /* The sections end with one line across the page (inset like the header's line) instead of a
+       line under the right column only */
+    .toc-host {
+        margin-inline: var(--space-md);
+        padding-inline: 0;
+        border-bottom: 1px solid var(--text-secondary);
+    }
+
+    .toc-host > .section-item:last-child,
+    .toc-host .resume-last {
+        border-bottom: none;
+    }
+
+    /* About: start the list below the first heading's line, level with the first entry. That's the heading's
+       space above, its text, its space below and line, then the gap before the first entry, minus the
+       extra space the list items have above their text */
+    .section-resume > .page-toc {
+        --toc-offset: calc(var(--space-xl) + var(--text-xl) * var(--leading-tight) + var(--space-md) + 1px + var(--space-md) - var(--space-sm));
+    }
+
+    /* Like the landing page's: hidden until the page has scrolled a full screen, and again once the
+       footer scrolls up to it, so it doesn't cover the footer's links (both set by script.js) */
+    .toc-top {
+        position: fixed;
+        left: var(--page-edge);
+        z-index: 50;
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transform: translateY(8px);
+        transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+    }
+
+    .toc-top.is-shown:not(.is-covered) {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+        transform: translateY(0);
+    }
+
+    /* Same label as the bottom-bar menu's "On this page" */
+    .toc-title {
+        margin-bottom: var(--space-sm);
+        color: var(--text-secondary);
+        font-size: var(--text-2xs);
+        font-weight: var(--weight-semibold);
+        letter-spacing: var(--tracking-wide);
+        text-transform: uppercase;
+    }
+
+    .toc-list {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-xs);
+    }
+
+    /* Same marker as the section menu: a dot beside each item, filled blue for the current section */
+    .toc-list button {
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm);
+        margin-left: calc(-6px - var(--space-sm)); /* the dot hangs into the margin, so the names line up with the page edge */
+        padding: var(--space-xs) 0;
+        border: none;
+        background: none;
+        color: var(--text-secondary);
+        font: inherit;
+        font-weight: var(--weight-medium);
+        text-align: left;
+        cursor: pointer;
+        transition: color 0.15s ease;
+    }
+
+    .toc-list button::before {
+        content: "";
+        flex-shrink: 0;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background-color: transparent;
+    }
+
+    .toc-list button:hover,
+    .toc-list button:focus-visible {
+        color: var(--text-primary);
+    }
+
+    .toc-list button[aria-current="true"] {
+        color: var(--text-primary);
+        font-weight: var(--weight-semibold);
+    }
+
+    .toc-list button[aria-current="true"]::before {
+        background-color: var(--accent-color);
+    }
+
+    /* Return to Top: a circle with an up arrow, labeled underneath */
+    .toc-top {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-sm);
+        bottom: var(--space-xl);
+        border: none;
+        background: none;
+        color: var(--text-secondary);
+        font: inherit;
+        cursor: pointer;
+    }
+
+    .toc-top-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 48px;
+        height: 48px;
+        border: 1px solid var(--text-secondary);
+        border-radius: 50%;
+        background-color: var(--bg-color);
+        color: var(--text-primary);
+        transition: background-color 0.15s ease;
+    }
+
+    .toc-top:hover,
+    .toc-top:focus-visible {
+        color: var(--text-primary);
+    }
+
+    .toc-top:hover .toc-top-icon,
+    .toc-top:focus-visible .toc-top-icon {
+        background-color: var(--bg-thumbnail);
     }
 }

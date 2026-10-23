@@ -218,6 +218,20 @@
         </div>
     </div>
 
+    <!-- Wide screens (1440px+): a fixed list of this page's sections (filled by script.js) and a return-to-top button -->
+    <aside class="page-toc" aria-label="On this page">
+        <p class="toc-title">On this page</p>
+        <ul class="toc-list"></ul>
+    </aside>
+    <button type="button" class="toc-top" aria-label="Return to top">
+        <span class="toc-top-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                <path fill-rule="evenodd" d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708z"/>
+            </svg>
+        </span>
+        <span class="toc-top-label">Return to Top</span>
+    </button>
+
     <!-- Page Navigation: back button + section menu with scroll progress -->
     <nav class="page-nav" aria-label="Page">
         <!-- Goes back in history; the link is the fallback when there's no previous page on this site -->

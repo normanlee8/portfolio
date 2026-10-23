@@ -144,6 +144,20 @@ if (copyEmailBtn && toast) {
     });
 }
 
+// Work page: clicking anywhere on a card opens its project, not just the title and thumbnail.
+// The title stays the real link (for keyboards), so its blue hover still only shows over the title
+document.querySelectorAll(".work-grid .work-card").forEach((card) => {
+    const link = card.querySelector(".work-link");
+    if (!link) return;
+
+    card.addEventListener("click", (e) => {
+        if (e.target.closest("a")) return; // the title and thumbnail links handle themselves
+        if (window.getSelection().toString()) return; // don't navigate while selecting text
+        if (e.ctrlKey || e.metaKey) window.open(link.href, "_blank");
+        else window.location.href = link.href;
+    });
+});
+
 // Return to Top
 const returnTopBtn = document.querySelector(".return-top");
 
@@ -203,10 +217,70 @@ if (pageNav) {
         return btn;
     }
 
+    // A clicked section stays current until the visitor scrolls themselves. Otherwise, when two short
+    // sections sit close together, landing on one can still mark the next as current
+    let pinnedSection = null;
+
+    function goToSection(i) {
+        pinnedSection = i;
+        sectionHeaders[i].scrollIntoView();
+        updatePageNav();
+    }
+
+    function unpinSection() {
+        if (pinnedSection === null) return;
+        pinnedSection = null;
+        updatePageNav();
+    }
+
+    // The visitor's own scrolling (wheel, touch, scrollbar, scroll keys) releases the pin;
+    // the smooth scroll that follows a click doesn't
+    window.addEventListener("wheel", unpinSection, { passive: true });
+    window.addEventListener("touchstart", unpinSection, { passive: true });
+    window.addEventListener("mousedown", unpinSection);
+    window.addEventListener("keydown", (e) => {
+        if (["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " "].includes(e.key)) unpinSection();
+    });
+
     addMenuItem("Return to Top", () => window.scrollTo({ top: 0 }));
-    const sectionItems = sectionHeaders.map((h) =>
-        addMenuItem(h.textContent.trim(), () => h.scrollIntoView())
+    const sectionItems = sectionHeaders.map((h, i) =>
+        addMenuItem(h.textContent.trim(), () => goToSection(i))
     );
+
+    // Wide screens (1440px+): the same sections as a fixed list on the left, plus a return-to-top button
+    const toc = document.querySelector(".page-toc");
+    const tocTop = document.querySelector(".toc-top");
+    const tocItems = sectionHeaders.map((h, i) => {
+        const item = document.createElement("li");
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.textContent = h.textContent.trim();
+        btn.addEventListener("click", () => goToSection(i));
+        item.append(btn);
+        toc.querySelector(".toc-list").append(item);
+        return btn;
+    });
+
+    // Move the list next to the sections: it becomes the first column of their container (the CSS makes
+    // that a grid at 1440px), spanning every section so it can stick while they scroll past
+    const sectionBlocks = sectionHeaders.map((h) => h.closest(".section-item, .resume-item"));
+    if (sectionBlocks.length) {
+        const host = sectionBlocks[0].parentElement;
+        host.classList.add("toc-host");
+        host.insertBefore(toc, sectionBlocks[0]);
+        toc.style.gridRow = `span ${sectionBlocks.length}`;
+    }
+
+    tocTop.addEventListener("click", () => window.scrollTo({ top: 0 }));
+
+    // Return to Top shows once the page has scrolled one full screen (like the landing page's),
+    // and fades out once the footer scrolls up to it, so it never sits on top of the footer's links
+    const footer = document.querySelector(".section-footer");
+
+    function updateTocOverlap() {
+        tocTop.classList.toggle("is-shown", window.scrollY > window.innerHeight);
+        tocTop.classList.toggle("is-covered", footer.getBoundingClientRect().top < tocTop.getBoundingClientRect().bottom);
+    }
 
     function updatePageNav() {
         const scrollable = document.documentElement.scrollHeight - window.innerHeight;
@@ -225,12 +299,17 @@ if (pageNav) {
         });
         if (atEnd) current = -1;
 
-        if (atEnd) sectionLabel.textContent = "The End";
+        // A section the visitor clicked wins until they scroll themselves
+        const pinned = pinnedSection !== null;
+        if (pinned) current = pinnedSection;
+
+        if (atEnd && !pinned) sectionLabel.textContent = "The End";
         else sectionLabel.textContent = current >= 0 ? sectionHeaders[current].textContent.trim() : "Scroll Down";
-        sectionItems.forEach((btn, i) => {
+        [sectionItems, tocItems].forEach((items) => items.forEach((btn, i) => {
             if (i === current) btn.setAttribute("aria-current", "true");
             else btn.removeAttribute("aria-current");
-        });
+        }));
+        updateTocOverlap();
     }
 
     sectionToggle.addEventListener("click", () => {
