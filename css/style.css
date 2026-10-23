@@ -786,6 +786,28 @@ h1.work-header {
     color: var(--text-on-project);
     padding: var(--space-sm);
     border-radius: 10px;
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+}
+
+/* Photo fills the frame */
+.work-thumbnail img {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* shade behind the year so it reads on any photo */
+.work-thumbnail::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(200deg, rgb(0 0 0 / 0.45), transparent 35%);
 }
 
 /* year: trimmed so its top gap matches the right gap */
@@ -1293,11 +1315,13 @@ body:has(.page-nav) .toast {
 
 /* 154px on phones up to 320px */
 .photo {
+    display: block;
     border-radius: 9999px;
     width: clamp(9.625rem, 25vw, 20rem);
     max-width: 100%;
     aspect-ratio: 1;
-    background-color: var(--accent-color);
+    object-fit: cover;
+    background-color: var(--bg-project);
 }
 
 .about-me {
@@ -1457,6 +1481,7 @@ body:has(.page-nav) .toast {
         display: grid;
         grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
         column-gap: var(--column-gap);
+        row-gap: var(--space-md);
         align-items: start;
     }
 
