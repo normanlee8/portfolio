@@ -917,6 +917,85 @@ h1.work-header {
     color: var(--text-secondary);
 }
 
+/* Previous / Next Project: stacked on phones, side by side from 768px.
+   A gap (not a line) separates it from the content; its bottom line is the one above the footer's thanks row */
+.project-pager {
+    display: grid;
+    row-gap: var(--space-xl);
+    margin: var(--space-lg) var(--space-md) 0;
+    padding: var(--space-lg) 0;
+    border-bottom: 1px solid var(--text-secondary);
+}
+
+/* the content's closing line gives way to the gap */
+.section-work:has(+ .project-pager) > .section-item:last-child,
+.toc-host:has(+ .project-pager) {
+    border-bottom: none;
+}
+
+/* only the label and title are clickable, not the space around them */
+.pager-link {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    width: fit-content;
+}
+
+.pager-next {
+    justify-self: end;
+    align-items: flex-end;
+    text-align: right;
+}
+
+.pager-label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    color: var(--text-secondary);
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+}
+
+.pager-label svg {
+    width: 1.1em;
+    height: 1.1em;
+    transition: transform 0.2s ease;
+}
+
+.pager-title {
+    font-size: var(--text-lg);
+    font-weight: var(--weight-semibold);
+    line-height: var(--leading-snug);
+    color: var(--text-primary);
+    max-width: 24ch;
+    transition: color 0.2s ease;
+}
+
+/* Same hover as the card titles: turns blue, arrow nudges outward */
+.pager-link:hover .pager-title,
+.pager-link:focus-visible .pager-title {
+    color: var(--accent-color);
+}
+
+.pager-prev:hover svg,
+.pager-prev:focus-visible svg {
+    transform: translateX(-4px);
+}
+
+.pager-next:hover svg,
+.pager-next:focus-visible svg {
+    transform: translateX(4px);
+}
+
+@media (min-width: 768px) {
+    .project-pager {
+        grid-template-columns: 1fr 1fr;
+        column-gap: var(--column-gap);
+    }
+}
+
 /* Footer */
 .section-footer {
     display: flex;
