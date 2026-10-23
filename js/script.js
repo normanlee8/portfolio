@@ -1,18 +1,58 @@
-// Page Fade In: only what's on screen when the page opens eases in; anything further down shows instantly
+// Page Fade In: only the first screen fades in. Runs last, once the layout is final
 function pageTop(el) {
     let top = 0;
     for (; el; el = el.offsetParent) top += el.offsetTop; // ignores the fade's slide offset
     return top;
 }
 
-const screenBottom = window.scrollY + window.innerHeight;
-document.querySelectorAll("[data-fade]").forEach((el) => {
-    if (pageTop(el) >= screenBottom) el.removeAttribute("data-fade");
-});
+// Blocks with their own text or background fade as one piece
+function canSplitFade(el) {
+    if (!el.children.length) return false;
+    if (getComputedStyle(el).backgroundColor !== "rgba(0, 0, 0, 0)") return false;
+    return ![...el.childNodes].some((node) => node.nodeType === Node.TEXT_NODE && node.textContent.trim());
+}
+
+function limitFadeToFirstScreen(el, screenBottom, leeway) {
+    const top = pageTop(el);
+    if (top >= screenBottom) {
+        el.removeAttribute("data-fade");
+        return;
+    }
+    if (top + el.offsetHeight <= screenBottom + leeway || !canSplitFade(el)) return;
+
+    // Crosses the fold: fade its children instead
+    const step = el.getAttribute("data-fade");
+    el.removeAttribute("data-fade");
+    for (const child of el.children) {
+        child.setAttribute("data-fade", step);
+        limitFadeToFirstScreen(child, screenBottom, leeway);
+    }
+}
+
+function setUpPageFade() {
+    const screenBottom = window.innerHeight; // the page's top screen, not the restored scroll position
+    const leeway = window.innerHeight * 0.1; // up to 10% past the fold still fades whole
+    document.querySelectorAll("[data-fade]").forEach((el) => {
+        if (el.hasAttribute("data-fade")) limitFadeToFirstScreen(el, screenBottom, leeway);
+    });
+
+    // Opened (or restored by a refresh) away from the top: show everything at once instead of waiting
+    function skipFadeIfScrolled() {
+        if (window.scrollY < window.innerHeight / 2) return;
+        document.getAnimations().forEach((a) => {
+            if (a.animationName === "page-fade-in") a.finish();
+        });
+    }
+
+    skipFadeIfScrolled();
+    window.addEventListener("scroll", skipFadeIfScrolled, { passive: true });
+    window.addEventListener("load", skipFadeIfScrolled);
+    setTimeout(() => window.removeEventListener("scroll", skipFadeIfScrolled), 4000); // the fade is over by then
+}
 
 // Title Fade + Header Stroke
 const heroTitle = document.querySelector('.title');
-// Fade the arrow itself, not its wrapper, so it doesn't fight the wrapper's fade-in
+// the arrow fades separately from its wrapper's fade-in
 const scrollDownArrow = document.querySelector('.scroll-down svg');
 const header = document.querySelector('.header');
 const FADE_DISTANCE = 8; // px of scroll to fully fade out
@@ -24,7 +64,7 @@ function updateOnScroll() {
     header.classList.toggle('scrolled', progress === 1);
     const arrowOpacity = 1 - Math.min(window.scrollY / ARROW_FADE_DISTANCE, 1);
     scrollDownArrow.style.opacity = arrowOpacity;
-    // Once fully faded, stop the invisible arrow from catching clicks
+    // invisible arrow can't be clicked
     scrollDownArrow.closest('.scroll-down').style.visibility = arrowOpacity === 0 ? 'hidden' : '';
 }
 
@@ -34,7 +74,7 @@ if (heroTitle) {
     updateOnScroll(); // correct state if the page loads already scrolled
 }
 
-// Scroll Progress: the header line fills left to right as the page scrolls
+// Scroll Progress
 function updateScrollProgress() {
     const scrollable = document.documentElement.scrollHeight - window.innerHeight;
     const progress = scrollable > 0 ? Math.min(window.scrollY / scrollable, 1) : 0;
@@ -73,7 +113,7 @@ applyTheme();
 themeToggleBtn.addEventListener("click", () => {
     const isDarkNow = !document.documentElement.classList.contains("dark-theme");
 
-    // If the choice matches the system, forget the override so the site keeps following the system
+    // Matching the system clears the saved choice
     if (isDarkNow === darkQuery.matches) {
         localStorage.removeItem("theme");
     } else {
@@ -83,7 +123,7 @@ themeToggleBtn.addEventListener("click", () => {
     applyTheme();
 });
 
-// Re-check whenever a page is shown, including when it's restored by the Back/Forward buttons
+// Re-check when a page is shown, including from Back/Forward
 window.addEventListener("pageshow", applyTheme);
 
 // Keep other open tabs of your site in sync
@@ -115,7 +155,7 @@ document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") setMenu(false);
 });
 
-// If the page is restored with Back/Forward, don't show the menu still open
+// Close the menu when returning with Back/Forward
 window.addEventListener("pageshow", (e) => {
     if (e.persisted) setMenu(false);
 });
@@ -144,14 +184,13 @@ if (copyEmailBtn && toast) {
     });
 }
 
-// Work page: clicking anywhere on a card opens its project, not just the title and thumbnail.
-// The title stays the real link (for keyboards), so its blue hover still only shows over the title
+// Work page: the whole card opens its project
 document.querySelectorAll(".work-grid .work-card").forEach((card) => {
     const link = card.querySelector(".work-link");
     if (!link) return;
 
     card.addEventListener("click", (e) => {
-        if (e.target.closest("a")) return; // the title and thumbnail links handle themselves
+        if (e.target.closest("a")) return; // real links handle themselves
         if (window.getSelection().toString()) return; // don't navigate while selecting text
         if (e.ctrlKey || e.metaKey) window.open(link.href, "_blank");
         else window.location.href = link.href;
@@ -176,7 +215,7 @@ if (returnTopBtn) {
     });
 }
 
-// Page Navigation (About + project pages): back button, scroll progress ring and section menu
+// Page Navigation (About + project pages)
 const pageNav = document.querySelector(".page-nav");
 
 if (pageNav) {
@@ -189,7 +228,7 @@ if (pageNav) {
     const progressFill = pageNav.querySelector(".progress-fill");
     const sectionHeaders = [...document.querySelectorAll(".section-header, .resume-header")];
 
-    // Go back if the visitor came from another page on this site; otherwise the link's fallback page opens
+    // Go back if the visitor came from this site; otherwise follow the link
     backBtn.addEventListener("click", (e) => {
         const cameFromSite = document.referrer && new URL(document.referrer).origin === location.origin;
         if (cameFromSite && history.length > 1) {
@@ -217,8 +256,7 @@ if (pageNav) {
         return btn;
     }
 
-    // A clicked section stays current until the visitor scrolls themselves. Otherwise, when two short
-    // sections sit close together, landing on one can still mark the next as current
+    // A clicked section stays current until the visitor scrolls
     let pinnedSection = null;
 
     function goToSection(i) {
@@ -233,8 +271,7 @@ if (pageNav) {
         updatePageNav();
     }
 
-    // The visitor's own scrolling (wheel, touch, scrollbar, scroll keys) releases the pin;
-    // the smooth scroll that follows a click doesn't
+    // The visitor's scrolling releases it; the smooth scroll after a click doesn't
     window.addEventListener("wheel", unpinSection, { passive: true });
     window.addEventListener("touchstart", unpinSection, { passive: true });
     window.addEventListener("mousedown", unpinSection);
@@ -247,7 +284,7 @@ if (pageNav) {
         addMenuItem(h.textContent.trim(), () => goToSection(i))
     );
 
-    // Wide screens (1440px+): the same sections as a fixed list on the left, plus a return-to-top button
+    // Wide screens (1280px+): side list and return-to-top
     const toc = document.querySelector(".page-toc");
     const tocTop = document.querySelector(".toc-top");
     const tocItems = sectionHeaders.map((h, i) => {
@@ -261,8 +298,7 @@ if (pageNav) {
         return btn;
     });
 
-    // Move the list next to the sections: it becomes the first column of their container (the CSS makes
-    // that a grid at 1440px), spanning every section so it can stick while they scroll past
+    // Move the list beside the sections (a grid at 1280px)
     const sectionBlocks = sectionHeaders.map((h) => h.closest(".section-item, .resume-item"));
     if (sectionBlocks.length) {
         const host = sectionBlocks[0].parentElement;
@@ -273,8 +309,7 @@ if (pageNav) {
 
     tocTop.addEventListener("click", () => window.scrollTo({ top: 0 }));
 
-    // Return to Top shows once the page has scrolled one full screen (like the landing page's),
-    // and fades out once the footer scrolls up to it, so it never sits on top of the footer's links
+    // Return to Top: shown after a screen of scrolling, hidden at the footer
     const footer = document.querySelector(".section-footer");
 
     function updateTocOverlap() {
@@ -290,8 +325,7 @@ if (pageNav) {
         progressPercent.textContent = `${percent}%`;
         progressFill.style.strokeDasharray = `${progress * 100} 100`;
 
-        // Current section: the last header that has passed a third of the way down the screen.
-        // At the very end no section is current, so the menu shows no dot or bold item
+        // Current section: last header past a third of the screen; none at the end
         const line = window.innerHeight / 3;
         let current = -1;
         sectionHeaders.forEach((h, i) => {
@@ -299,7 +333,7 @@ if (pageNav) {
         });
         if (atEnd) current = -1;
 
-        // A section the visitor clicked wins until they scroll themselves
+        // a clicked section wins
         const pinned = pinnedSection !== null;
         if (pinned) current = pinnedSection;
 
@@ -328,3 +362,6 @@ if (pageNav) {
     window.addEventListener("resize", updatePageNav);
     updatePageNav();
 }
+
+// Run last, once the layout is final
+setUpPageFade();

@@ -1,25 +1,24 @@
 :root {
-    /* Default Colors: a soft, slightly warm light gray (not bright white) with near-black text */
+    /* Default Colors */
     --bg-color: #ECEAE5;
     --text-primary: #2B2A27;   /* 12:1 on the background */
     --text-secondary: #615E58; /* 5.4:1 on the background */
     --line-faint: color-mix(in srgb, var(--text-secondary) 30%, transparent); /* light lines: header track, Work page box */
 
-    /* Surfaces: cards and menus sit a step lighter than the page; hover a clear step darker */
+    /* Surfaces */
     --bg-thumbnail: #DCD8D0;   /* hover backgrounds */
     --bg-card: #F4F3EF;        /* cards, menus, bottom bar */
     --border-card: #D9D6CF;
-    --bg-project: #7A7771;     /* project thumbnails: a medium gray */
-    --text-on-project: #ECEAE5; /* off-white year on thumbnails, same in both modes */
+    --bg-project: #7A7771;     /* project thumbnails */
+    --text-on-project: #ECEAE5; /* year on thumbnails, both themes */
     --shadow-color: rgba(43, 42, 39, 0.1);
 
-    /* Pill tags: light gray with darker gray text (5.8:1) and a barely-there border */
+    /* Pill Tags */
     --bg-pill: #E0DDD6;
     --text-pill: #54514B;
     --border-pill: #DCD9D2;
 
-    /* Accent palette: vivid but readable as text (4.5:1+) on the background,
-       with a brighter version for dark mode below */
+    /* Accent Colors (4.5:1+ as text) */
     --color-blue:   #0963D3;
     --color-green:  #0F7A39;
     --color-purple: #7E3FE6;
@@ -30,9 +29,8 @@
 
     --font-primary: "Figtree", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 
-    /* Typography Scale (Where 1rem = 16px). The common sizes are fluid: they grow in a straight
-       line from their phone size at a 393px-wide screen to their desktop size at 1280px, then stop */
-    --text-logo: 1.75rem;   /* 28px, fixed so the name always fits the 56px header */
+    /* Typography Scale (1rem = 16px). Fluid sizes scale from 393px to 1280px */
+    --text-logo: 1.75rem;   /* 28px, fixed to fit the header */
     --text-3xs:  0.6875rem; /* 11px */
     --text-2xs: clamp(0.75rem, 0.7223rem + 0.1127vw, 0.8125rem); /* 12 → 13px */
     --text-xs: clamp(0.875rem, 0.8473rem + 0.1127vw, 0.9375rem); /* 14 → 15px */
@@ -66,7 +64,7 @@
     --tracking-tight: -0.02em; /* Small text that needs to sit snug */
     --tracking-wide:   0.06em; /* Uppercase labels */
 
-    /* Spacing Scale: xs and sm stay fixed for tight UI; md and up grow from 393px to 1280px like the type */
+    /* Spacing Scale: md and up scale from 393px to 1280px */
     --space-xs:  0.25rem;   /* 4px  - tiny gaps */
     --space-sm:  0.5rem;    /* 8px  - tight padding, small margins */
     --space-md: clamp(1rem, 0.7785rem + 0.9019vw, 1.5rem); /* 16 → 24px - standard padding, component gaps */
@@ -82,8 +80,7 @@
     /* Header Height */
     --header-height: 56px;
 
-    /* Left edge of the page content, for fixed buttons: the page margin, plus the empty space on
-       each side once the page is capped at 1440px (100% here is the window width) */
+    /* Left edge of the content, for fixed elements */
     --page-edge: max(var(--space-md), calc((100% - 1440px) / 2 + var(--space-md)));
 
     /* Header Blur */
@@ -92,12 +89,12 @@
 
 /* Dark Mode */
 :root.dark-theme {
-    /* Background & Text: a mid charcoal gray, not black, with soft off-white text */
+    /* Background & Text */
     --bg-color: #2A2A28;
     --text-primary: #ECEAE5;   /* 12:1 on the background */
     --text-secondary: #AEABA4; /* 6.3:1 on the background */
 
-    /* Surfaces: each step up is a little lighter */
+    /* Surfaces */
     --bg-card: #333331;
     --border-card: #4A4945;
     --bg-thumbnail: #46443F;
@@ -107,7 +104,7 @@
     --border-pill: #444340;
     --shadow-color: rgba(0, 0, 0, 0.3);
 
-    /* Accent palette, brightened for gray; all readable as text here (5:1+) */
+    /* Accent Colors */
     --color-blue:   #4D9BFF;
     --color-green:  #38D27A;
     --color-purple: #B47EFF;
@@ -143,8 +140,7 @@ img {
     display: block;
 }
 
-/* Headings: balanced lines, tight leading, semibold. Sizes come from each heading's class:
-   hero 3xl, page titles 2xl, section and card titles xl, labels lg */
+/* Headings */
 h1, h2, h3, h4, h5, h6 {
     text-wrap: balance;
     line-height: var(--leading-tight);
@@ -152,13 +148,11 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: var(--weight-semibold);
 }
 
-/* Paragraphs keep the body's normal line height; avoid a lone word on the last line */
 p {
     text-wrap: pretty;
 }
 
-/* Hidden on screen but still read by screen readers and search engines (e.g. a page's h1).
-   !important so it wins over the element's own class, like .page-header's padding */
+/* Screen-reader-only text */
 .visually-hidden {
     position: absolute !important;
     width: 1px !important;
@@ -180,7 +174,7 @@ ul {
     list-style: none;
 }
 
-/* The page stops growing at 1440px and centers; the background still fills the window */
+/* Max content width */
 body {
     max-width: 1440px;
     margin-inline: auto;
@@ -207,10 +201,7 @@ body {
     }
 }
 
-/* The header stays put between pages; what's on screen when the page opens eases in top to bottom.
-   data-fade sets each element's place in that order (script.js turns it off for anything below the first screen) */
 [data-fade] {
-    /* Starts quick and settles gently into place */
     animation: page-fade-in 1.4s cubic-bezier(0.33, 1, 0.68, 1) backwards;
 }
 
@@ -231,7 +222,7 @@ body {
 .return-top {
     position: fixed;
     bottom: var(--space-xl);
-    left: max(var(--space-lg), calc((100% - 1440px) / 2 + var(--space-lg))); /* follows the centered page */
+    left: max(var(--space-lg), calc((100% - 1440px) / 2 + var(--space-lg)));
     z-index: 999;
     display: flex;
     align-items: center;
@@ -282,7 +273,7 @@ body {
     backdrop-filter: blur(8px);
 }
 
-/* Header line: a faint track (::before) with a scroll progress bar (::after) filling it left to right */
+/* Header line: track (::before) and scroll progress (::after) */
 .header::before,
 .header::after {
     content: "";
@@ -292,7 +283,7 @@ body {
     bottom: 0;
     height: 1px;
     opacity: 0;
-    /* Hide instantly so the line is gone before the title fades back in */
+    /* hides instantly so it never overlaps the title */
     transition: none;
 }
 
@@ -372,13 +363,12 @@ body {
     transition: background-color 0.15s ease;
 }
 
-/* Darkens on hover, and stays dark while the menu is open */
 .hamburger-menu:hover,
 .hamburger-menu[aria-expanded="true"] {
     background-color: var(--bg-thumbnail);
 }
 
-/* Animated hamburger: three bars that morph into an X */
+/* Hamburger: three bars that morph into an X */
 .hamburger-box {
     position: relative;
     display: block;
@@ -458,7 +448,7 @@ body {
 
     z-index: 9999;
     transform-origin: top right;
-    /* visibility switches at the end of a fade-out, so the menu stays visible while it fades */
+    /* visibility waits for the fade-out */
     transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s;
 }
 
@@ -491,7 +481,7 @@ body {
     background-color: var(--bg-thumbnail);
 }
 
-/* The current page (aria-current): bolder text and a filled icon (below), no background */
+/* Current page */
 .menu-item[aria-current] {
     font-weight: var(--weight-semibold);
 }
@@ -563,7 +553,7 @@ body {
     text-align: center;
 }
 
-/* Location line above the headline */
+/* Hero eyebrow */
 .hero-eyebrow {
     display: flex;
     align-items: center;
@@ -582,12 +572,11 @@ body {
     background-color: var(--color-green);
 }
 
-/* A ring that grows and fades out of the dot, so it looks live */
+/* Ping ring */
 .status-dot::after {
     content: "";
     position: absolute;
-    /* Drawn at its full size (2.5x the dot, 15px) and scaled down at the start, so it stays sharp;
-       scaling a tiny 6px circle up looks chunky and choppy */
+    /* drawn full size and scaled down, so it stays sharp */
     inset: -4.5px;
     border-radius: 50%;
     background-color: inherit;
@@ -597,7 +586,7 @@ body {
 
 @keyframes dot-ping {
     from {
-        transform: scale(0.4); /* 15px x 0.4 = the 6px dot, so the ring starts at the dot's edge */
+        transform: scale(0.4); /* 0.4 x 15px = the 6px dot */
         opacity: 0.6;
     }
     to {
@@ -606,7 +595,7 @@ body {
     }
 }
 
-/* Grows with both width and height (whichever is tighter), so short, wide screens don't get a giant headline */
+/* scales with width and height */
 .hero-text {
     font-size: clamp(2rem, 0.75rem + min(5vw, 6svh), 3.5rem);
 }
@@ -617,7 +606,7 @@ body {
     font-weight: var(--weight-medium);
 }
 
-/* Link to the work cards; only the arrow is clickable, not the whole row */
+/* Scroll-down arrow */
 .scroll-down {
     display: flex;
     justify-content: center;
@@ -631,8 +620,7 @@ body {
     color: var(--text-secondary);
 }
 
-/* Gentle bounce to invite scrolling. It runs on a span, not the SVG: Firefox can only hand
-   HTML element animations to the graphics card, so a bouncing SVG drops frames there */
+/* bounce runs on a span: Firefox drops frames animating SVG */
 .scroll-down-bounce {
     display: block;
     animation: arrow-bounce 1.8s cubic-bezier(0.45, 0, 0.55, 1) infinite;
@@ -676,12 +664,11 @@ body {
     padding-top: var(--space-md);
 }
 
-/* Work page cards open their project from anywhere on the card (script.js) */
+/* whole card is clickable (script.js) */
 .work-grid .work-card {
     cursor: pointer;
 }
 
-/* Card titles are h2s; on a project page the same class is the page's h1 title */
 .work-header {
     font-size: var(--text-xl);
 }
@@ -695,7 +682,6 @@ h1.work-header {
     color: var(--text-secondary);
 }
 
-/* Home and Work cards (the ones with a title link): a slightly heavier description */
 .work-card:has(.work-link) .work-description {
     font-weight: var(--weight-medium);
 }
@@ -729,15 +715,14 @@ h1.work-header {
     border-bottom: 1px solid var(--text-secondary);
 }
 
-/* Card title link: the arrow shows it opens the project */
-/* Hover area is the title text only, not the empty space beside it */
+/* Card title link */
 .work-header:has(.work-link) {
     width: fit-content;
 }
 
 .work-link {
     display: inline-block;
-    /* Slide with left, not transform: transform redraws the text off its pixel row and it looks like it bounces */
+    /* left, not transform: transform made the text bounce */
     position: relative;
     left: 0;
     transition: color 0.2s ease, left 0.2s ease;
@@ -751,13 +736,12 @@ h1.work-header {
 .link-arrow svg {
     width: 0.8em;
     height: 0.8em;
-    /* Outline the filled icon to thicken its lines */
+    /* thicker lines */
     stroke: currentColor;
     stroke-width: 0.6;
 }
 
-/* Hovering the title turns it blue and slides it right. The hover sits on the heading, which
-   doesn't move, so the title can't slide out from under the cursor and flicker */
+/* hover sits on the heading, so the sliding title can't flicker */
 .work-header:hover .work-link,
 .work-link:focus-visible {
     color: var(--accent-color);
@@ -791,8 +775,7 @@ h1.work-header {
     border-radius: 10px;
 }
 
-/* Year in the corner: trim the line spacing and the font's built-in space above the digits,
-   so the gap above them matches the gap on the right */
+/* year: trimmed so its top gap matches the right gap */
 .work-thumbnail p {
     line-height: var(--leading-none);
     margin-top: -0.09em;
@@ -822,7 +805,7 @@ h1.work-header {
     gap: var(--space-3xl);
     padding: 0 var(--space-md);
     padding-top: var(--space-lg);
-    /* The big name's empty side space runs past the screen edge; clip it so there's no sideways scroll */
+    /* the big name overflows; prevents sideways scroll */
     overflow-x: clip;
 }
 
@@ -854,7 +837,7 @@ h1.work-header {
     overflow-wrap: anywhere; /* long email can wrap on very narrow screens */
 }
 
-/* Email button: strip default button styling so it looks like the other rows */
+/* Email button: reset button styles */
 .email {
     background: none;
     border: none;
@@ -867,7 +850,7 @@ h1.work-header {
 /* Toast */
 .toast {
     position: fixed;
-    right: max(var(--space-lg), calc((100% - 1440px) / 2 + var(--space-lg))); /* follows the centered page */
+    right: max(var(--space-lg), calc((100% - 1440px) / 2 + var(--space-lg)));
     bottom: var(--space-xl);
     z-index: 1000;
     display: flex;
@@ -881,7 +864,7 @@ h1.work-header {
     border-radius: 16px;
     box-shadow: 0 8px 24px var(--shadow-color);
 
-    /* Hidden by default; slides up and fades in when .show is added */
+    /* hidden until .show */
     opacity: 0;
     visibility: hidden;
     transform: translateY(8px);
@@ -909,20 +892,20 @@ h1.work-header {
     color: var(--text-secondary);
 }
 
-/* Small screens: stay bottom right, but narrow enough to sit beside the 48px return-to-top button */
+/* Small screens: beside the return-to-top button */
 @media (max-width: 480px) {
     .toast {
         max-width: calc(100vw - 2 * var(--space-lg) - 48px - var(--space-sm));
     }
 }
 
-/* Wide-screen sections list and return-to-top button (project + About pages): only shown from 1440px */
+/* Shown from 1280px */
 .page-toc,
 .toc-top {
     display: none;
 }
 
-/* Page Navigation (About + project pages): back button and section menu fixed at the bottom */
+/* Page Navigation (About + project pages) */
 .page-nav {
     --page-nav-height: 56px;
     position: fixed;
@@ -936,12 +919,12 @@ h1.work-header {
     transform: translateX(-50%);
 }
 
-/* Room so the bar never covers the end of the page */
+/* room for the bar */
 body:has(.page-nav) {
     padding-bottom: calc(var(--page-nav-height, 56px) + var(--space-lg) + var(--space-md));
 }
 
-/* The toast sits above the bar, at full width, since there's no return-to-top button here */
+/* toast sits above the bar */
 body:has(.page-nav) .toast {
     bottom: calc(56px + var(--space-lg) + var(--space-sm));
     max-width: min(360px, calc(100vw - 2 * var(--space-lg)));
@@ -966,7 +949,7 @@ body:has(.page-nav) .toast {
     transition: background-color 0.15s ease;
 }
 
-/* Section pill and its menu are one panel: closed it's a pill, open it grows upward into a rounded box */
+/* Section pill and menu: one panel */
 .page-nav-sections {
     display: flex;
     flex-direction: column;
@@ -996,7 +979,7 @@ body:has(.page-nav) .toast {
     cursor: pointer;
 }
 
-/* Same hover as the menu items. Closed, the whole pill tints, so it stays one color */
+/* Hover: the closed pill tints as one */
 .page-nav-back:hover,
 .page-nav-back:focus-visible,
 .page-nav-sections:has(.section-toggle[aria-expanded="false"]:hover),
@@ -1004,13 +987,13 @@ body:has(.page-nav) .toast {
     background-color: var(--bg-thumbnail);
 }
 
-/* Open, the panel keeps one color; the chevron dims to show the row closes the menu */
+/* Open: the chevron dims on hover */
 .section-toggle[aria-expanded="true"]:hover .section-chevron,
 .section-toggle[aria-expanded="true"]:focus-visible .section-chevron {
     color: var(--text-secondary);
 }
 
-/* Divider between the list and the progress row, inset from the edges; only when open */
+/* Divider above the progress row, open only */
 .section-toggle::before {
     content: "";
     position: absolute;
@@ -1027,7 +1010,7 @@ body:has(.page-nav) .toast {
     opacity: 1;
 }
 
-/* Progress ring: the blue arc fills clockwise as the page scrolls (set by script.js) */
+/* Progress ring (set by script.js) */
 .progress-ring {
     position: relative;
     display: flex;
@@ -1056,7 +1039,7 @@ body:has(.page-nav) .toast {
     stroke: var(--line-faint);
 }
 
-/* The circle's length is 100, so the dash length is the percentage */
+/* circle length is 100, so dash length = percent */
 .progress-fill {
     stroke: var(--accent-color);
     stroke-dasharray: 0 100;
@@ -1088,8 +1071,7 @@ body:has(.page-nav) .toast {
     transform: rotate(180deg);
 }
 
-/* Section menu: sits above the toggle inside the panel. The grid row animates
-   from 0 to the list's full height, so the panel grows smoothly */
+/* Section menu: the grid row animates the panel's height */
 .section-menu {
     display: grid;
     grid-template-rows: 1fr;
@@ -1109,13 +1091,13 @@ body:has(.page-nav) .toast {
     transition: padding 0.3s ease;
 }
 
-/* Collapse the padding too, or it'd keep the closed panel taller than the pill */
+/* collapse padding too, or the closed pill is taller */
 .section-menu.hidden .section-menu-inner {
     padding-block: 0;
 }
 
 .section-menu-title {
-    /* Left padding = item padding + dot + gap, so it lines up with the item names */
+    /* item padding + dot + gap, to line up with the names */
     padding: var(--space-xs) var(--space-md) var(--space-sm) calc(var(--space-md) + 6px + var(--space-sm));
     color: var(--text-secondary);
     font-size: var(--text-2xs);
@@ -1149,7 +1131,7 @@ body:has(.page-nav) .toast {
     transition: background-color 0.15s ease;
 }
 
-/* Dot beside every item, so the text lines up; it's only filled for the current section */
+/* dot on every item, filled for the current one */
 .section-list button::before {
     content: "";
     flex-shrink: 0;
@@ -1164,7 +1146,7 @@ body:has(.page-nav) .toast {
     background-color: var(--bg-thumbnail);
 }
 
-/* The section you're currently in: blue dot and bolder text, like the current page in the hamburger menu */
+/* Current section */
 .section-list button[aria-current="true"] {
     font-weight: var(--weight-semibold);
 }
@@ -1256,7 +1238,7 @@ body:has(.page-nav) .toast {
 }
 
 .footer-nav-links {
-    align-items: flex-start; /* rows shrink to their content, so hover only triggers on the icon + text */
+    align-items: flex-start; /* rows shrink to their content */
 }
 
 .nav-content p {
@@ -1282,7 +1264,7 @@ body:has(.page-nav) .toast {
     transform: scaleX(1);
 }
 
-/* Location isn't a link: normal cursor and no underline, icon still fills on hover */
+/* Location isn't a link */
 .location {
     cursor: default;
 }
@@ -1296,7 +1278,7 @@ body:has(.page-nav) .toast {
     padding: var(--space-md);
 }
 
-/* Grows with the screen: 154px on phones up to 320px, never wider than its column */
+/* 154px on phones up to 320px */
 .photo {
     border-radius: 9999px;
     width: clamp(9.625rem, 25vw, 20rem);
@@ -1316,7 +1298,7 @@ body:has(.page-nav) .toast {
     font-size: var(--text-2xl);
 }
 
-/* Text and down arrow side by side; the underline runs under both */
+/* text and arrow share the underline */
 .download-resume {
     display: flex;
     align-items: center;
@@ -1335,7 +1317,7 @@ body:has(.page-nav) .toast {
     border-color: var(--text-primary);
 }
 
-/* Sized to the text, and outlined so its lines are about 2px, like the 600-weight letters */
+/* sized to the text, thickened to match the 600 weight */
 .download-resume svg {
     flex-shrink: 0;
     width: 1em;
@@ -1378,12 +1360,12 @@ body:has(.page-nav) .toast {
     border-bottom: 1px solid var(--text-secondary);
 }
 
-/* About page labels (h3), e.g. a school or job title */
+/* About labels (h3) */
 .content-label {
     font-size: var(--text-lg);
 }
 
-/* Words that shouldn't be split across lines, like "@ Handshake AI"; a wrap happens before them instead */
+/* keeps "@ Company" together */
 .keep-together {
     white-space: nowrap;
 }
@@ -1392,17 +1374,14 @@ body:has(.page-nav) .toast {
     color: var(--text-secondary);
 }
 
-/* Continue the styling for about page */
 /* ===== Tablet and up (768px+) ===== */
 @media (min-width: 768px) {
-    /* Gap between the left (one third) and right (two thirds) columns on the project and About pages */
+    /* gap between the 1/3 and 2/3 columns */
     :root {
         --column-gap: 4rem; /* 64px */
     }
 
-    /* Header: the hamburger goes away and the menu becomes a row of links, styled like the footer
-       links (icon + name; the icon fills and the name underlines on hover). The same menu markup
-       is reused, so it's shown here even while script.js marks it "hidden" */
+    /* Header: nav links replace the hamburger */
     .nav-container {
         display: none;
     }
@@ -1460,8 +1439,7 @@ body:has(.page-nav) .toast {
         transform: scaleX(1);
     }
 
-    /* Project page sections: heading in the left third, text in the right two thirds,
-       both starting at the section's top line */
+    /* Project sections: heading 1/3, text 2/3 */
     .section-item {
         display: grid;
         grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
@@ -1474,12 +1452,11 @@ body:has(.page-nav) .toast {
         grid-row: 1;
     }
 
-    /* Any paragraphs, images, etc. stack in the right column */
     .section-item > :not(.section-header) {
         grid-column: 2;
     }
 
-    /* About page intro: photo in the left third, greeting and bio in the right two thirds */
+    /* About intro: photo 1/3, bio 2/3 */
     .about-intro {
         display: grid;
         grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
@@ -1493,7 +1470,7 @@ body:has(.page-nav) .toast {
         padding: 0;
     }
 
-    /* About page resume: section headings stay full width; entries use the same thirds */
+    /* About resume */
     .resume-item {
         display: grid;
         grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
@@ -1504,22 +1481,21 @@ body:has(.page-nav) .toast {
         grid-column: 1 / -1;
     }
 
-    /* Single entries (Skills, Fun): label on the left, value on the right, sharing the columns */
+    /* single entries: label and value share the columns */
     .resume-content {
         grid-column: 1 / -1;
         display: grid;
         grid-template-columns: subgrid;
-        column-gap: var(--column-gap); /* its own 8px gap would otherwise shift the right column left */
+        column-gap: var(--column-gap); /* overrides its own 8px gap */
     }
 
-    /* Paired entries (Education, Experience): the title and dates block sits on the left...
-       (the next block starts with something other than a label heading, so it's that entry's details) */
+    /* paired entries: title and dates on the left... */
     .resume-content:has(+ .resume-content > :first-child:not(h3)) {
         grid-column: 1;
         display: flex;
     }
 
-    /* ...and the details block that follows it (it has no label of its own) sits on the right */
+    /* ...details on the right */
     .resume-content:not(:has(.content-label)) {
         grid-column: 2;
         display: flex;
@@ -1528,10 +1504,7 @@ body:has(.page-nav) .toast {
 
 /* ===== Desktop (968px+) ===== */
 @media (min-width: 968px) {
-    /* Landing page cards and the project page header (the card whose title is the page's h1):
-       project info in the left third, thumbnail in the right two thirds.
-       The info column never drops below 320px, so the pills fit in two rows instead of a ragged stack.
-       The last row takes any spare height, so the info stays together at the top */
+    /* Landing cards and project header: info 1/3, thumbnail 2/3 */
     #work .work-card,
     .work-card:has(> h1.work-header) {
         display: grid;
@@ -1553,28 +1526,23 @@ body:has(.page-nav) .toast {
         grid-row: 1 / -1;
     }
 
-    /* Work page: three vertical slices that fill the screen below the header, divided by thin lines.
-       Hovering a slice widens it a little (the others narrow to make room), darkens it,
-       and zooms its thumbnail slightly */
-    /* Work page heading: a header row above the slices. Its bottom line spans the same width as the
-       header's line, and the slice dividers start from it, so heading and slices read as one table */
+    /* Work page: three vertical slices */
+    /* Work heading row */
     .page-header {
         margin: 0 var(--space-md);
         padding: var(--space-lg) 0;
         border-bottom: 1px solid var(--line-faint);
     }
 
-    /* The slices sit inside the page margins, closed off by a line on each side and along the bottom,
-       so every line ends where the header's line does. The lines belong to the cards (left on the first,
-       right on each, bottom on all) so they fade in with them */
+    /* the lines belong to the cards so they fade in with them */
     .work-grid {
-        container-type: inline-size; /* lets the cards size their content from the grid's width (cqi) */
+        container-type: inline-size; /* for cqi units */
         display: flex;
         flex-direction: row;
         gap: 0;
         padding: 0;
         margin: 0 var(--space-md);
-        /* Fill the screen below the header and the heading row (its text, padding and line) */
+        /* fill the screen below the heading */
         min-height: calc(100svh - var(--header-height) - var(--text-2xl) * 1.15 - 2 * var(--space-lg) - 1px);
     }
 
@@ -1592,24 +1560,20 @@ body:has(.page-nav) .toast {
         border-left: 1px solid var(--line-faint);
     }
 
-    /* Content stays at its normal (un-hovered) width, a third of the grid minus padding and the line.
-       A widening slice gains a little empty space, and a narrowing one lets its content use a few
-       pixels of its side padding, so no text reflows or moves on hover */
+    /* content keeps its normal width, so text doesn't reflow on hover */
     .work-grid .work-card > * {
         --slice-content: calc(100cqi / 3 - 2 * var(--space-md) - 1px);
         width: var(--slice-content);
         flex-shrink: 0;
     }
 
-    /* The thumbnail is the exception: it widens and narrows with its slice, at a fixed height
-       (the normal 16:9 height), so the text below it never moves */
+    /* thumbnail widens with the slice at a fixed height */
     .work-grid .work-card > .work-thumbnail {
         width: auto;
         height: calc(var(--slice-content) * 9 / 16);
         aspect-ratio: auto;
     }
 
-    /* Titles keep their shrink-to-text width (for the hover area), up to the same limit */
     .work-grid .work-card > .work-header {
         width: max-content;
         max-width: var(--slice-content);
@@ -1618,10 +1582,10 @@ body:has(.page-nav) .toast {
     .work-grid .work-card:hover,
     .work-grid .work-card:focus-within {
         flex-grow: 1.1;
-        background-color: var(--bg-thumbnail); /* the site's hover color, a step darker than the page */
+        background-color: var(--bg-thumbnail);
     }
 
-    /* The pills' gray nearly matches the hover color, so they switch to the page color to stay visible */
+    /* pills switch to the page color to stay visible */
     .work-grid .work-card:hover .pill-tag,
     .work-grid .work-card:focus-within .pill-tag {
         background-color: var(--bg-color);
@@ -1637,7 +1601,7 @@ body:has(.page-nav) .toast {
     }
 }
 
-/* Reduced motion: the Work slices change instantly on hover instead of animating */
+/* Reduced motion: Work slices don't animate */
 @media (min-width: 968px) and (prefers-reduced-motion: reduce) {
     .work-grid .work-card,
     .work-grid .work-thumbnail {
@@ -1645,13 +1609,11 @@ body:has(.page-nav) .toast {
     }
 }
 
-/* ===== Wide (1440px+) ===== */
-@media (min-width: 1440px) {
-    /* Project and About pages: the bottom bar gives way to a list of sections beside the sections
-       themselves, plus a return-to-top button in the bottom-left corner. The header area above
-       (the project's thumbnail and details, the About photo and bio) stays full width */
+/* ===== Wide (1280px+) ===== */
+@media (min-width: 1280px) {
+    /* Project and About: side list replaces the bottom bar */
     :root {
-        --toc-width: 14rem; /* the list's column, including the space before the sections */
+        --toc-width: 14rem; /* list column, including the gap */
     }
 
     .page-nav {
@@ -1666,8 +1628,7 @@ body:has(.page-nav) .toast {
         bottom: var(--space-xl);
     }
 
-    /* The sections' container (marked by script.js): the list in a narrow first column and the
-       sections in the second. Anything else in it, like the project header card, spans both */
+    /* sections container (set by script.js): list | sections */
     .toc-host {
         display: grid;
         grid-template-columns: var(--toc-width) minmax(0, 1fr);
@@ -1683,9 +1644,7 @@ body:has(.page-nav) .toast {
         grid-column: 2;
     }
 
-    /* The list starts level with the first section heading, then sticks under the header
-       until the sections end, so it never reaches the footer. --toc-offset is any space added above
-       the list to line it up (About); it's taken off when stuck, so every page sticks at the same height */
+    /* sticky list; --toc-offset is extra top space, removed when stuck */
     .toc-host > .page-toc {
         display: block;
         grid-column: 1;
@@ -1696,8 +1655,7 @@ body:has(.page-nav) .toast {
         padding-right: var(--space-lg);
     }
 
-    /* The sections end with one line across the page (inset like the header's line) instead of a
-       line under the right column only */
+    /* one closing line across the page */
     .toc-host {
         margin-inline: var(--space-md);
         padding-inline: 0;
@@ -1709,15 +1667,12 @@ body:has(.page-nav) .toast {
         border-bottom: none;
     }
 
-    /* About: start the list below the first heading's line, level with the first entry. That's the heading's
-       space above, its text, its space below and line, then the gap before the first entry, minus the
-       extra space the list items have above their text */
+    /* About: start below the first heading's line */
     .section-resume > .page-toc {
         --toc-offset: calc(var(--space-xl) + var(--text-xl) * var(--leading-tight) + var(--space-md) + 1px + var(--space-md) - var(--space-sm));
     }
 
-    /* Like the landing page's: hidden until the page has scrolled a full screen, and again once the
-       footer scrolls up to it, so it doesn't cover the footer's links (both set by script.js) */
+    /* shown after a screen of scrolling, hidden at the footer (script.js) */
     .toc-top {
         position: fixed;
         left: var(--page-edge);
@@ -1736,7 +1691,6 @@ body:has(.page-nav) .toast {
         transform: translateY(0);
     }
 
-    /* Same label as the bottom-bar menu's "On this page" */
     .toc-title {
         margin-bottom: var(--space-sm);
         color: var(--text-secondary);
@@ -1752,12 +1706,12 @@ body:has(.page-nav) .toast {
         gap: var(--space-xs);
     }
 
-    /* Same marker as the section menu: a dot beside each item, filled blue for the current section */
+    /* dot marks the current section */
     .toc-list button {
         display: flex;
         align-items: center;
         gap: var(--space-sm);
-        margin-left: calc(-6px - var(--space-sm)); /* the dot hangs into the margin, so the names line up with the page edge */
+        margin-left: calc(-6px - var(--space-sm)); /* dot hangs into the margin */
         padding: var(--space-xs) 0;
         border: none;
         background: none;
@@ -1792,7 +1746,7 @@ body:has(.page-nav) .toast {
         background-color: var(--accent-color);
     }
 
-    /* Return to Top: a circle with an up arrow, labeled underneath */
+    /* Return to Top */
     .toc-top {
         display: flex;
         flex-direction: column;
