@@ -184,6 +184,92 @@ if (copyEmailBtn && toast) {
     });
 }
 
+// Local Time (PT) in the footer, updated on the minute
+const localTime = document.getElementById("local-time");
+
+if (localTime) {
+    const ptFormat = new Intl.DateTimeFormat("en-US", {
+        timeZone: "America/Los_Angeles",
+        hour: "numeric",
+        minute: "2-digit",
+    });
+
+    function updateLocalTime() {
+        localTime.textContent = ptFormat.format(new Date());
+        localTime.closest(".local-time").hidden = false;
+    }
+
+    updateLocalTime();
+    setTimeout(() => {
+        updateLocalTime();
+        setInterval(updateLocalTime, 60000);
+    }, 60000 - (Date.now() % 60000));
+}
+
+// Thumbnails: the "View Details" pill floats at the top right of the cursor,
+// easing toward it each frame so it trails loosely instead of snapping
+const CURSOR_OFFSET = 12; // px from the pointer
+const FOLLOW_EASE = 0.12; // share of the remaining distance covered per frame (at 60fps)
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+document.querySelectorAll(".work-thumbnail .view-project").forEach((pill) => {
+    const thumb = pill.closest(".work-thumbnail");
+    const target = { x: 0, y: 0 };
+    const current = { x: 0, y: 0 };
+    let frame = null;
+    let lastTime = 0;
+
+    function place() {
+        pill.style.setProperty("--x", `${current.x}px`);
+        pill.style.setProperty("--y", `${current.y}px`);
+    }
+
+    function step(time) {
+        const dt = lastTime ? time - lastTime : 16.7;
+        lastTime = time;
+        const k = 1 - Math.pow(1 - FOLLOW_EASE, dt / 16.7); // same feel at any frame rate
+        current.x += (target.x - current.x) * k;
+        current.y += (target.y - current.y) * k;
+        place();
+        if (Math.abs(target.x - current.x) > 0.1 || Math.abs(target.y - current.y) > 0.1) {
+            frame = requestAnimationFrame(step);
+        } else {
+            frame = null;
+        }
+    }
+
+    function setTarget(e) {
+        const rect = thumb.getBoundingClientRect();
+        const scale = rect.width / thumb.offsetWidth; // the Work page scales thumbnails on hover
+        // flips to the top left only when the right side would run off the screen
+        const fitsRight = e.clientX + CURSOR_OFFSET + pill.offsetWidth <= document.documentElement.clientWidth;
+        target.x = (e.clientX - rect.left) / scale + (fitsRight ? CURSOR_OFFSET : -CURSOR_OFFSET - pill.offsetWidth);
+        target.y = (e.clientY - rect.top) / scale - pill.offsetHeight - CURSOR_OFFSET;
+    }
+
+    // Appear where the cursor enters, not where it last left
+    thumb.addEventListener("pointerenter", (e) => {
+        if (e.pointerType !== "mouse") return;
+        setTarget(e);
+        current.x = target.x;
+        current.y = target.y;
+        place();
+    });
+
+    thumb.addEventListener("pointermove", (e) => {
+        if (e.pointerType !== "mouse") return;
+        setTarget(e);
+        if (reduceMotion.matches) {
+            current.x = target.x;
+            current.y = target.y;
+            place();
+        } else if (!frame) {
+            lastTime = 0;
+            frame = requestAnimationFrame(step);
+        }
+    });
+});
+
 // Work page: the whole card opens its project
 document.querySelectorAll(".work-grid .work-card").forEach((card) => {
     const link = card.querySelector(".work-link");

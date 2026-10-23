@@ -14,17 +14,17 @@
             }
         }
     </script>
-    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="/css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
-    <script src="../js/script.js" defer></script>
+    <script src="/js/script.js" defer></script>
 </head>
 <body>
     <!-- Header -->
     <div class="header perma-line">
         <div class="name">
-            <a href="../index.html">NORMANLEE</a>
+            <a href="/"><span class="name-chevron" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/></svg></span>NORMANLEE</a>
         </div>
         <div class="nav-container">
             <button class="hamburger-menu" aria-label="Toggle menu" aria-expanded="false">
@@ -36,7 +36,7 @@
             </button>
         </div>
         <div class="expanded-menu hidden" id="menu">
-            <a href="../index.html" class="menu-item">
+            <a href="/" class="menu-item">
                 <!-- Home outline -->
                 <svg class="icon-outline" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
                     <path d="M8.354 1.146a.5.5 0 0 0-.708 0l-6 6A.5.5 0 0 0 1.5 7.5v7a.5.5 0 0 0 .5.5h4.5a.5.5 0 0 0 .5-.5v-4h2v4a.5.5 0 0 0 .5.5H14a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-.146-.354L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293zM2.5 14V7.707l5.5-5.5 5.5 5.5V14H10v-4a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5v4z"/>
@@ -48,20 +48,29 @@
                 <span>Home</span>
             </a>
 
-            <a href="../work/work.html" class="menu-item">
-                <!-- Briefcase outline -->
-                <svg class="icon-outline" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M6.5 1A1.5 1.5 0 0 0 5 2.5V3H1.5A1.5 1.5 0 0 0 0 4.5v8A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-8A1.5 1.5 0 0 0 14.5 3H11v-.5A1.5 1.5 0 0 0 9.5 1zm0 1h3a.5.5 0 0 1 .5.5V3H6v-.5a.5.5 0 0 1 .5-.5m1.886 6.914L15 7.151V12.5a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5V7.15l6.614 1.764a1.5 1.5 0 0 0 .772 0M1.5 4h13a.5.5 0 0 1 .5.5v1.616L8.129 7.948a.5.5 0 0 1-.258 0L1 6.116V4.5a.5.5 0 0 1 .5-.5"/>
-                </svg>
-                <!-- Briefcase fill -->
-                <svg class="icon-fill" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M6.5 1A1.5 1.5 0 0 0 5 2.5V3H1.5A1.5 1.5 0 0 0 0 4.5v1.384l7.614 2.03a1.5 1.5 0 0 0 .772 0L16 5.884V4.5A1.5 1.5 0 0 0 14.5 3H11v-.5A1.5 1.5 0 0 0 9.5 1zm0 1h3a.5.5 0 0 1 .5.5V3H6v-.5a.5.5 0 0 1 .5-.5"/>
-                    <path d="M0 12.5A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5V6.85L8.129 8.947a.5.5 0 0 1-.258 0L0 6.85z"/>
-                </svg>
-                <span>Work</span>
-            </a>
+            <div class="nav-dropdown">
+                <a href="/work" class="menu-item">
+                    <!-- Briefcase outline -->
+                    <svg class="icon-outline" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M6.5 1A1.5 1.5 0 0 0 5 2.5V3H1.5A1.5 1.5 0 0 0 0 4.5v8A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-8A1.5 1.5 0 0 0 14.5 3H11v-.5A1.5 1.5 0 0 0 9.5 1zm0 1h3a.5.5 0 0 1 .5.5V3H6v-.5a.5.5 0 0 1 .5-.5m1.886 6.914L15 7.151V12.5a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5V7.15l6.614 1.764a1.5 1.5 0 0 0 .772 0M1.5 4h13a.5.5 0 0 1 .5.5v1.616L8.129 7.948a.5.5 0 0 1-.258 0L1 6.116V4.5a.5.5 0 0 1 .5-.5"/>
+                    </svg>
+                    <!-- Briefcase fill -->
+                    <svg class="icon-fill" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M6.5 1A1.5 1.5 0 0 0 5 2.5V3H1.5A1.5 1.5 0 0 0 0 4.5v1.384l7.614 2.03a1.5 1.5 0 0 0 .772 0L16 5.884V4.5A1.5 1.5 0 0 0 14.5 3H11v-.5A1.5 1.5 0 0 0 9.5 1zm0 1h3a.5.5 0 0 1 .5.5V3H6v-.5a.5.5 0 0 1 .5-.5"/>
+                        <path d="M0 12.5A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5V6.85L8.129 8.947a.5.5 0 0 1-.258 0L0 6.85z"/>
+                    </svg>
+                    <span>Work</span>
+                </a>
+                <div class="project-menu">
+                    <div class="project-menu-panel">
+                        <a href="/apple-sports" class="project-menu-item">Extending Apple Sports with Team Schedules and Results</a>
+                        <a href="/apple-sports" class="project-menu-item">Rethinking Trip Planning for Bay Area Transit Riders</a>
+                        <a href="/apple-sports" class="project-menu-item">Designing a Hands-Free Cooking Mode for Recipe Apps</a>
+                    </div>
+                </div>
+            </div>
 
-            <a href="../about/about.html" class="menu-item" aria-current="page">
+            <a href="/about" class="menu-item" aria-current="page">
                 <!-- About Icon -->
                 <svg class="icon-outline" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
                     <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0m4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4m-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10s-3.516.68-4.168 1.332c-.678.678-.83 1.418-.832 1.664z"/>
@@ -98,7 +107,7 @@
     <!-- About -->
     <div class="about-intro">
         <div class="section-photo" data-fade="0">
-            <div class="photo"></div>
+            <img class="photo" src="https://images.unsplash.com/photo-1792434740207-ca4feec854d7?q=80&w=735&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D" alt="Portrait of Norman Lee">
         </div>
 
         <div class="about-me" data-fade="1">
@@ -203,6 +212,9 @@
 
     <!-- Footer -->
     <div class="section-footer" data-fade="6">
+        <div class="footer-thanks">
+            <p>Thanks for stopping by!</p>
+        </div>
         <div class="footer-details">
             <div class="footer-nav-links">
                 <a href="#" class="resume nav-content">
@@ -263,12 +275,16 @@
                     <div class="location nav-content">
                         <p>San Francisco, CA</p>
                     </div>
+
+                    <div class="location local-time nav-content" hidden>
+                        <p><span id="local-time"></span> PT</p>
+                    </div>
                 </div>
             </div>
         </div>
         <div class="footer-name">
             <div class="bigname">
-                <a href="../index.html">
+                <a href="/">
                     <p>NORMANLEE</p>
                 </a>
             </div>
@@ -297,7 +313,7 @@
 
     <!-- Page Navigation -->
     <nav class="page-nav" aria-label="Page">
-        <a href="../index.html" class="page-nav-back" aria-label="Go back">
+        <a href="/" class="page-nav-back" aria-label="Go back">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
                 <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
             </svg>
