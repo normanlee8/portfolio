@@ -270,6 +270,122 @@ document.querySelectorAll(".work-thumbnail .view-project").forEach((pill) => {
     });
 });
 
+// About photos: drag one over another's spot and they swap right away (slots).
+// The other photo glides to the spot you came from; on release, yours settles into its spot
+const photoCluster = document.querySelector(".photo-cluster");
+const SWAP_EASE = "cubic-bezier(0.22, 1, 0.36, 1)";
+const SWAP_COVER = 0.5; // swap once the two circles overlap by half of the smaller one
+
+// Overlapping area of two circles (radii r1, r2, centers d apart)
+function circleOverlap(r1, r2, d) {
+    if (d >= r1 + r2) return 0;
+    if (d <= Math.abs(r1 - r2)) return Math.PI * Math.min(r1, r2) ** 2;
+    const a1 = r1 * r1 * Math.acos((d * d + r1 * r1 - r2 * r2) / (2 * d * r1));
+    const a2 = r2 * r2 * Math.acos((d * d + r2 * r2 - r1 * r1) / (2 * d * r2));
+    const lens = 0.5 * Math.sqrt((-d + r1 + r2) * (d + r1 - r2) * (d - r1 + r2) * (d + r1 + r2));
+    return a1 + a2 - lens;
+}
+
+if (photoCluster) {
+    const photos = [...photoCluster.querySelectorAll(".photo")];
+    const slotOf = (el) => [...el.classList].find((c) => c.startsWith("slot-"));
+
+    // Where a photo's spot is, ignoring any drag or animation on it
+    function spotOf(p) {
+        const c = photoCluster.getBoundingClientRect();
+        const size = p.offsetWidth;
+        return { left: c.left + p.offsetLeft, top: c.top + p.offsetTop, size, x: c.left + p.offsetLeft + size / 2, y: c.top + p.offsetTop + size / 2 };
+    }
+
+    // Play a photo's move from its old box to its new one (measure, change, play back)
+    function glideFrom(p, from) {
+        if (reduceMotion.matches) return;
+        const to = p.getBoundingClientRect();
+        p.animate(
+            [
+                { transformOrigin: "top left", transform: `translate(${from.left - to.left}px, ${from.top - to.top}px) scale(${from.width / to.width})` },
+                { transformOrigin: "top left", transform: "none" },
+            ],
+            { duration: 450, easing: SWAP_EASE }
+        );
+    }
+
+    function settle(p) {
+        const from = p.style.translate;
+        p.style.translate = "";
+        if (!from || reduceMotion.matches) return;
+        p.animate([{ translate: from }, { translate: "0px 0px" }], { duration: 300, easing: SWAP_EASE });
+    }
+
+    photos.forEach((photo) => {
+        photo.querySelector("img").draggable = false;
+
+        photo.addEventListener("pointerdown", (e) => {
+            if (e.button !== 0) return;
+            e.preventDefault();
+            photo.setPointerCapture(e.pointerId);
+            photo.classList.add("dragging");
+            // where in the photo it was grabbed, so that point stays under the pointer even as the photo resizes
+            const start = spotOf(photo);
+            const grabX = (e.clientX - start.left) / start.size;
+            const grabY = (e.clientY - start.top) / start.size;
+
+            function follow(ev) {
+                const spot = spotOf(photo);
+                const left = ev.clientX - grabX * spot.size;
+                const top = ev.clientY - grabY * spot.size;
+                photo.style.translate = `${left - spot.left}px ${top - spot.top}px`;
+                return { x: left + spot.size / 2, y: top + spot.size / 2 };
+            }
+
+            // the photo just swapped out still overlaps the held one, so it's skipped until they separate
+            let justSwapped = null;
+
+            function onMove(ev) {
+                const center = follow(ev);
+                const r = photo.offsetWidth / 2;
+                const covers = (p) => {
+                    const spot = spotOf(p);
+                    const overlap = circleOverlap(r, spot.size / 2, Math.hypot(center.x - spot.x, center.y - spot.y));
+                    return overlap >= SWAP_COVER * Math.PI * Math.min(r, spot.size / 2) ** 2;
+                };
+                if (justSwapped && !covers(justSwapped)) justSwapped = null;
+                const other = photos.find((p) => p !== photo && p !== justSwapped && covers(p));
+                if (!other) return;
+                justSwapped = other;
+
+                const otherFrom = other.getBoundingClientRect();
+                const mySize = photo.offsetWidth;
+                const mySlot = slotOf(photo);
+                const otherSlot = slotOf(other);
+                photo.classList.replace(mySlot, otherSlot);
+                other.classList.replace(otherSlot, mySlot);
+                glideFrom(other, otherFrom);
+                follow(ev);
+                // ease the held photo into its new size around the grab point
+                if (!reduceMotion.matches && photo.offsetWidth !== mySize) {
+                    photo.animate(
+                        [{ transformOrigin: `${grabX * 100}% ${grabY * 100}%`, scale: mySize / photo.offsetWidth }, { transformOrigin: `${grabX * 100}% ${grabY * 100}%`, scale: 1 }],
+                        { duration: 250, easing: SWAP_EASE }
+                    );
+                }
+            }
+
+            function onUp() {
+                photo.removeEventListener("pointermove", onMove);
+                photo.removeEventListener("pointerup", onUp);
+                photo.removeEventListener("pointercancel", onUp);
+                photo.classList.remove("dragging");
+                settle(photo);
+            }
+
+            photo.addEventListener("pointermove", onMove);
+            photo.addEventListener("pointerup", onUp);
+            photo.addEventListener("pointercancel", onUp);
+        });
+    });
+}
+
 // Work page: the whole card opens its project
 document.querySelectorAll(".work-grid .work-card").forEach((card) => {
     const link = card.querySelector(".work-link");

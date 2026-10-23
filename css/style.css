@@ -825,6 +825,9 @@ h1.work-header {
     border-radius: 10px;
     position: relative;
     isolation: isolate; /* no overflow clip, so the "View Details" pill can pass the edges */
+    /* same faint ring as the About photos */
+    outline: 1px solid var(--line-faint);
+    outline-offset: -1px;
 }
 
 /* Photo fills the frame */
@@ -1495,15 +1498,92 @@ body:has(.page-nav) .toast {
     padding: var(--space-md);
 }
 
-/* 154px on phones up to 320px */
 .photo {
-    display: block;
+    position: absolute;
+    overflow: hidden;
     border-radius: 9999px;
-    width: clamp(9.625rem, 25vw, 20rem);
-    max-width: 100%;
     aspect-ratio: 1;
-    object-fit: cover;
     background-color: var(--bg-project);
+    /* faint ring drawn over the photo's edge; an outline doesn't change the size or crop */
+    outline: 1px solid var(--line-faint);
+    outline-offset: -1px;
+}
+
+/* Phones: the cats are same-size "ears" at 45° above the photo, like a
+   Mickey Mouse silhouette. The left ear sits on the left edge, which
+   shifts the photo right. Everything follows the photo's size (--head) */
+.photo-cluster {
+    --head: clamp(9.625rem, 25vw, 20rem); /* 154px on phones up to 616px */
+    --ear: calc(var(--head) * 0.57);
+    --ear-gap: var(--space-xs);
+    /* how far each ear's center sits left/right and up from the photo's center */
+    --ear-offset: calc(((var(--head) + var(--ear)) / 2 + var(--ear-gap)) * 0.7071);
+    position: relative;
+    width: calc(var(--ear-offset) * 2 + var(--ear));
+    height: calc(var(--ear-offset) + var(--ear) / 2 + var(--head) / 2);
+}
+
+/* Slots are the spots the photos sit in (slot-1 is the big one). Dragging a
+   photo onto another swaps their slots (script.js); crops stay with the photo */
+.slot-1 {
+    width: var(--head);
+    left: calc(var(--ear-offset) + var(--ear) / 2 - var(--head) / 2);
+    top: calc(var(--ear-offset) + var(--ear) / 2 - var(--head) / 2);
+}
+
+.slot-2 {
+    width: var(--ear);
+    left: 0;
+    top: 0;
+}
+
+.slot-3 {
+    width: var(--ear);
+    right: 0;
+    top: 0;
+}
+
+/* Drag to swap */
+.photo-cluster .photo {
+    cursor: grab;
+    touch-action: none; /* a drag moves the photo instead of scrolling the page */
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.photo-cluster .photo.dragging {
+    z-index: 2;
+    cursor: grabbing;
+    box-shadow: 0 12px 32px var(--shadow-color);
+}
+
+/* Each photo is cropped to a square around its subject:
+   width = image width / square side, left and top = the square's offset / side */
+.photo {
+    --crop-w: 182.86%; /* about-photo.jpg, as 1024x768: 560px square at x 410, y 140 */
+    --crop-x: -73.21%;
+    --crop-y: -25%;
+}
+
+.photo img {
+    position: absolute;
+    width: var(--crop-w);
+    max-width: none;
+    height: auto;
+    left: var(--crop-x);
+    top: var(--crop-y);
+}
+
+.photo-cat {
+    --crop-w: 140.63%; /* thecutestcat.jpg, as 1125x2000: 800px square at x 20, y 610 */
+    --crop-x: -2.5%;
+    --crop-y: -76.25%;
+}
+
+.photo-kitten {
+    --crop-w: 197.37%; /* thecutestkitten.jpg, as 1500x2000: 760px square at x 390, y 670 */
+    --crop-x: -51.32%;
+    --crop-y: -88.16%;
 }
 
 .about-me {
@@ -1754,6 +1834,38 @@ body:has(.page-nav) .toast {
         padding: 0;
     }
 
+    /* Photos trail down: the cat below and right of the photo (30° from vertical),
+       the kitten below and left of the cat (45°) */
+    .photo-cluster {
+        --cat: calc(var(--head) * 0.55);
+        --kitten: calc(var(--head) * 0.38);
+        --trail-gap: var(--space-sm);
+        --to-cat: calc((var(--head) + var(--cat)) / 2 + var(--trail-gap)); /* center to center */
+        --to-kitten: calc((var(--cat) + var(--kitten)) / 2 + var(--trail-gap));
+        --cat-x: calc(var(--head) / 2 + var(--to-cat) * 0.5); /* cat's center */
+        --cat-y: calc(var(--head) / 2 + var(--to-cat) * 0.866);
+        width: 100%;
+        height: calc(var(--cat-y) + var(--to-kitten) * 0.7071 + var(--kitten) / 2);
+    }
+
+    .slot-1 {
+        left: 0;
+        top: 0;
+    }
+
+    .slot-2 {
+        width: var(--cat);
+        left: calc(var(--cat-x) - var(--cat) / 2);
+        top: calc(var(--cat-y) - var(--cat) / 2);
+    }
+
+    .slot-3 {
+        width: var(--kitten);
+        right: auto;
+        left: calc(var(--cat-x) - var(--to-kitten) * 0.7071 - var(--kitten) / 2);
+        top: calc(var(--cat-y) + var(--to-kitten) * 0.7071 - var(--kitten) / 2);
+    }
+
     /* About resume */
     .resume-item {
         display: grid;
@@ -1908,6 +2020,41 @@ body:has(.page-nav) .toast {
 
     .page-nav {
         display: none;
+    }
+
+    /* About intro: the bio starts where the resume's right column does
+       (list column + a third of what's left after the gap, then the gap) */
+    .about-intro {
+        grid-template-columns: calc(var(--toc-width) + (100% - var(--toc-width) - var(--column-gap)) / 3) minmax(0, 1fr);
+    }
+
+    /* The freed space holds three circles: you top left, the kitten in the
+       bottom right corner, and the cat between them with equal gaps to both.
+       Designed at 1280px (a 534 x 420px area: 320px photo, 180px cat, 112px kitten,
+       24px gaps); every size is a share of the area's width (cqi), so on wider
+       screens the circles grow and the gaps stay in proportion */
+    .photo-cluster {
+        container-type: inline-size;
+        height: auto;
+        aspect-ratio: 534 / 420;
+    }
+
+    .slot-1 {
+        width: 59.93cqi;
+    }
+
+    .slot-2 {
+        width: 33.71cqi;
+        left: 63.85cqi;
+        top: 20.72cqi;
+    }
+
+    .slot-3 {
+        width: 20.97cqi;
+        left: auto;
+        top: auto;
+        right: 0;
+        bottom: 0;
     }
 
     body:has(.page-nav) {
