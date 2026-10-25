@@ -206,19 +206,44 @@ if (localTime) {
     }, 60000 - (Date.now() % 60000));
 }
 
-// Location dot: its beam faces the cursor, like the heading cone in a maps app
-const statusDot = document.querySelector(".status-dot");
+// Location arrow: rests tilted up and to the right, like the usual current-location
+// arrow, and glances toward the cursor when it comes near.
+// It drifts back to rest when the cursor stops, moves away, or leaves the page
+const locationArrow = document.querySelector(".location-arrow");
+const ARROW_REST = 45; // degrees: up and to the right (0 = up, 90 = right)
+const ARROW_REACH = 360; // px: only a cursor this close turns the arrow
+const ARROW_IDLE_MS = 1500; // a still cursor is let go after this long
 
-if (statusDot) {
-    let heading = 0; // degrees, 0 = up; keeps counting past 360 so it always turns the short way
+if (locationArrow) {
+    let heading = ARROW_REST; // keeps counting past 360 so it always turns the short way
+    let idleTimer = null;
+
+    function turnTo(target) {
+        heading += ((target - heading + 540) % 360) - 180;
+        locationArrow.style.setProperty("--heading", `${heading}deg`);
+    }
 
     window.addEventListener("pointermove", (e) => {
         if (e.pointerType !== "mouse") return;
-        const r = statusDot.getBoundingClientRect();
-        const target = (Math.atan2(e.clientY - (r.top + r.height / 2), e.clientX - (r.left + r.width / 2)) * 180) / Math.PI + 90;
-        heading += ((target - heading + 540) % 360) - 180;
-        statusDot.style.setProperty("--heading", `${heading}deg`);
+        const r = locationArrow.getBoundingClientRect();
+        const dx = e.clientX - (r.left + r.width / 2);
+        const dy = e.clientY - (r.top + r.height / 2);
+        clearTimeout(idleTimer);
+        if (Math.hypot(dx, dy) > ARROW_REACH) {
+            turnTo(ARROW_REST);
+            return;
+        }
+        turnTo((Math.atan2(dy, dx) * 180) / Math.PI + 90);
+        idleTimer = setTimeout(() => turnTo(ARROW_REST), ARROW_IDLE_MS);
     }, { passive: true });
+
+    // the cursor left the window
+    document.addEventListener("pointerout", (e) => {
+        if (!e.relatedTarget) {
+            clearTimeout(idleTimer);
+            turnTo(ARROW_REST);
+        }
+    });
 }
 
 // Thumbnails: the "View Details" pill floats at the top right of the cursor,

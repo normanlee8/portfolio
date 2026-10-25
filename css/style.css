@@ -599,40 +599,27 @@ body {
     font-weight: var(--weight-medium);
 }
 
-/* Location dot, like the "you are here" dot in a maps app: a blue dot with a
-   white ring, and a soft beam showing the way it faces (toward the cursor) */
-.status-dot {
-    position: relative;
+/* Location arrow, like the "current location" arrow in a maps app. It rests
+   tilted 45° up and to the right; script.js turns it via --heading
+   (0 = up, 90 = right) */
+.location-arrow {
+    display: flex;
     flex-shrink: 0;
-    width: 12px;
-    height: 12px;
+    width: 1em;
+    height: 1em;
+    color: var(--color-blue);
 }
 
-/* Beam: a 70° wedge pointing up, faded out from the dot; script.js turns it via --heading */
-.status-dot::before {
-    content: "";
-    position: absolute;
-    inset: -12px;
-    background: conic-gradient(
-        from -35deg,
-        color-mix(in srgb, var(--color-blue) 55%, transparent) 0deg 70deg,
-        transparent 70deg
-    );
-    -webkit-mask-image: radial-gradient(closest-side, #000 20%, transparent 100%);
-    mask-image: radial-gradient(closest-side, #000 20%, transparent 100%);
-    rotate: var(--heading, 0deg);
-    transition: rotate 0.25s ease-out;
-}
-
-/* Dot and ring are one gradient from one center, so the ring is always even:
-   an 8px blue dot inside a 1.5px white ring */
-.status-dot::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: 50%;
-    background: radial-gradient(circle closest-side, var(--color-blue) calc(100% - 2px), #FFFFFF calc(100% - 1.5px));
-    box-shadow: 0 1px 3px var(--shadow-color);
+.location-arrow svg {
+    width: 100%;
+    height: 100%;
+    fill: currentColor;
+    /* a stroke in the same color rounds the arrow's points */
+    stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-linejoin: round;
+    rotate: var(--heading, 45deg);
+    transition: rotate 0.7s cubic-bezier(0.22, 1, 0.36, 1); /* turns like a glance, not a snap */
 }
 
 /* 32 → 64px from 393px, smaller below so the lines still fit; always two lines */
@@ -693,7 +680,7 @@ body {
         animation: none;
     }
 
-    .status-dot::before {
+    .location-arrow svg {
         transition: none;
     }
 }
