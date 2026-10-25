@@ -372,7 +372,34 @@ body {
 
 .nav-container {
     display: flex;
-    gap: var(--space-sm);
+    align-items: center;
+    gap: var(--space-md);
+}
+
+/* Theme toggle: an icon button outside the menu, so it reads as a control
+   rather than a link to another page. Hover only fills the icon (see below) */
+.theme-toggle-btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-xs);
+    border: none;
+    background: none;
+    color: inherit;
+    cursor: pointer;
+}
+
+/* Phones: a thin divider centered between the theme button and the hamburger */
+.theme-toggle-btn::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: calc(100% + var(--space-md) / 2);
+    width: 1px;
+    height: 1.25rem;
+    background-color: var(--line-faint);
+    translate: 0 -50%;
 }
 
 .hamburger-menu {
@@ -1688,8 +1715,34 @@ body:has(.page-nav) .toast {
     }
 
     /* Header: nav links replace the hamburger */
-    .nav-container {
+    /* the theme button stays; it moves after the links, past a thin divider */
+    .hamburger-menu {
         display: none;
+    }
+
+    .theme-toggle-btn::after {
+        content: none; /* no hamburger to divide from; the divider sits before the button instead */
+    }
+
+    .nav-container {
+        order: 1;
+        position: relative;
+        margin-left: var(--space-lg);
+    }
+
+    .nav-container::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        right: calc(100% + var(--space-lg) / 2);
+        width: 1px;
+        height: 1.25rem;
+        background-color: var(--line-faint);
+        translate: 0 -50%;
+    }
+
+    .expanded-menu {
+        margin-left: auto;
     }
 
     .expanded-menu,
