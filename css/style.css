@@ -3,35 +3,6 @@
     --bg-color: #ECEAE5;
     --text-primary: #2B2A27;   /* 12:1 on the background */
     --text-secondary: #615E58; /* 5.4:1 on the background */
-
-    /* About "Fun" brand colors: each brand's hue, darkened where needed for 4.5:1+ */
-    --fun-niners: #AA0000;     /* 49ers red */
-    --fun-warriors: #1D428A;   /* Warriors blue */
-    --fun-giants: #C03502;     /* Giants orange */
-    --fun-psych: #4C7300;      /* Psych green */
-    --fun-maplestory: #C23314; /* MapleStory red */
-    --fun-tf2: #7A5230;        /* TF2 brown */
-    --fun-milk-tea: #846036;   /* jasmine milk tea */
-    --fun-bun-bo-hue: #BA3C18; /* bun bo hue broth */
-    --fun-malatang: #C42D1A;   /* chili oil */
-    --fun-salmon: #C23210;     /* salmon sashimi */
-    --fun-wings: #8C5F27;      /* golden fried */
-    --fun-spring-roll: #45732C; /* lettuce and herbs */
-    --fun-filet: #BD324D;      /* medium rare pink */
-    --fun-napa: #51702C;       /* napa cabbage */
-    --fun-bean-curd: #7E6516;
-    --fun-brisket: #965835;
-    --fun-udon: #7C652B;
-    --fun-shimeji: #846239;    /* seafood mushroom */
-    --fun-enoki: #776728;
-    --fun-king-oyster: #856131;
-    --fun-roast-pork: #B44036;
-    --fun-cucumber: #437334;
-    --fun-lettuce: #4F712A;
-    --fun-fish-sauce: #8A5F1E;
-    --fun-mango-sago: #8C5D00; /* mango */
-    --fun-mango-mochi: #8A610C;
-    --fun-fried-bun: #8D5F21;  /* golden fried bun */
     --line-faint: color-mix(in srgb, var(--text-secondary) 30%, transparent); /* light lines: header track, Work page box */
 
     /* Surfaces */
@@ -122,35 +93,6 @@
     --bg-color: #2A2A28;
     --text-primary: #ECEAE5;   /* 12:1 on the background */
     --text-secondary: #AEABA4; /* 6.3:1 on the background */
-
-    /* About "Fun" brand colors, lightened where needed for 4.5:1+ */
-    --fun-niners: #B3995D;     /* 49ers gold */
-    --fun-warriors: #6A92E0;
-    --fun-giants: #FD5A1E;
-    --fun-psych: #7AB800;
-    --fun-maplestory: #ED694D;
-    --fun-tf2: #BE885A;
-    --fun-milk-tea: #C29A6B;
-    --fun-bun-bo-hue: #E86E4C;
-    --fun-malatang: #E96B5C;
-    --fun-salmon: #F27B5F;
-    --fun-wings: #C98A3B;
-    --fun-spring-roll: #60A23D;
-    --fun-filet: #DA7286;
-    --fun-napa: #9BC46A;
-    --fun-bean-curd: #E2C25A;
-    --fun-brisket: #C6825C;
-    --fun-udon: #E9DDBF;
-    --fun-shimeji: #B98F5E;
-    --fun-enoki: #EEE7CC;
-    --fun-king-oyster: #D4B48A;
-    --fun-roast-pork: #D57971;
-    --fun-cucumber: #5FA34A;
-    --fun-lettuce: #86BC4A;
-    --fun-fish-sauce: #C98A2C;
-    --fun-mango-sago: #F5A200;
-    --fun-mango-mochi: #EFB94A;
-    --fun-fried-bun: #C7862F;
 
     /* Surfaces */
     --bg-card: #333331;
@@ -657,36 +599,40 @@ body {
     font-weight: var(--weight-medium);
 }
 
+/* Location dot, like the "you are here" dot in a maps app: a blue dot with a
+   white ring, and a soft beam showing the way it faces (toward the cursor) */
 .status-dot {
     position: relative;
     flex-shrink: 0;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background-color: var(--color-green);
+    width: 12px;
+    height: 12px;
 }
 
-/* Ping ring */
+/* Beam: a 70° wedge pointing up, faded out from the dot; script.js turns it via --heading */
+.status-dot::before {
+    content: "";
+    position: absolute;
+    inset: -12px;
+    background: conic-gradient(
+        from -35deg,
+        color-mix(in srgb, var(--color-blue) 55%, transparent) 0deg 70deg,
+        transparent 70deg
+    );
+    -webkit-mask-image: radial-gradient(closest-side, #000 20%, transparent 100%);
+    mask-image: radial-gradient(closest-side, #000 20%, transparent 100%);
+    rotate: var(--heading, 0deg);
+    transition: rotate 0.25s ease-out;
+}
+
+/* Dot and ring are one gradient from one center, so the ring is always even:
+   an 8px blue dot inside a 1.5px white ring */
 .status-dot::after {
     content: "";
     position: absolute;
-    /* drawn full size and scaled down, so it stays sharp */
-    inset: -4.5px;
+    inset: 0;
     border-radius: 50%;
-    background-color: inherit;
-    animation: dot-ping 2.4s cubic-bezier(0, 0, 0.2, 1) infinite;
-    will-change: transform, opacity;
-}
-
-@keyframes dot-ping {
-    from {
-        transform: scale(0.4); /* 0.4 x 15px = the 6px dot */
-        opacity: 0.6;
-    }
-    to {
-        transform: scale(1);
-        opacity: 0;
-    }
+    background: radial-gradient(circle closest-side, var(--color-blue) calc(100% - 2px), #FFFFFF calc(100% - 1.5px));
+    box-shadow: 0 1px 3px var(--shadow-color);
 }
 
 /* 32 → 64px from 393px, smaller below so the lines still fit; always two lines */
@@ -743,9 +689,12 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .scroll-down-bounce,
-    .status-dot::after {
+    .scroll-down-bounce {
         animation: none;
+    }
+
+    .status-dot::before {
+        transition: none;
     }
 }
 
@@ -1731,45 +1680,12 @@ body:has(.page-nav) .toast {
     color: var(--text-secondary);
 }
 
-/* Fun: each item in its brand's color, one per line
-   (a small gap so long dishes that wrap still read as separate items) */
+/* Fun: one item per line, with a small gap so long dishes that wrap still read as separate items */
 .fun-list {
     display: flex;
     flex-direction: column;
     gap: var(--space-xs);
 }
-
-.fun-niners { color: var(--fun-niners); }
-.fun-warriors { color: var(--fun-warriors); }
-.fun-giants { color: var(--fun-giants); }
-.fun-psych { color: var(--fun-psych); }
-.fun-maplestory { color: var(--fun-maplestory); }
-.fun-tf2 { color: var(--fun-tf2); }
-.fun-milk-tea { color: var(--fun-milk-tea); }
-.fun-bun-bo-hue { color: var(--fun-bun-bo-hue); }
-.fun-rice { color: var(--text-primary); } /* plain white rice: the page's own text color */
-.fun-malatang { color: var(--fun-malatang); }
-.fun-salmon { color: var(--fun-salmon); }
-.fun-wings { color: var(--fun-wings); }
-.fun-spring-roll { color: var(--fun-spring-roll); }
-.fun-filet { color: var(--fun-filet); }
-.fun-mango-sago { color: var(--fun-mango-sago); }
-.fun-mango-mochi { color: var(--fun-mango-mochi); }
-.fun-fried-bun { color: var(--fun-fried-bun); }
-
-/* ingredients inside a dish, each in its own color */
-.fun-napa { color: var(--fun-napa); }
-.fun-white { color: var(--text-primary); } /* quail egg, rice noodle */
-.fun-bean-curd { color: var(--fun-bean-curd); }
-.fun-brisket { color: var(--fun-brisket); }
-.fun-udon { color: var(--fun-udon); }
-.fun-shimeji { color: var(--fun-shimeji); }
-.fun-enoki { color: var(--fun-enoki); }
-.fun-king-oyster { color: var(--fun-king-oyster); }
-.fun-roast-pork { color: var(--fun-roast-pork); }
-.fun-cucumber { color: var(--fun-cucumber); }
-.fun-lettuce { color: var(--fun-lettuce); }
-.fun-fish-sauce { color: var(--fun-fish-sauce); }
 
 /* small note under an About label, like "Snack portions please" */
 .content-sublabel {

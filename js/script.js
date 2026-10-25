@@ -206,6 +206,21 @@ if (localTime) {
     }, 60000 - (Date.now() % 60000));
 }
 
+// Location dot: its beam faces the cursor, like the heading cone in a maps app
+const statusDot = document.querySelector(".status-dot");
+
+if (statusDot) {
+    let heading = 0; // degrees, 0 = up; keeps counting past 360 so it always turns the short way
+
+    window.addEventListener("pointermove", (e) => {
+        if (e.pointerType !== "mouse") return;
+        const r = statusDot.getBoundingClientRect();
+        const target = (Math.atan2(e.clientY - (r.top + r.height / 2), e.clientX - (r.left + r.width / 2)) * 180) / Math.PI + 90;
+        heading += ((target - heading + 540) % 360) - 180;
+        statusDot.style.setProperty("--heading", `${heading}deg`);
+    }, { passive: true });
+}
+
 // Thumbnails: the "View Details" pill floats at the top right of the cursor,
 // easing toward it each frame so it trails loosely instead of snapping
 const CURSOR_OFFSET = 12; // px from the pointer
