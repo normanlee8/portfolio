@@ -1585,9 +1585,9 @@ body:has(.page-nav) .toast {
 /* Each photo is cropped to a square around its subject:
    width = image width / square side, left and top = the square's offset / side */
 .photo {
-    --crop-w: 182.86%; /* about-photo.jpg, as 1024x768: 560px square at x 410, y 140 */
-    --crop-x: -73.21%;
-    --crop-y: -25%;
+    --crop-w: 100%; /* about-photo.jpg, 720x757: 720px square at x 0, y 1 */
+    --crop-x: 0%;
+    --crop-y: -0.16%;
 }
 
 .photo img {
@@ -1600,15 +1600,15 @@ body:has(.page-nav) .toast {
 }
 
 .photo-cat {
-    --crop-w: 140.63%; /* thecutestcat.jpg, as 1125x2000: 800px square at x 20, y 610 */
+    --crop-w: 140.56%; /* thecutestcat.jpg, 1012x906: 720px square at x 18, y 0 */
     --crop-x: -2.5%;
-    --crop-y: -76.25%;
+    --crop-y: 0%;
 }
 
 .photo-kitten {
-    --crop-w: 197.37%; /* thecutestkitten.jpg, as 1500x2000: 760px square at x 390, y 670 */
-    --crop-x: -51.32%;
-    --crop-y: -88.16%;
+    --crop-w: 107.64%; /* thecutestkitten.jpg, 775x862: 720px square at x 25, y 66 */
+    --crop-x: -3.52%;
+    --crop-y: -9.23%;
 }
 
 .about-me {
