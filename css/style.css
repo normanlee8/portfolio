@@ -620,7 +620,7 @@ body {
 .hero-eyebrow {
     display: flex;
     align-items: center;
-    gap: var(--space-sm);
+    gap: 0.375em;
     color: var(--text-secondary);
     font-size: clamp(0.875rem, 0.8196rem + 0.2255vw, 1rem); /* 14 → 16px */
     font-weight: var(--weight-medium);
@@ -635,6 +635,7 @@ body {
     width: 1em;
     height: 1em;
     color: var(--color-blue);
+    translate: 0 -0.11em; /* lines the arrow's visual center up with the middle of the capital letters */
 }
 
 .location-arrow svg {
@@ -645,6 +646,9 @@ body {
     stroke: currentColor;
     stroke-width: 1.5;
     stroke-linejoin: round;
+    /* turns around the shape's visual center (13.17 of 24 units down; the wide
+       end is heavier), so it stays centered at every angle */
+    transform-origin: 50% 54.9%;
     rotate: var(--heading, 45deg);
     transition: rotate 0.7s cubic-bezier(0.22, 1, 0.36, 1); /* turns like a glance, not a snap */
 }
