@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Extending Apple Sports with Team Schedules and Results - Norman Lee</title>
-    <meta name="description" content="A UX case study adding upcoming games and recent results to Apple Sports, so fans can follow their team without leaving the app.">
+    <title>Conceptualizing Team Schedules and Results for Apple Sports - Norman Lee</title>
+    <meta name="description" content="A concept adding team pages with recent results and upcoming schedules to Apple Sports, while adding as little interface as possible.">
     <link rel="canonical" href="https://normanmade.com/apple-sports">
     <!-- Link Previews -->
     <meta property="og:type" content="article">
     <meta property="og:site_name" content="Norman Lee">
-    <meta property="og:title" content="Extending Apple Sports with Team Schedules and Results">
-    <meta property="og:description" content="A UX case study adding upcoming games and recent results to Apple Sports, so fans can follow their team without leaving the app.">
+    <meta property="og:title" content="Conceptualizing Team Schedules and Results for Apple Sports">
+    <meta property="og:description" content="A concept adding team pages with recent results and upcoming schedules to Apple Sports, while adding as little interface as possible.">
     <meta property="og:url" content="https://normanmade.com/apple-sports">
     <meta property="og:image" content="https://normanmade.com/images/og-image.png">
     <meta property="og:image:width" content="1200">
@@ -99,7 +99,7 @@
                 </a>
                 <div class="project-menu">
                     <div class="project-menu-panel">
-                        <a href="/apple-sports" class="project-menu-item">Extending Apple Sports with Team Schedules and Results</a>
+                        <a href="/apple-sports" class="project-menu-item">Conceptualizing Team Schedules and Results for Apple Sports</a>
                         <a href="/apple-sports" class="project-menu-item">Rethinking Trip Planning for Bay Area Transit Riders</a>
                         <a href="/apple-sports" class="project-menu-item">Designing a Hands-Free Cooking Mode for Recipe Apps</a>
                     </div>
@@ -122,19 +122,30 @@
     </div>
 
     <!-- Work -->
+    <!--
+        MEDIA SLOTS: each placeholder is a <div class="shot ..."> with its shot number.
+        To swap one in, replace the div with an <img> or <video> that keeps the same classes, e.g.
+            <img class="shot" src="/images/apple-sports/02a-yesterday.webp" alt="..." width="1179" height="2556" loading="lazy">
+            <video class="shot" src="/images/apple-sports/03a-logo-flight.mp4" poster="/images/apple-sports/03a-logo-flight.webp" autoplay muted loop playsinline></video>
+        "shot" is phone-sized, "shot is-wide" fills the width.
+    -->
     <div class="section-work">
         <div class="work-card" data-fade="0">
             <div class="work-thumbnail">
-                <img src="https://images.unsplash.com/photo-1504450758481-7338eba7524a?w=1200&q=75&auto=format&fit=crop" alt="">
+                <div class="cover-screens" aria-hidden="true">
+                    <span class="cover-phone"><img src="/images/apple-sports/cover-scores.webp" alt="" width="560" height="1214"></span>
+                    <span class="cover-phone"><img src="/images/apple-sports/cover-game.webp" alt="" width="560" height="1214"></span>
+                    <span class="cover-phone"><img src="/images/apple-sports/cover-team-upcoming.webp" alt="" width="560" height="1214"></span>
+                    <span class="cover-phone"><img src="/images/apple-sports/cover-team-previous.webp" alt="" width="560" height="1214"></span>
+                </div>
                 <p>2026</p>
             </div>
-            <h1 class="work-header">Extending Apple Sports with Team Schedules and Results</h1>
+            <h1 class="work-header">Conceptualizing Team Schedules and Results for Apple Sports</h1>
             <div class="tag-container">
+                <span class="pill-tag">CONCEPT</span>
+                <span class="pill-tag">INTERACTION DESIGN</span>
                 <span class="pill-tag">PROTOTYPING</span>
-                <span class="pill-tag">0 TO 1</span>
-                <span class="pill-tag">USER RESEARCH</span>
-                <span class="pill-tag">RESPONSIVE WEB DESIGN</span>
-                <span class="pill-tag">PHYSICAL UX</span>
+                <span class="pill-tag">MOBILE</span>
             </div>
             <dl class="project-details">
                 <div class="detail-item">
@@ -155,35 +166,240 @@
                 </div>
             </dl>
         </div>
+
+        <!-- Overview -->
         <div class="section-item" data-fade="1">
             <h2 class="section-header">Overview</h2>
-            <p class="section-content">Apple Sports is built for speed: open it, see the score, close it. That focus is its strength, but it stops at today. Fans who want to know when their team plays next, or how the last five games went, have to leave for ESPN or a league app. This concept adds a team page with upcoming games and recent results, without giving up the quick, glanceable feel that makes the app worth keeping.</p>
+            <dl class="case-tldr">
+                <div>
+                    <dt>Problem</dt>
+                    <dd>Apple Sports has no way to follow a single team. Results vanish after a day, and upcoming games are buried among every other team and sport.</dd>
+                </div>
+                <div>
+                    <dt>Solution</dt>
+                    <dd>A team page with recent results and the upcoming schedule, opened from the places where you've already shown interest in that team.</dd>
+                </div>
+                <div>
+                    <dt>Constraint</dt>
+                    <dd>Add as little interface as possible. Keep what makes it Apple Sports: fast, current, and minimal.</dd>
+                </div>
+            </dl>
+            <!-- TODO: point this at the GitHub Pages prototype -->
+            <a href="#" class="case-button" target="_blank" rel="noopener noreferrer">
+                Try the prototype
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"><path fill-rule="evenodd" d="M14 2.5a.5.5 0 0 0-.5-.5h-6a.5.5 0 0 0 0 1h4.793L2.146 13.146a.5.5 0 0 0 .708.708L13 3.707V8.5a.5.5 0 0 0 1 0z"/></svg>
+            </a>
         </div>
+
+        <!-- Problem -->
         <div class="section-item" data-fade="2">
-            <h2 class="section-header">Problem</h2>
-            <p class="section-content">The app answers “what’s happening right now?” very well, and almost nothing else. Following a team means remembering game times yourself or bouncing between apps, so many fans stop opening Apple Sports at all once a game ends. The challenge was to add a sense of time to the app, past and future, while keeping every screen as light as the scoreboard it already is.</p>
+            <h2 class="section-header">The Problem</h2>
+            <p class="section-content">The main list only covers a few days in each direction. Previous stops at yesterday, and Upcoming shows the next few games mixed in with every other team. To follow one team, fans leave for ESPN, Yahoo, or theScore.</p>
+            <p class="section-content">Die-hard and casual fans want different levels of depth, but they ask the same two questions: <em class="case-em">how has my team been doing, and when do they play next?</em></p>
+            <ul class="case-moments">
+                <li>
+                    <p class="case-moment-label">Monday's game, gone by Wednesday</p>
+                    <p>The Warriors played Monday. On Wednesday, the Yesterday tab only shows Tuesday's games, so their result is already gone.</p>
+                </li>
+                <li>
+                    <p class="case-moment-label">Are they winning lately?</p>
+                    <p>There's no way to see a team's last five games anywhere in the app.</p>
+                </li>
+                <li>
+                    <p class="case-moment-label">Is a tough stretch coming?</p>
+                    <p>Upcoming shows only the next few games, buried among other teams. Planning a week, let alone a month, is impossible.</p>
+                </li>
+            </ul>
+            <p class="section-content">It's sharper in weekly sports. In the NFL, the Yesterday tab is empty most days.</p>
+            <figure class="case-figure">
+                <div class="case-stage">
+                    <!-- SHOT 2a: real iPhone screenshot of the Yesterday tab on a Wednesday, a Monday game missing -->
+                    <div class="shot" role="img" aria-label="Placeholder for shot 2a">2a · Yesterday tab, Monday's game missing</div>
+                    <!-- SHOT 2b: real iPhone screenshot of the Yesterday tab on an NFL off day, empty -->
+                    <div class="shot" role="img" aria-label="Placeholder for shot 2b">2b · Yesterday tab on an NFL off day</div>
+                </div>
+                <figcaption>Apple Sports today. A result disappears after one day, and weekly sports leave the tab empty.</figcaption>
+            </figure>
         </div>
+
+        <!-- Solution -->
         <div class="section-item" data-fade="3">
-            <h2 class="section-header">Research</h2>
-            <p class="section-content">I interviewed eight sports fans who follow between one and four teams, and asked each of them to walk through how they had checked on their team that week. I also mapped how ESPN, theScore, and the official league apps present schedules, noting what each one shows first and how many taps it takes to reach the next game.</p>
-            <p class="section-content">Every fan checked the score on the day of a game, but most checked the schedule only a few times a week, usually to plan around it: when to leave work, whether to book a bar, or if a game clashed with something else.</p>
+            <h2 class="section-header">The Solution</h2>
+            <p class="case-lede">Turn Yesterday into Previous, which shows the most recent games, and give every team its own page.</p>
+            <p class="section-content">A team page opens from two places: a team's logo in a game's card, and the team's name in the league menu. Both are moments when you've already shown interest in that team. It opens inside the existing slide-up card, so it adds one layer and nothing about the main app changes.</p>
+            <figure class="case-figure">
+                <div class="case-stage">
+                    <!-- SHOT 3a: screen recording from the prototype, 6-8s loop. MP4 (H.264), muted, under ~3MB, plus a poster frame -->
+                    <div class="shot" role="img" aria-label="Placeholder for shot 3a">3a · Video: logo flies from the game card into the team page</div>
+                    <!-- SHOT 3b: screen recording from the prototype, 6-8s loop -->
+                    <div class="shot" role="img" aria-label="Placeholder for shot 3b">3b · Video: opening a team from the league menu</div>
+                </div>
+                <figcaption>The two ways in: from a game's card, or from the league menu.</figcaption>
+            </figure>
         </div>
-        <div class="section-item" data-fade="4">
-            <h2 class="section-header">Key Insights</h2>
-            <p class="section-content">Fans think about the next game, not the whole season. A full calendar was rarely what they wanted; the next one or two games, with the time in their own time zone and where to watch, covered nearly every need. Results worked the same way: a team’s last five games told the story better than a standings table, and a simple win or loss mark was enough to see the trend at a glance.</p>
+
+        <!-- Decision 1 -->
+        <div class="section-item">
+            <h2 class="section-header">Where It Lives</h2>
+            <p class="case-lede">Two entry points, one layer deep. Not three, and not one.</p>
+            <p class="section-content">I considered the alternatives on either side and rejected both.</p>
+            <ul class="case-rejected">
+                <li>
+                    <p class="case-rejected-label">Tap a logo in the main list</p>
+                    <p>A third entry point, and it shrinks the area you tap to open the game card.</p>
+                </li>
+                <li>
+                    <p class="case-rejected-label">Game card only, no menu entry</p>
+                    <p>You could only reach your team on days it appears in the list. The teams were already in the menu, so I gave them somewhere to go.</p>
+                </li>
+            </ul>
+            <figure class="case-figure">
+                <div class="case-stage">
+                    <!-- SHOT 4: Figma, annotated. Main list with the logo tap target marked against the card's hit area -->
+                    <div class="shot is-wide" role="img" aria-label="Placeholder for shot 4">4 · Main list: logo tap target vs. the card's hit area</div>
+                </div>
+                <figcaption>A logo tap target in the main list would cut into the card's hit area.</figcaption>
+            </figure>
         </div>
-        <div class="section-item" data-fade="5">
-            <h2 class="section-header">Design Process</h2>
-            <p class="section-content">I started with paper sketches of three directions: a scrolling season calendar, a card for each game, and a single team page split into “Next” and “Recent.” Quick tests with five fans favored the team page, since it answered both questions on one screen without any filters or tabs to learn.</p>
-            <p class="section-content">From there I built the screens in Figma using Apple’s own type, spacing, and colors, so the new pages would feel native rather than bolted on. I kept the team page reachable from any score tile with a single tap, and added a widget that shows the next game on the Home Screen.</p>
+
+        <!-- Decision 2 -->
+        <div class="section-item">
+            <h2 class="section-header">What I Left Out</h2>
+            <p class="case-lede">Rosters, news, and stats.</p>
+            <p class="section-content">Each would bloat a page built to be quick. Schedules and results are different: they aren't new content, just the games the app already shows, filtered to one team. That makes them a core function, not an add-on.</p>
+            <div class="case-in-out">
+                <div>
+                    <p class="case-in-out-label">In</p>
+                    <ul>
+                        <li>Recent results</li>
+                        <li>Upcoming schedule</li>
+                        <li>Where to watch</li>
+                    </ul>
+                </div>
+                <div>
+                    <p class="case-in-out-label">Out</p>
+                    <ul>
+                        <li>Rosters</li>
+                        <li>News</li>
+                        <li>Stats</li>
+                    </ul>
+                </div>
+            </div>
         </div>
-        <div class="section-item" data-fade="6">
-            <h2 class="section-header">Final Design</h2>
-            <p class="section-content">Tapping a team opens a page with its next game pinned at the top, showing the opponent, time, and broadcast. Below it, the last five results read as a row of wins and losses, and each game opens to the same box score fans already know. The rest of the season sits in a compact list further down for anyone who wants it, out of the way for everyone else.</p>
+
+        <!-- Decision 3 -->
+        <div class="section-item">
+            <h2 class="section-header">The Hardest Decision</h2>
+            <p class="case-lede">Breaking the app's game row to fit the date and the network.</p>
+            <p class="section-content">Apple Sports shows a game as team, record, time, record, team, with the date above. I needed to add the date and the TV network, and squeezing both into that row made it cluttered.</p>
+            <figure class="case-figure">
+                <div class="case-rows">
+                    <div class="case-row-group">
+                        <p class="case-row-label">Apple Sports</p>
+                        <div class="case-row" aria-label="Team, record, time, record, team">
+                            <span>Team</span><span>Record</span><span class="is-key">Time</span><span>Record</span><span>Team</span>
+                        </div>
+                    </div>
+                    <div class="case-row-group">
+                        <p class="case-row-label">Team page</p>
+                        <div class="case-row is-new" aria-label="Date, vs or at opponent, time, with the network below the time">
+                            <span>Date</span><span class="is-grow">vs / @ Opponent</span><span class="case-row-stack"><span class="is-key">Time</span><span class="is-accent">Network</span></span>
+                        </div>
+                    </div>
+                </div>
+                <figcaption>Row anatomy, before and after.</figcaption>
+            </figure>
+            <p class="section-content">The network drove the change. With games spread across ESPN, Prime Video, Peacock, and more, knowing where to watch is genuinely hard, and seeing the network shows at a glance which games are on national TV. I shortened long network names to keep the rows clean.</p>
+            <p class="case-tradeoff"><span>Tradeoff</span>These rows look different from the rest of the app, but they keep its clean, minimal style. It's different, not foreign.</p>
+            <figure class="case-figure">
+                <div class="case-stage">
+                    <!-- SHOT 5: Figma crop. Several upcoming rows at real size, including a shortened network name -->
+                    <div class="shot is-wide" role="img" aria-label="Placeholder for shot 5">5 · Upcoming rows at real size, with shortened network names</div>
+                </div>
+                <figcaption>The upcoming schedule. The network sits under the time.</figcaption>
+            </figure>
         </div>
-        <div class="section-item" data-fade="7">
-            <h2 class="section-header">Reflection</h2>
-            <p class="section-content">The hardest part was deciding what to leave out. Standings, player stats, and news all came up in interviews, and each would have made the page heavier. Holding the line on “next game and recent results” kept the concept true to the app. If I took it further, I would test the Home Screen widget over a full week of games and look at how fans following several teams switch between them.</p>
+
+        <!-- Craft -->
+        <div class="section-item">
+            <h2 class="section-header">Making It Feel Native</h2>
+            <p class="case-lede">An extension of the app, not a new screen.</p>
+            <dl class="case-specs">
+                <div>
+                    <dt>Motion</dt>
+                    <dd>Built inside the existing slide-up card, with the team's logo flying into place.</dd>
+                </div>
+                <div>
+                    <dt>Type</dt>
+                    <dd>SF Pro throughout, with SF Pro Rounded only for times, as Apple Sports does.</dd>
+                </div>
+                <div>
+                    <dt>Color</dt>
+                    <dd>Layered gradients in each team's colors add depth, in the style of Apple's own backgrounds.</dd>
+                </div>
+                <div>
+                    <dt>Materials</dt>
+                    <dd>Apple's iOS design resources in Figma for the see-through, blurred materials.</dd>
+                </div>
+                <div>
+                    <dt>Spacing</dt>
+                    <dd>Measured from the existing app, then held to one scale.</dd>
+                </div>
+            </dl>
+            <figure class="case-figure">
+                <ol class="case-scale" aria-label="Spacing scale in points">
+                    <li style="--pt: 4"><span class="case-scale-box"></span>4</li>
+                    <li style="--pt: 6"><span class="case-scale-box"></span>6</li>
+                    <li style="--pt: 8"><span class="case-scale-box"></span>8</li>
+                    <li style="--pt: 12"><span class="case-scale-box"></span>12</li>
+                    <li style="--pt: 16"><span class="case-scale-box"></span>16</li>
+                    <li style="--pt: 24"><span class="case-scale-box"></span>24</li>
+                </ol>
+                <figcaption>The spacing scale, in points.</figcaption>
+            </figure>
+            <figure class="case-figure">
+                <div class="case-stage">
+                    <!-- SHOTS 6a-c: Figma, team pages for three different teams to show the gradient system -->
+                    <div class="shot" role="img" aria-label="Placeholder for shot 6a">6a · Team page, team one</div>
+                    <div class="shot" role="img" aria-label="Placeholder for shot 6b">6b · Team page, team two</div>
+                    <div class="shot" role="img" aria-label="Placeholder for shot 6c">6c · Team page, team three</div>
+                </div>
+                <figcaption>The same page, in each team's colors.</figcaption>
+            </figure>
+        </div>
+
+        <!-- Success -->
+        <div class="section-item">
+            <h2 class="section-header">Measuring Success</h2>
+            <dl class="case-specs">
+                <div>
+                    <dt>Usage</dt>
+                    <dd>How often team pages are opened.</dd>
+                </div>
+                <div>
+                    <dt>Return</dt>
+                    <dd>Whether people come back to them.</dd>
+                </div>
+                <div>
+                    <dt>Retention</dt>
+                    <dd>Whether people who follow one team keep using the app over time.</dd>
+                </div>
+            </dl>
+            <p class="case-tradeoff"><span>Biggest risk</span>Discoverability. Apple tends to keep features out of sight. A one-time tip when the app opens, like the built-in tips iOS already uses, would point out the feature without cluttering the interface.</p>
+            <figure class="case-figure">
+                <div class="case-stage">
+                    <!-- SHOT 7 (optional): Figma, the one-time tip on launch -->
+                    <div class="shot" role="img" aria-label="Placeholder for shot 7">7 · One-time tip on launch (optional)</div>
+                </div>
+                <figcaption>A one-time tip, shown once on launch.</figcaption>
+            </figure>
+        </div>
+
+        <!-- Reflection -->
+        <div class="section-item">
+            <h2 class="section-header">What I Learned</h2>
+            <p class="case-lede">The feature was simple. The hard part was deciding where it lives, what it leaves out, and how far to move from the existing design.</p>
+            <p class="section-content">A small, well-placed addition can solve a real problem without changing what makes a product good.</p>
         </div>
     </div>
 

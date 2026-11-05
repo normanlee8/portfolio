@@ -85,6 +85,21 @@ window.addEventListener('scroll', updateScrollProgress, { passive: true });
 window.addEventListener('resize', updateScrollProgress);
 updateScrollProgress();
 
+// Work Dropdown: never runs past the header's right edge; long titles wrap instead
+const projectMenu = document.querySelector('.project-menu');
+
+function fitProjectMenu() {
+    const contentRight = header.getBoundingClientRect().right - parseFloat(getComputedStyle(header).paddingRight);
+    const room = contentRight - projectMenu.getBoundingClientRect().left;
+    projectMenu.style.setProperty('--menu-room', `${Math.max(room, 0)}px`);
+}
+
+if (projectMenu) {
+    window.addEventListener('resize', fitProjectMenu);
+    document.fonts.ready.then(fitProjectMenu); // the nav's width depends on the loaded font
+    fitProjectMenu();
+}
+
 // Theme Toggle
 const themeToggleBtn = document.querySelector(".theme-toggle-btn");
 const darkQuery = window.matchMedia("(prefers-color-scheme: dark)");
