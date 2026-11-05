@@ -727,8 +727,13 @@ body {
     min-height: 60svh; /* a bit over half the screen, content centered in it */
     margin: 0 var(--space-md);
     padding: var(--space-xl) 0;
-    border-bottom: 1px solid var(--text-secondary); /* the line above the footer's thanks, like the other pages */
+    border-bottom: 1px solid var(--text-secondary); /* the one line between the page and the footer links (no thanks row here) */
     text-align: center;
+}
+
+/* footer links sit the same distance below the line as on the other pages */
+.not-found + .section-footer {
+    padding-top: var(--space-lg);
 }
 
 .not-found-title {
