@@ -718,17 +718,18 @@ body {
 
 
 /* Work Section */
+.page-header {
+    margin: 0 var(--space-md);
+    padding-top: var(--space-xl);
+    font-size: var(--text-2xl);
+}
+
 .section-work {
     display: flex;
     flex-direction: column;
     padding: 0 var(--space-md);
     gap: var(--space-md);
     margin-top: var(--space-xl);
-}
-
-/* Work page: cards start just below the header (the page heading is screen-reader only) */
-.work-grid {
-    margin-top: var(--space-md);
 }
 
 .card-first {
@@ -1158,6 +1159,159 @@ h1.work-header {
 .case-button:hover,
 .case-button:focus-visible {
     background-color: var(--accent-color);
+}
+
+/* ===== Prototype popup =====
+   The live prototype in a phone frame, scaled to fit the window (--proto-scale, set by script.js).
+   On phones it fills the screen instead. */
+html:has(.proto-dialog[open]) {
+    overflow: hidden; /* no page scrolling behind it */
+}
+
+.proto-dialog {
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: none;
+    overflow: hidden;
+    background: transparent;
+    color: #fff;
+}
+
+.proto-dialog[open] {
+    display: grid;
+    place-items: center;
+}
+
+.proto-dialog::backdrop {
+    background-color: rgb(5 7 13 / 0.7);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+}
+
+.proto-stage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+/* black bezel, titanium edge, dynamic island over the prototype's status bar */
+.proto-phone {
+    position: relative;
+    zoom: var(--proto-scale, 1);
+    padding: 12px;
+    border-radius: 64px;
+    background-color: #0B0B0C;
+    box-shadow:
+        0 0 0 3px #48484A,
+        0 30px 80px rgb(0 0 0 / 0.55);
+}
+
+.proto-phone::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 23px;
+    width: 126px;
+    height: 37px;
+    translate: -50% 0;
+    border-radius: 999px;
+    background-color: #000;
+    pointer-events: none;
+}
+
+.proto-frame {
+    display: block;
+    width: 393px;
+    height: 852px;
+    border: 0;
+    border-radius: 52px;
+    background-color: #05070d; /* the prototype's own background, while it loads */
+}
+
+.proto-newtab {
+    font-size: var(--text-xs);
+    color: rgb(255 255 255 / 0.75);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: color 0.2s ease;
+}
+
+.proto-newtab:hover,
+.proto-newtab:focus-visible {
+    color: #fff;
+}
+
+.proto-close {
+    position: fixed;
+    top: var(--space-md);
+    right: var(--space-md);
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid rgb(255 255 255 / 0.2);
+    background-color: rgb(255 255 255 / 0.12);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.proto-close:hover,
+.proto-close:focus-visible {
+    background-color: rgb(255 255 255 / 0.24);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .proto-dialog[open] .proto-stage {
+        animation: proto-in 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .proto-dialog[open]::backdrop {
+        animation: proto-fade 0.3s ease;
+    }
+}
+
+@keyframes proto-in {
+    from { opacity: 0; scale: 0.96; translate: 0 12px; }
+}
+
+@keyframes proto-fade {
+    from { opacity: 0; }
+}
+
+/* phones: the prototype fills the screen, no frame */
+@media (max-width: 500px) {
+    .proto-phone {
+        zoom: 1;
+        padding: 0;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    .proto-phone::after,
+    .proto-newtab {
+        display: none;
+    }
+
+    .proto-frame {
+        width: 100vw;
+        height: 100dvh;
+        border-radius: 0;
+    }
+
+    .proto-close {
+        top: max(var(--space-sm), env(safe-area-inset-top));
+        right: var(--space-sm);
+    }
 }
 
 /* moments of need */
@@ -2497,6 +2651,13 @@ body:has(.page-nav) .toast {
     }
 
     /* Work page: three vertical slices */
+    /* Work heading row */
+    .page-header {
+        margin: 0 var(--space-md);
+        padding: var(--space-lg) 0;
+        border-bottom: 1px solid var(--line-faint);
+    }
+
     /* the lines belong to the cards so they fade in with them */
     .work-grid {
         container-type: inline-size; /* for cqi units */
@@ -2505,8 +2666,8 @@ body:has(.page-nav) .toast {
         gap: 0;
         padding: 0;
         margin: 0 var(--space-md);
-        /* fill the screen below the header; the column lines run up to the header line */
-        min-height: calc(100svh - var(--header-height));
+        /* fill the screen below the heading */
+        min-height: calc(100svh - var(--header-height) - var(--text-2xl) * 1.15 - 2 * var(--space-lg) - 1px);
     }
 
     .work-grid .work-card {

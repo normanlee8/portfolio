@@ -100,6 +100,39 @@ if (projectMenu) {
     fitProjectMenu();
 }
 
+// Prototype Popup: "Try the prototype" opens it here instead of leaving the site
+const protoDialog = document.getElementById('proto-dialog');
+const protoLink = document.querySelector('[data-prototype]');
+
+if (protoDialog && protoLink && typeof protoDialog.showModal === 'function') {
+    const protoFrame = protoDialog.querySelector('.proto-frame');
+    const protoPhone = protoDialog.querySelector('.proto-phone');
+    const PHONE_W = 393 + 24; // screen plus bezel
+    const PHONE_H = 852 + 24;
+
+    // shrink the phone to fit the window, leaving room for the margins and the "new tab" link
+    function fitPrototype() {
+        const scale = Math.min(1, (window.innerHeight - 120) / PHONE_H, (window.innerWidth - 48) / PHONE_W);
+        protoPhone.style.setProperty('--proto-scale', scale.toFixed(3));
+    }
+
+    protoLink.addEventListener('click', (e) => {
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return; // still opens a new tab
+        e.preventDefault();
+        if (!protoFrame.src) protoFrame.src = protoFrame.dataset.src; // load on first open only
+        fitPrototype();
+        protoDialog.showModal();
+    });
+
+    window.addEventListener('resize', fitPrototype);
+    protoDialog.querySelector('.proto-close').addEventListener('click', () => protoDialog.close());
+
+    // clicking the dimmed area around the phone closes it (Esc does too, natively)
+    protoDialog.addEventListener('click', (e) => {
+        if (e.target === protoDialog || e.target.classList.contains('proto-stage')) protoDialog.close();
+    });
+}
+
 // Theme Toggle
 const themeToggleBtn = document.querySelector(".theme-toggle-btn");
 const darkQuery = window.matchMedia("(prefers-color-scheme: dark)");
