@@ -717,6 +717,72 @@ body {
 }
 
 
+/* 404 page: the message and the ways back, with the footer right below */
+.not-found {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-xl);
+    min-height: 60svh; /* a bit over half the screen, content centered in it */
+    margin: 0 var(--space-md);
+    padding: var(--space-xl) 0;
+    border-bottom: 1px solid var(--text-secondary); /* the line above the footer's thanks, like the other pages */
+    text-align: center;
+}
+
+.not-found-title {
+    font-size: clamp(2.5rem, 1.8rem + 2.8vw, 4rem); /* 40 → 64px */
+    text-transform: capitalize; /* shows as "Page Not Found" */
+}
+
+.not-found-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-sm);
+}
+
+/* second button: same shape as the main one, in quiet pill colors */
+.case-button.is-secondary {
+    background-color: var(--bg-pill);
+    color: var(--text-primary);
+    box-shadow: inset 0 0 0 1px var(--border-pill);
+}
+
+.case-button.is-secondary:hover,
+.case-button.is-secondary:focus-visible {
+    background-color: var(--bg-thumbnail);
+    color: var(--accent-color);
+}
+
+/* main 404 button: hover lightens it in light mode and darkens it in dark mode, instead of turning blue */
+.not-found-links .case-button:not(.is-secondary):hover,
+.not-found-links .case-button:not(.is-secondary):focus-visible {
+    background-color: color-mix(in srgb, var(--text-primary) 75%, #fff);
+}
+
+:root.dark-theme .not-found-links .case-button:not(.is-secondary):hover,
+:root.dark-theme .not-found-links .case-button:not(.is-secondary):focus-visible {
+    background-color: color-mix(in srgb, var(--text-primary) 75%, #000);
+}
+
+/* the arrow nudges right on hover */
+.case-button.is-secondary svg {
+    transition: translate 0.2s ease;
+}
+
+.case-button.is-secondary:hover svg,
+.case-button.is-secondary:focus-visible svg {
+    translate: 3px 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .case-button.is-secondary svg {
+        transition: none;
+    }
+}
+
 /* Work Section */
 .page-header {
     margin: 0 var(--space-md);
