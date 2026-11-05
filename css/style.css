@@ -116,7 +116,7 @@
 }
 
 html {
-    scroll-padding-top: var(--header-height);
+    scroll-padding-top: calc(var(--header-height) + var(--space-lg));
 }
 
 *, *:before, *:after {
@@ -2395,8 +2395,9 @@ body:has(.page-nav) .toast {
     color: var(--text-secondary);
 }
 
-/* Fun: one item per line, with a small gap so long dishes that wrap still read as separate items */
-.fun-list {
+/* Fun and job duties: one item per line, with a small gap so long items that wrap still read as separate items */
+.fun-list,
+.duty-list {
     display: flex;
     flex-direction: column;
     gap: var(--space-xs);
