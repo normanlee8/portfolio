@@ -665,12 +665,13 @@ body {
 
 /* 18 → 24px; below ~450px it shrinks so the first line still fits */
 .hero-description {
-    font-size: clamp(0.75rem, min(100cqi / 23, 0.9589rem + 0.6764vw), 1.5rem);
+    margin-top: calc(var(--space-md) - var(--space-sm)); /* sits --space-md under the headline, as its own beat */
+    font-size: clamp(1rem, 0.889rem + 0.451vw, 1.25rem); /* 16 → 20px */
     color: var(--text-secondary);
     font-weight: var(--weight-medium);
 }
 
-/* first line always whole; the last sentence wraps at most once, so 2 or 3 lines */
+/* the line never wraps */
 .hero-description span {
     display: block;
     white-space: nowrap;
@@ -773,17 +774,17 @@ body {
 }
 
 /* the arrow nudges right on hover */
-.case-button.is-secondary svg {
+.not-found-links .case-button.is-secondary svg {
     transition: translate 0.2s ease;
 }
 
-.case-button.is-secondary:hover svg,
-.case-button.is-secondary:focus-visible svg {
+.not-found-links .case-button.is-secondary:hover svg,
+.not-found-links .case-button.is-secondary:focus-visible svg {
     translate: 3px 0;
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .case-button.is-secondary svg {
+    .not-found-links .case-button.is-secondary svg {
         transition: none;
     }
 }
@@ -1212,7 +1213,13 @@ h1.work-header {
     color: var(--text-secondary);
 }
 
-/* prototype link */
+/* prototype and Figma buttons, side by side */
+.case-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+}
+
 .case-button {
     display: inline-flex;
     align-items: center;
@@ -1227,9 +1234,10 @@ h1.work-header {
     transition: background-color 0.2s ease;
 }
 
+/* hover turns it gray, like the name in the header */
 .case-button:hover,
 .case-button:focus-visible {
-    background-color: var(--accent-color);
+    background-color: var(--text-secondary);
 }
 
 /* ===== Prototype popup =====
@@ -1513,37 +1521,125 @@ html:has(.proto-dialog[open]) {
 .case-stage {
     display: flex;
     justify-content: center;
+    align-items: center; /* each shot keeps its own shape; none stretches to a taller neighbor */
     gap: var(--space-md);
 }
 
+/* ===== Phone frame =====
+   A full-screen shot or recording inside an iPhone: black border, rounded screen and status bar.
+   Every measurement is a share of the frame's own box (393 x 852pt screen, 10pt border), so it scales with the frame. */
+.phone {
+    --phone-edge: #9A9AA0; /* titanium, as on the cover */
+    position: relative;
+    flex: 1 1 0;
+    min-width: 0;
+    max-width: 13rem;
+    aspect-ratio: 413 / 872;
+    border-radius: 15.74% / 7.45%;
+    background-color: #0B0B0C;
+    box-shadow:
+        0 0 0 1px var(--phone-edge),
+        0 2px 4px rgb(0 0 0 / 0.14),
+        0 12px 28px rgb(0 0 0 / 0.2);
+}
+
+:root.dark-theme .phone {
+    --phone-edge: #48484A;
+}
+
+/* the screen */
+.phone > img,
+.phone > video {
+    position: absolute;
+    left: 2.42%;
+    top: 1.147%;
+    width: 95.16%;
+    height: 97.706%;
+    object-fit: cover;
+    border-radius: 14% / 6.46%;
+}
+
+/* status bar: Dynamic Island, 1:46, signal, Wi-Fi and battery. Each shot's own status bar is painted out of the file,
+   so this is the only one showing and every phone matches */
+.phone::after {
+    content: "";
+    position: absolute;
+    left: 2.42%;
+    top: 1.147%;
+    width: 95.16%;
+    aspect-ratio: 393 / 59;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 393 59' fill='%23fff'%3E%3Crect x='133.5' y='11' width='126' height='37' rx='18.5' fill='%23000'/%3E%3Ctext x='71' y='36' text-anchor='middle' font-family='-apple-system,BlinkMacSystemFont,SF Pro Text,Segoe UI,Roboto,Helvetica,Arial,sans-serif' font-size='17' font-weight='600'%3E1:46%3C/text%3E%3Crect x='282' y='31.5' width='3.2' height='4' rx='.8'/%3E%3Crect x='286.8' y='29.3' width='3.2' height='6.2' rx='.8'/%3E%3Crect x='291.6' y='26.9' width='3.2' height='8.6' rx='.8'/%3E%3Crect x='296.4' y='24.5' width='3.2' height='11' rx='.8'/%3E%3Cg fill='none' stroke='%23fff' stroke-width='2.1' stroke-linecap='round'%3E%3Cpath d='M307.2 28.4a10.6 10.6 0 0 1 14.6 0'/%3E%3Cpath d='M310.3 31.6a6.2 6.2 0 0 1 8.4 0'/%3E%3C/g%3E%3Ccircle cx='314.5' cy='34.5' r='1.6'/%3E%3Crect x='330.5' y='24' width='24' height='12' rx='3.8' fill='none' stroke='%23fff' stroke-opacity='.45'/%3E%3Crect x='332.5' y='26' width='20' height='8' rx='2.2'/%3E%3Crect x='356' y='28' width='1.6' height='4' rx='.8' fill-opacity='.5'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+    pointer-events: none;
+}
+
+/* recordings play on their own; a click pauses or resumes them (script.js) */
+.phone > video {
+    cursor: pointer;
+}
+
+.phone > video:focus-visible {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 3px;
+}
+
+/* paused: a play badge in the middle of the screen */
+.phone.is-paused::before {
+    content: "";
+    position: absolute;
+    z-index: 1;
+    left: 50%;
+    top: 50%;
+    width: 26%;
+    aspect-ratio: 1;
+    translate: -50% -50%;
+    border-radius: 50%;
+    background: rgb(0 0 0 / 0.55) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23fff'%3E%3Cpath d='M5 3.3v9.4a.6.6 0 0 0 .9.5l7.8-4.7a.6.6 0 0 0 0-1L5.9 2.8a.6.6 0 0 0-.9.5z'/%3E%3C/svg%3E") 56% 50% / 46% no-repeat;
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    pointer-events: none;
+}
+
+/* crops and placeholders */
 .shot {
     display: block;
     flex: 1 1 0;
     min-width: 0;
     max-width: 13rem;
     height: auto;
-    aspect-ratio: 1179 / 2556; /* iPhone screenshot */
-    object-fit: cover;
-    border-radius: 1.25rem;
+}
+
+img.shot {
     outline: 1px solid var(--line-faint);
     outline-offset: -1px;
 }
 
 .shot.is-wide {
     max-width: none;
-    aspect-ratio: auto;
     border-radius: 6px;
 }
 
-/* placeholder until the real shot is swapped in */
+/* a crop shown at its real size: as wide as its width attribute, shrinking only if the stage is narrower.
+   The shadow lifts it off the stage, so its edges read even on the light theme's near-white */
+.shot.is-actual {
+    flex: 0 1 auto;
+    max-width: 100%;
+    border-radius: 6px;
+    box-shadow:
+        0 1px 3px rgb(0 0 0 / 0.16),
+        0 10px 28px rgb(0 0 0 / 0.24);
+}
+
+/* placeholder until the real shot is swapped in: the size and shape of a phone frame,
+   drawn with an outline and no padding so it takes exactly the width a phone would beside it */
 div.shot {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: var(--space-sm);
+    aspect-ratio: 413 / 872;
+    border-radius: 15.74% / 7.45%;
     background-color: var(--bg-color);
-    border: 1.5px dashed color-mix(in srgb, var(--text-secondary) 45%, transparent);
-    outline: none;
+    outline: 1.5px dashed color-mix(in srgb, var(--text-secondary) 45%, transparent);
+    outline-offset: -1.5px;
     font-size: var(--text-2xs);
     font-weight: var(--weight-medium);
     color: var(--text-secondary);
@@ -1552,6 +1648,12 @@ div.shot {
 
 div.shot.is-wide {
     aspect-ratio: 16 / 9;
+    border-radius: 6px;
+}
+
+/* the label's breathing room sits on an inner span, so the placeholder itself stays padding-free */
+div.shot > span {
+    padding: var(--space-sm);
 }
 
 /* row anatomy diagram */
@@ -1572,7 +1674,7 @@ div.shot.is-wide {
     gap: var(--space-xs);
 }
 
-.case-row span:not(.case-row-stack) {
+.case-row span:not(.case-row-stack, .case-row-line) {
     flex: 1 1 0;
     min-width: 0;
     padding: var(--space-sm) var(--space-xs);
@@ -1589,13 +1691,33 @@ div.shot.is-wide {
     overflow-wrap: anywhere;
 }
 
-.case-row .is-key {
+.case-row span.is-key {
     color: var(--text-primary);
     font-weight: var(--weight-semibold);
 }
 
-.case-row .is-grow {
-    flex-grow: 2.5;
+/* team page row: a narrow date beside two lines. Each line has one long box and one short one,
+   on opposite sides: opponent + time, then record + network and spread */
+.case-row span.is-date {
+    flex-grow: 0.5;
+}
+
+.case-row.is-new .case-row-stack {
+    flex-grow: 3.6;
+}
+
+.case-row-line {
+    display: flex;
+    gap: var(--space-xs);
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+.case-row span.is-long {
+    flex-grow: 2.2;
+}
+
+.case-row span.is-left {
     justify-content: flex-start;
     padding-inline: var(--space-sm);
     text-align: left;
@@ -1609,7 +1731,7 @@ div.shot.is-wide {
     min-width: 0;
 }
 
-.case-row .is-accent {
+.case-row span.is-accent {
     background-color: color-mix(in srgb, var(--accent-color) 12%, transparent);
     border-color: color-mix(in srgb, var(--accent-color) 40%, transparent);
     color: var(--accent-color);

@@ -123,11 +123,12 @@
 
     <!-- Work -->
     <!--
-        MEDIA SLOTS: each placeholder is a <div class="shot ..."> with its shot number.
-        To swap one in, replace the div with an <img> or <video> that keeps the same classes, e.g.
-            <img class="shot" src="/images/apple-sports/02a-yesterday.webp" alt="..." width="1179" height="2556" loading="lazy">
-            <video class="shot" src="/images/apple-sports/03a-logo-flight.mp4" poster="/images/apple-sports/03a-logo-flight.webp" autoplay muted loop playsinline></video>
-        "shot" is phone-sized, "shot is-wide" fills the width.
+        MEDIA SLOTS: a placeholder is a <div class="shot"> with its shot number.
+        A full phone screen goes in a phone frame, which draws the border and the status bar (1:46, island, signal, Wi-Fi, battery):
+            <div class="phone"><img src="/images/apple-sports/02a-yesterday.webp?v=2" alt="..." width="624" height="1353" loading="lazy"></div>
+            <div class="phone"><video src="..." poster="..." autoplay muted loop playsinline></video></div>
+        The file's own status bar is painted out first, so the frame's is the only one showing.
+        A crop goes in bare: <img class="shot is-actual"> shows it at its real size, <img class="shot is-wide"> fills the width.
     -->
     <div class="section-work">
         <div class="work-card" data-fade="0">
@@ -184,11 +185,25 @@
                     <dd>Add as little interface as possible. Keep what makes it Apple Sports: fast, current, and minimal.</dd>
                 </div>
             </dl>
-            <!-- Opens the prototype in a popup (script.js); without JS, or with Ctrl/Cmd-click, it opens in a new tab -->
-            <a href="https://normanlee8.github.io/apple-sports-team-schedule/" class="case-button" data-prototype target="_blank" rel="noopener noreferrer">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"><path d="M11 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM5 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"/><path d="M8 14a1 1 0 1 0 0-2 1 1 0 0 0 0 2"/></svg>
-                Try the prototype
-            </a>
+            <figure class="case-figure">
+                <div class="case-stage">
+                    <!-- SHOT 1: screen recording of the whole flow, 36s loop. Plays on its own; a click pauses or resumes (script.js) -->
+                    <div class="phone"><video src="/images/apple-sports/01-full-demo.mp4?v=1" poster="/images/apple-sports/01-full-demo.webp?v=1" width="480" height="1040" autoplay muted loop playsinline preload="metadata" tabindex="0" aria-label="Screen recording of the whole feature: the Previous tab, a team page opened from the league menu, and a team page opened from a game's card. Click to pause or play."></video></div>
+                </div>
+                <figcaption>The whole feature in 36 seconds.</figcaption>
+            </figure>
+            <div class="case-actions">
+                <!-- Opens the prototype in a popup (script.js); without JS, or with Ctrl/Cmd-click, it opens in a new tab -->
+                <a href="https://normanlee8.github.io/apple-sports-team-schedule/" class="case-button" data-prototype target="_blank" rel="noopener noreferrer">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"><path d="M11 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM5 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"/><path d="M8 14a1 1 0 1 0 0-2 1 1 0 0 0 0 2"/></svg>
+                    Try the prototype
+                </a>
+                <!-- Figma file: no link yet. Add href="https://www.figma.com/..." target="_blank" rel="noopener noreferrer" when it is ready -->
+                <a class="case-button is-secondary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="11" height="16" viewBox="0 0 12 18" aria-hidden="true"><path fill="#F24E1E" d="M6 0H3a3 3 0 0 0 0 6h3z"/><path fill="#FF7262" d="M6 0h3a3 3 0 0 1 0 6H6z"/><path fill="#A259FF" d="M6 6H3a3 3 0 0 0 0 6h3z"/><circle fill="#1ABCFE" cx="9" cy="9" r="3"/><path fill="#0ACF83" d="M3 12h3v3a3 3 0 1 1-3-3z"/></svg>
+                    View in Figma
+                </a>
+            </div>
         </div>
 
         <!-- Problem -->
@@ -213,12 +228,10 @@
             <p class="section-content">It's sharper in weekly sports. In the NFL, the Yesterday tab is empty most days.</p>
             <figure class="case-figure">
                 <div class="case-stage">
-                    <!-- SHOT 2a: real iPhone screenshot of the Yesterday tab on a Wednesday, a Monday game missing -->
-                    <div class="shot" role="img" aria-label="Placeholder for shot 2a">2a · Yesterday tab, Monday's game missing</div>
-                    <!-- SHOT 2b: real iPhone screenshot of the Yesterday tab on an NFL off day, empty -->
-                    <div class="shot" role="img" aria-label="Placeholder for shot 2b">2b · Yesterday tab on an NFL off day</div>
+                    <!-- SHOT 2b: real iPhone screenshot of the Yesterday tab on a day with no games -->
+                    <div class="phone"><img src="/images/apple-sports/02b-yesterday-empty.webp?v=2" alt="Apple Sports' Yesterday tab, empty, reading No Events Yesterday" width="624" height="1353" loading="lazy" decoding="async"></div>
                 </div>
-                <figcaption>Apple Sports today. A result disappears after one day, and weekly sports leave the tab empty.</figcaption>
+                <figcaption>Apple Sports today. On a day with no games, the Yesterday tab is empty.</figcaption>
             </figure>
         </div>
 
@@ -229,12 +242,13 @@
             <p class="section-content">A team page opens from two places: a team's logo in a game's card, and the team's name in the league menu. Both are moments when you've already shown interest in that team. It opens inside the existing slide-up card, so it adds one layer and nothing about the main app changes.</p>
             <figure class="case-figure">
                 <div class="case-stage">
-                    <!-- SHOT 3a: screen recording from the prototype, 6-8s loop. MP4 (H.264), muted, under ~3MB, plus a poster frame -->
-                    <div class="shot" role="img" aria-label="Placeholder for shot 3a">3a · Video: logo flies from the game card into the team page</div>
-                    <!-- SHOT 3b: screen recording from the prototype, 6-8s loop -->
-                    <div class="shot" role="img" aria-label="Placeholder for shot 3b">3b · Video: opening a team from the league menu</div>
+                    <!-- SHOT 3: Figma, the main list on its new Previous tab -->
+                    <div class="phone"><img src="/images/apple-sports/03-previous-tab.webp?v=2" alt="The main list on the new Previous tab, with finished games grouped by date" width="624" height="1353" loading="lazy" decoding="async"></div>
+                    <!-- SHOTS 3a, 3b: screen recordings, 10s loops. MP4 (H.264), no audio, each with a poster frame. They play on their own; a click pauses or resumes (script.js) -->
+                    <div class="phone"><video src="/images/apple-sports/03a-from-game-card.mp4?v=2" poster="/images/apple-sports/03a-from-game-card.webp?v=2" width="480" height="1040" autoplay muted loop playsinline preload="metadata" tabindex="0" aria-label="Screen recording: tapping a team's logo in a game's card opens that team's page. Click to pause or play."></video></div>
+                    <div class="phone"><video src="/images/apple-sports/03b-from-league-menu.mp4?v=2" poster="/images/apple-sports/03b-from-league-menu.webp?v=2" width="480" height="1040" autoplay muted loop playsinline preload="metadata" tabindex="0" aria-label="Screen recording: choosing a team in the league menu opens that team's page. Click to pause or play."></video></div>
                 </div>
-                <figcaption>The two ways in: from a game's card, or from the league menu.</figcaption>
+                <figcaption>The new Previous tab, then the two ways into a team page: from a game's card, or from the league menu.</figcaption>
             </figure>
         </div>
 
@@ -255,10 +269,10 @@
             </ul>
             <figure class="case-figure">
                 <div class="case-stage">
-                    <!-- SHOT 4: Figma, annotated. Main list with the logo tap target marked against the card's hit area -->
-                    <div class="shot is-wide" role="img" aria-label="Placeholder for shot 4">4 · Main list: logo tap target vs. the card's hit area</div>
+                    <!-- SHOT 4: Figma crop, annotated. The first three games, with the logo tap targets (red) marked against the card's hit area (green) -->
+                    <img class="shot is-actual" src="/images/apple-sports/04-card-vs-logo.webp?v=2" alt="The first three games in the main list. In the first row, the two team logos are shaded red and the rest of the row is shaded green." width="393" height="314" loading="lazy" decoding="async">
                 </div>
-                <figcaption>A logo tap target in the main list would cut into the card's hit area.</figcaption>
+                <figcaption>Logo tap targets (red) would cut into the area that opens the game card (green).</figcaption>
             </figure>
         </div>
 
@@ -297,13 +311,13 @@
                     <div class="case-row-group">
                         <p class="case-row-label">Apple Sports</p>
                         <div class="case-row" aria-label="Team, record, time, record, team">
-                            <span>Team</span><span>Record</span><span class="is-key">Time</span><span>Record</span><span>Team</span>
+                            <span>Team</span><span>Record</span><span>Time</span><span>Record</span><span>Team</span>
                         </div>
                     </div>
                     <div class="case-row-group">
                         <p class="case-row-label">Team page</p>
-                        <div class="case-row is-new" aria-label="Date, vs or at opponent, time, with the network below the time">
-                            <span>Date</span><span class="is-grow">vs / @ Opponent</span><span class="case-row-stack"><span class="is-key">Time</span><span class="is-accent">Network</span></span>
+                        <div class="case-row is-new" aria-label="Date, then two lines: vs or at opponent with the time, and the opponent's record with the network and spread">
+                            <span class="is-date">Date</span><span class="case-row-stack"><span class="case-row-line"><span class="is-long is-left">vs / @ Opponent</span><span>Time</span></span><span class="case-row-line"><span class="is-left">Opponent Record</span><span class="is-long">Network &amp; Spread</span></span></span>
                         </div>
                     </div>
                 </div>
@@ -313,8 +327,8 @@
             <p class="case-tradeoff"><span>Tradeoff</span>These rows look different from the rest of the app, but they keep its clean, minimal style. It's different, not foreign.</p>
             <figure class="case-figure">
                 <div class="case-stage">
-                    <!-- SHOT 5: Figma crop. Several upcoming rows at real size, including a shortened network name -->
-                    <div class="shot is-wide" role="img" aria-label="Placeholder for shot 5">5 · Upcoming rows at real size, with shortened network names</div>
+                    <!-- SHOT 5: Figma crop. Four upcoming rows at real size (a 3x image shown at its 1x width) -->
+                    <img class="shot is-actual" src="/images/apple-sports/05-upcoming-rows.webp?v=2" alt="Four upcoming Heat games. Each row has the date, the opponent and its record, and the time with the TV network and betting line under it." width="342" height="267" loading="lazy" decoding="async">
                 </div>
                 <figcaption>The upcoming schedule. The network sits under the time.</figcaption>
             </figure>
@@ -358,10 +372,9 @@
             </figure>
             <figure class="case-figure">
                 <div class="case-stage">
-                    <!-- SHOTS 6a-c: Figma, team pages for three different teams to show the gradient system -->
-                    <div class="shot" role="img" aria-label="Placeholder for shot 6a">6a · Team page, team one</div>
-                    <div class="shot" role="img" aria-label="Placeholder for shot 6b">6b · Team page, team two</div>
-                    <div class="shot" role="img" aria-label="Placeholder for shot 6c">6c · Team page, team three</div>
+                    <!-- SHOTS 6a, 6b: Figma, two teams' pages to show the gradient system -->
+                    <div class="phone"><img src="/images/apple-sports/06b-team-warriors.webp?v=2" alt="Golden State Warriors team page in blue, showing upcoming games" width="624" height="1353" loading="lazy" decoding="async"></div>
+                    <div class="phone"><img src="/images/apple-sports/06a-team-heat.webp?v=2" alt="Miami Heat team page in red, showing previous games" width="624" height="1353" loading="lazy" decoding="async"></div>
                 </div>
                 <figcaption>The same page, in each team's colors.</figcaption>
             </figure>
@@ -387,10 +400,11 @@
             <p class="case-tradeoff"><span>Biggest risk</span>Discoverability. Apple tends to keep features out of sight. A one-time tip when the app opens, like the built-in tips iOS already uses, would point out the feature without cluttering the interface.</p>
             <figure class="case-figure">
                 <div class="case-stage">
-                    <!-- SHOT 7 (optional): Figma, the one-time tip on launch -->
-                    <div class="shot" role="img" aria-label="Placeholder for shot 7">7 · One-time tip on launch (optional)</div>
+                    <!-- SHOTS 7, 7b: Figma, the one-time tip on launch and in a game's card -->
+                    <div class="phone"><img src="/images/apple-sports/07-launch-tip.webp?v=2" alt="Apple Sports' main list with a tip that reads Discover Team Pages: explore upcoming and previous games for your team" width="624" height="1353" loading="lazy" decoding="async"></div>
+                    <div class="phone"><img src="/images/apple-sports/07b-game-card-tip.webp?v=2" alt="A game's card with a tip that reads Discover Team Pages: tap on the team logo to explore upcoming and previous games" width="624" height="1353" loading="lazy" decoding="async"></div>
                 </div>
-                <figcaption>A one-time tip, shown once on launch.</figcaption>
+                <figcaption>A one-time tip: on launch, and in a game's card.</figcaption>
             </figure>
         </div>
 

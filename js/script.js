@@ -208,6 +208,20 @@ window.addEventListener("pageshow", (e) => {
     if (e.persisted) setMenu(false);
 });
 
+// Header links to the page you're on scroll back to the top instead of reloading
+// ("/", "/index.html", "/work" and "/work.html" count as the same page)
+const pagePath = (path) => path.replace(/(index)?\.html$/, "").replace(/\/$/, "") || "/";
+
+document.addEventListener("click", (e) => {
+    const link = e.target.closest(".header a[href]");
+    if (!link || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return; // new-tab clicks still open
+    const url = new URL(link.href);
+    if (url.origin !== location.origin || url.hash || pagePath(url.pathname) !== pagePath(location.pathname)) return;
+    e.preventDefault();
+    setMenu(false);
+    window.scrollTo({ top: 0 });
+});
+
 // Copy Email
 const copyEmailBtn = document.getElementById("copy-email");
 const toast = document.getElementById("toast");
@@ -599,12 +613,12 @@ if (pageNav) {
 
     tocTop.addEventListener("click", () => window.scrollTo({ top: 0 }));
 
-    // Return to Top: shown after a screen of scrolling, hidden at the footer
-    const footer = document.querySelector(".section-footer");
+    // Return to Top: shown after a screen of scrolling, hidden before it reaches Previous / Next Project (or the footer)
+    const tocStop = document.querySelector(".project-pager") || document.querySelector(".section-footer");
 
     function updateTocOverlap() {
         tocTop.classList.toggle("is-shown", window.scrollY > window.innerHeight);
-        tocTop.classList.toggle("is-covered", footer.getBoundingClientRect().top < tocTop.getBoundingClientRect().bottom);
+        tocTop.classList.toggle("is-covered", tocStop.getBoundingClientRect().top < tocTop.getBoundingClientRect().bottom);
     }
 
     function updatePageNav() {
@@ -652,6 +666,32 @@ if (pageNav) {
     window.addEventListener("resize", updatePageNav);
     updatePageNav();
 }
+
+// Screen recordings: they play on their own, and a click (or Enter / Space) pauses or resumes them.
+// "is-paused" shows the play badge. It's set only by the visitor's own pause, so a recording
+// that hasn't started yet (still off screen) doesn't show one
+document.querySelectorAll(".phone > video").forEach((video) => {
+    const frame = video.parentElement;
+
+    function setPaused(paused) {
+        frame.classList.toggle("is-paused", paused);
+        if (paused) video.pause();
+        else video.play().catch(() => frame.classList.add("is-paused")); // playback refused: stay paused
+    }
+
+    video.addEventListener("click", () => setPaused(!video.paused));
+    video.addEventListener("keydown", (e) => {
+        if (e.key !== "Enter" && e.key !== " ") return;
+        e.preventDefault(); // Space would scroll the page
+        setPaused(!video.paused);
+    });
+
+    // With reduced motion on, they wait for the visitor to start them
+    if (reduceMotion.matches) {
+        video.removeAttribute("autoplay");
+        setPaused(true);
+    }
+});
 
 // Run last, once the layout is final
 setUpPageFade();
