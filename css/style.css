@@ -238,66 +238,33 @@ body {
     font-weight: var(--weight-regular);
 }
 
-/* Page Reveal: the first screen rises into place, top to bottom (script.js sets it up).
-   Text slides up from behind its own bottom edge, line by line, with no fade; images and other filled boxes
-   wipe upward. [data-fade] marks the blocks it covers; they stay hidden until the script takes over,
-   and appear on their own after 1.5s if it never does */
-@media (prefers-reduced-motion: no-preference) {
+/* Page Fade In */
+@keyframes page-fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(24px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+[data-fade] {
+    animation: page-fade-in 1.4s cubic-bezier(0.33, 1, 0.68, 1) backwards;
+}
+
+[data-fade="1"] { animation-delay: 0.25s; }
+[data-fade="2"] { animation-delay: 0.5s; }
+[data-fade="3"] { animation-delay: 0.75s; }
+[data-fade="4"] { animation-delay: 1s; }
+[data-fade="5"] { animation-delay: 1.25s; }
+[data-fade="6"] { animation-delay: 1.5s; }
+[data-fade="7"] { animation-delay: 1.75s; }
+
+@media (prefers-reduced-motion: reduce) {
     [data-fade] {
-        animation: reveal-hold 0s 1.5s backwards;
-    }
-}
-
-@keyframes reveal-hold {
-    from { opacity: 0; }
-}
-
-/* The header slides down from above the screen as one bar, with no fade, just ahead of the page
-   (script.js starts the page a beat later). Pure CSS, so it plays even if the script doesn't run */
-@media (prefers-reduced-motion: no-preference) {
-    .header {
-        animation: header-drop 0.9s cubic-bezier(0.33, 1, 0.68, 1) backwards;
-    }
-}
-
-@keyframes header-drop {
-    from { transform: translateY(-100%); }
-}
-
-/* a word, set apart from the text around it for the reveal (the text is put back afterwards) */
-.rv-word {
-    display: inline-block;
-}
-
-.rv-up {
-    animation: rv-up 0.9s cubic-bezier(0.33, 1, 0.68, 1) backwards;
-}
-
-.rv-wipe {
-    animation: rv-wipe 1s cubic-bezier(0.33, 1, 0.68, 1) backwards;
-}
-
-/* rises from fully below its own bottom edge. The clip moves opposite to the rise, so its edge stays put just under
-   where the word ends up (0.3em below, so descenders show): the word appears from behind a fixed line */
-@keyframes rv-up {
-    from {
-        transform: translateY(calc(100% + 0.35em));
-        clip-path: inset(-1em -1em calc(100% + 0.05em) -1em);
-    }
-    to {
-        transform: none;
-        clip-path: inset(-1em -1em -0.3em -1em);
-    }
-}
-
-/* uncovered from the bottom up while rising a little; the sides stay open so shadows aren't cut off */
-@keyframes rv-wipe {
-    from {
-        clip-path: inset(100% -60px -60px -60px);
-        transform: translateY(16px);
-    }
-    to {
-        clip-path: inset(-60px);
+        animation: none;
     }
 }
 
@@ -745,6 +712,14 @@ body {
     letter-spacing: -0.025em;
     white-space: nowrap;
 }
+
+/* the headline rises one word at a time, 0.18s apart (each word fades in on its own) */
+.hero-word {
+    display: inline-block; /* so each word can move */
+}
+
+.hero-word:nth-child(2) { animation-delay: 0.68s; }
+.hero-word:nth-child(3) { animation-delay: 0.86s; }
 
 /* the line under it: a comfortable measure, balanced so its lines come out even */
 .hero-description {
