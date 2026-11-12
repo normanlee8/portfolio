@@ -311,7 +311,7 @@ if (locationArrow) {
 // Thumbnails: the "View Details" pill floats at the top right of the cursor,
 // easing toward it each frame so it trails loosely instead of snapping
 const CURSOR_OFFSET = 12; // px from the pointer
-const FOLLOW_EASE = 0.12; // share of the remaining distance covered per frame (at 60fps)
+const FOLLOW_EASE = 0.24; // share of the remaining distance covered per frame (at 60fps)
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
 document.querySelectorAll(".work-thumbnail .view-project").forEach((pill) => {
@@ -667,31 +667,182 @@ if (pageNav) {
     updatePageNav();
 }
 
-// Screen recordings: they play on their own, and a click (or Enter / Space) pauses or resumes them.
-// "is-paused" shows the play badge. It's set only by the visitor's own pause, so a recording
-// that hasn't started yet (still off screen) doesn't show one
-document.querySelectorAll(".phone > video").forEach((video) => {
-    const frame = video.parentElement;
+// Screen recordings: they play on their own. A small button in the corner of each screen pauses or resumes it.
+// With reduced motion on, they start paused and wait for that button
+const PAUSE_ICON = '<svg class="icon-pause" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><rect x="3.5" y="2.5" width="3" height="11" rx="1"/><rect x="9.5" y="2.5" width="3" height="11" rx="1"/></svg>';
+const PLAY_ICON = '<svg class="icon-play" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M5 3.3v9.4a.6.6 0 0 0 .9.5l7.8-4.7a.6.6 0 0 0 0-1L5.9 2.8a.6.6 0 0 0-.9.5z"/></svg>';
 
-    function setPaused(paused) {
-        frame.classList.toggle("is-paused", paused);
-        if (paused) video.pause();
-        else video.play().catch(() => frame.classList.add("is-paused")); // playback refused: stay paused
+function addMediaToggle(video) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "media-toggle";
+    btn.innerHTML = PAUSE_ICON + PLAY_ICON;
+
+    function show() {
+        const paused = video.paused;
+        btn.classList.toggle("is-paused", paused);
+        btn.setAttribute("aria-label", paused ? "Play video" : "Pause video");
     }
 
-    video.addEventListener("click", () => setPaused(!video.paused));
-    video.addEventListener("keydown", (e) => {
-        if (e.key !== "Enter" && e.key !== " ") return;
-        e.preventDefault(); // Space would scroll the page
-        setPaused(!video.paused);
+    btn.addEventListener("click", (e) => {
+        e.stopPropagation(); // pausing doesn't also open the larger view
+        if (video.paused) video.play().catch(show);
+        else video.pause();
     });
+    video.addEventListener("play", show);
+    video.addEventListener("pause", show);
+    // autoplay may not have started yet; the button shows pause unless the visitor (or reduced motion) paused it
+    if (video.autoplay) btn.classList.remove("is-paused");
+    else show();
+    btn.setAttribute("aria-label", btn.classList.contains("is-paused") ? "Play video" : "Pause video");
+    video.parentElement.append(btn);
+}
 
-    // With reduced motion on, they wait for the visitor to start them
+document.querySelectorAll(".phone > video").forEach((video) => {
     if (reduceMotion.matches) {
         video.removeAttribute("autoplay");
-        setPaused(true);
+        video.pause();
     }
+    addMediaToggle(video);
 });
+
+// Larger view: clicking (or Enter / Space on) a phone or a crop opens it big over a dimmed page.
+// The copy inside is fresh: a recording picks up where the small one was, and has its own pause button
+const zoomables = document.querySelectorAll(".case-stage > .phone, .case-stage > .shot.is-actual");
+
+if (zoomables.length && typeof HTMLDialogElement === "function") {
+    const mediaDialog = document.createElement("dialog");
+    mediaDialog.className = "proto-dialog media-dialog";
+    mediaDialog.setAttribute("aria-label", "Larger view");
+    mediaDialog.innerHTML =
+        '<button type="button" class="proto-close" aria-label="Close larger view">' +
+        '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/></svg>' +
+        '</button><div class="proto-stage media-stage"></div>';
+    document.body.append(mediaDialog);
+    const mediaStage = mediaDialog.querySelector(".media-stage");
+
+    const closeBtn = mediaDialog.querySelector(".proto-close");
+    let openItem = null; // the small item now shown larger
+    let busy = false; // an opening or closing move is running
+
+    // How far, and how much smaller, the large copy sits from the small item: the move starts (or ends) there
+    function offsetFrom(item, copy) {
+        const from = item.getBoundingClientRect();
+        const to = copy.getBoundingClientRect();
+        const dx = from.left + from.width / 2 - (to.left + to.width / 2);
+        const dy = from.top + from.height / 2 - (to.top + to.height / 2);
+        return `translate(${dx}px, ${dy}px) scale(${from.width / to.width})`;
+    }
+
+    // Moves the copy and fades the backdrop and close button; resolves when done.
+    // Reduced motion: no move, everything just appears or disappears
+    function animateView(copy, opening) {
+        const moved = offsetFrom(openItem, copy);
+        const time = reduceMotion.matches ? 0 : opening ? 450 : 350;
+        const easing = "cubic-bezier(0.32, 0.72, 0, 1)"; // fast start, long soft landing, like iOS
+        const frames = (a, b) => (opening ? [a, b] : [b, a]);
+        const options = { duration: time, easing, fill: "forwards" };
+        const moves = [
+            copy.animate({ transform: frames(moved, "none") }, options),
+            closeBtn.animate({ opacity: frames(0, 1) }, options),
+        ];
+        try {
+            moves.push(mediaDialog.animate({ opacity: frames(0, 1) }, { ...options, pseudoElement: "::backdrop" }));
+        } catch (e) {} // browsers that can't animate the backdrop just show it
+        return Promise.all(moves.map((m) => m.finished)).catch(() => {});
+    }
+
+    async function openLarger(item) {
+        if (busy || mediaDialog.open) return;
+        busy = true;
+        openItem = item;
+
+        const copy = item.cloneNode(true);
+        copy.classList.remove("is-zoomable");
+        copy.removeAttribute("tabindex");
+        copy.removeAttribute("role");
+        copy.removeAttribute("aria-label");
+        copy.style.visibility = "";
+        copy.querySelector(".media-toggle")?.remove();
+
+        const img = copy.matches("img") ? copy : copy.querySelector("img");
+        if (img) img.loading = "eager";
+
+        const smallVideo = item.querySelector("video");
+        const video = copy.querySelector("video");
+        if (video) {
+            video.muted = true;
+            video.currentTime = smallVideo.currentTime;
+            video.autoplay = false;
+            addMediaToggle(video);
+            if (!smallVideo.paused) video.play().catch(() => {});
+        }
+
+        mediaStage.replaceChildren(copy);
+        mediaDialog.showModal();
+        item.style.visibility = "hidden"; // the small one seems to lift off the page into the larger view
+        await animateView(copy, true);
+        busy = false;
+    }
+
+    // The copy shrinks back into its spot, then the small one takes over where the large one left off
+    async function closeLarger() {
+        if (busy || !mediaDialog.open) return;
+        busy = true;
+        const copy = mediaStage.firstElementChild;
+        const video = copy?.querySelector("video");
+        const smallVideo = openItem.querySelector("video");
+        if (video && smallVideo) {
+            smallVideo.currentTime = video.currentTime;
+            if (video.paused) smallVideo.pause();
+            else smallVideo.play().catch(() => {});
+        }
+        if (copy) await animateView(copy, false);
+        finishClose();
+        busy = false;
+    }
+
+    function finishClose() {
+        mediaStage.replaceChildren();
+        closeBtn.getAnimations().forEach((a) => a.cancel());
+        mediaDialog.getAnimations({ subtree: true }).forEach((a) => a.cancel());
+        if (mediaDialog.open) mediaDialog.close();
+        if (openItem) openItem.style.visibility = "";
+    }
+
+    zoomables.forEach((item) => {
+        const label = item.querySelector("img, video")?.getAttribute(item.querySelector("img") ? "alt" : "aria-label") || item.getAttribute("alt") || "";
+        item.classList.add("is-zoomable");
+        item.tabIndex = 0;
+        item.setAttribute("role", "button");
+        item.setAttribute("aria-label", `View larger: ${label}`);
+
+        item.addEventListener("click", () => openLarger(item));
+        item.addEventListener("keydown", (e) => {
+            if (e.target !== item || (e.key !== "Enter" && e.key !== " ")) return;
+            e.preventDefault(); // Space would scroll the page
+            openLarger(item);
+        });
+    });
+
+    closeBtn.addEventListener("click", closeLarger);
+
+    // clicking the dimmed area closes it
+    mediaDialog.addEventListener("click", (e) => {
+        if (e.target === mediaDialog || e.target === mediaStage) closeLarger();
+    });
+
+    // Esc: the same animated close instead of the dialog's instant one
+    mediaDialog.addEventListener("cancel", (e) => {
+        e.preventDefault();
+        closeLarger();
+    });
+
+    // if it closes any other way, the small item comes back
+    mediaDialog.addEventListener("close", () => {
+        if (!mediaDialog.open && !busy) finishClose();
+    });
+}
 
 // Run last, once the layout is final
 setUpPageFade();

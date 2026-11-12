@@ -8,6 +8,11 @@
     /* Surfaces */
     --bg-thumbnail: #DCD8D0;   /* hover backgrounds */
     --bg-card: #F4F3EF;        /* cards, menus, bottom bar */
+    --bg-stage: #E2E0DA;       /* case study cards (images, diagrams, text): a soft gray, a step darker than the page */
+    --border-stage: #D6D3CC;
+    --bg-diagram: #EDEBE6;     /* boxes in the row diagram, a step lighter than the gray card */
+    --border-diagram: #D2CFC8;
+    --object-shadow: 1;        /* strength of the shadows under phones and crops */
     --border-card: #D9D6CF;
     --bg-project: #7A7771;     /* project thumbnails */
     --text-on-project: #ECEAE5; /* year on thumbnails, both themes */
@@ -97,6 +102,11 @@
     /* Surfaces */
     --bg-card: #333331;
     --border-card: #4A4945;
+    --bg-stage: #333331;
+    --border-stage: #4A4945;
+    --bg-diagram: #3F3E3B;
+    --border-diagram: #52504C;
+    --object-shadow: 2.2;      /* darker card, so the shadows need more weight to read */
     --bg-thumbnail: #46443F;
     --bg-project: #5C5B57;
     --bg-pill: #403F3C;
@@ -117,6 +127,7 @@
 
 html {
     scroll-padding-top: calc(var(--header-height) + var(--space-lg));
+    scrollbar-gutter: stable; /* the page doesn't shift sideways when a popup hides the scrollbar */
 }
 
 *, *:before, *:after {
@@ -609,7 +620,7 @@ body {
     container-type: inline-size; /* for cqi */
     display: flex;
     flex-direction: column;
-    gap: var(--space-sm);
+    gap: var(--space-md); /* the same space above and below the headline */
     flex-grow: 1;
     justify-content: center;
     align-items: center;
@@ -624,6 +635,7 @@ body {
     color: var(--text-secondary);
     font-size: clamp(0.875rem, 0.8196rem + 0.2255vw, 1rem); /* 14 → 16px */
     font-weight: var(--weight-medium);
+    margin-bottom: -0.3em; /* its line spacing would otherwise make the gap above the headline look bigger than the one below */
 }
 
 /* Location arrow, like the "current location" arrow in a maps app. It rests
@@ -654,27 +666,22 @@ body {
 }
 
 /* 32 → 64px from 393px, smaller below so the lines still fit; always two lines */
+/* the headline: one short line, 36 → 72px, set slightly tight */
 .hero-text {
-    font-size: clamp(1.75rem, 1.1139rem + 3.6077vw, 4rem);
-}
-
-.hero-text span {
-    display: block;
+    font-size: clamp(2.25rem, 9cqi, 4.5rem);
+    line-height: var(--leading-none);
+    letter-spacing: -0.025em;
     white-space: nowrap;
 }
 
-/* 18 → 24px; below ~450px it shrinks so the first line still fits */
+/* the line under it: a comfortable measure, balanced so its lines come out even */
 .hero-description {
-    margin-top: calc(var(--space-md) - var(--space-sm)); /* sits --space-md under the headline, as its own beat */
-    font-size: clamp(1rem, 0.889rem + 0.451vw, 1.25rem); /* 16 → 20px */
+    max-width: 48ch;
+    font-size: clamp(1.0625rem, 0.97rem + 0.4vw, 1.3125rem); /* 17 → 21px */
+    line-height: var(--leading-snug);
     color: var(--text-secondary);
-    font-weight: var(--weight-medium);
-}
-
-/* the line never wraps */
-.hero-description span {
-    display: block;
-    white-space: nowrap;
+    font-weight: var(--weight-regular);
+    text-wrap: balance;
 }
 
 /* Scroll-down arrow */
@@ -1359,6 +1366,12 @@ html:has(.proto-dialog[open]) {
     }
 }
 
+/* the larger view runs its own move from the small item (script.js), so it skips the popup's fade-ins */
+.media-dialog[open] .media-stage,
+.media-dialog[open]::backdrop {
+    animation: none;
+}
+
 @keyframes proto-in {
     from { opacity: 0; scale: 0.96; translate: 0 12px; }
 }
@@ -1406,8 +1419,8 @@ html:has(.proto-dialog[open]) {
     flex-direction: column;
     gap: var(--space-xs);
     padding: var(--space-md);
-    background-color: var(--bg-card);
-    border: 1px solid var(--border-card);
+    background-color: var(--bg-stage);
+    border: 1px solid var(--border-stage);
     border-radius: 10px;
     font-size: var(--text-base);
     color: var(--text-secondary);
@@ -1512,8 +1525,8 @@ html:has(.proto-dialog[open]) {
 .case-rows,
 .case-scale {
     padding: var(--space-lg);
-    background-color: var(--bg-card);
-    border: 1px solid var(--border-card);
+    background-color: var(--bg-stage);
+    border: 1px solid var(--border-stage);
     border-radius: 10px;
 }
 
@@ -1537,10 +1550,32 @@ html:has(.proto-dialog[open]) {
     aspect-ratio: 413 / 872;
     border-radius: 15.74% / 7.45%;
     background-color: #0B0B0C;
+    isolation: isolate; /* keeps the side buttons (::before) just behind the frame */
+    /* titanium band and its dark lip, a glint where the glass meets the band, then the shadow on the card:
+       tight and dark where it touches, wide and soft further out, falling down as if lit from above */
     box-shadow:
         0 0 0 1px var(--phone-edge),
-        0 2px 4px rgb(0 0 0 / 0.14),
-        0 12px 28px rgb(0 0 0 / 0.2);
+        0 0 0 1.75px rgb(0 0 0 / 0.35),
+        inset 0 0 0 1px rgb(255 255 255 / 0.1),
+        0 1px 1px rgb(0 0 0 / calc(0.1 * var(--object-shadow))),
+        0 3px 6px rgb(0 0 0 / calc(0.1 * var(--object-shadow))),
+        0 12px 24px -4px rgb(0 0 0 / calc(0.16 * var(--object-shadow))),
+        0 32px 56px -16px rgb(0 0 0 / calc(0.28 * var(--object-shadow)));
+}
+
+/* side buttons: Action button and volume on the left, side button on the right, in the band's titanium */
+.phone::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset: 0 -2.5px;
+    --btn: linear-gradient(var(--phone-edge), var(--phone-edge));
+    background:
+        var(--btn) left 0 top 15.6% / 2.5px 4% no-repeat,
+        var(--btn) left 0 top 23.8% / 2.5px 7.5% no-repeat,
+        var(--btn) left 0 top 33.5% / 2.5px 7.5% no-repeat,
+        var(--btn) right 0 top 28.1% / 2.5px 11% no-repeat;
+    pointer-events: none;
 }
 
 :root.dark-theme .phone {
@@ -1572,31 +1607,96 @@ html:has(.proto-dialog[open]) {
     pointer-events: none;
 }
 
-/* recordings play on their own; a click pauses or resumes them (script.js) */
-.phone > video {
-    cursor: pointer;
+/* ===== Larger view =====
+   Phones and crops open bigger on click (script.js). Recordings keep playing there, and each has a small
+   pause/play button in the corner of its screen */
+.phone.is-zoomable,
+.shot.is-zoomable {
+    cursor: zoom-in;
 }
 
-.phone > video:focus-visible {
+.phone.is-zoomable:focus-visible,
+.shot.is-zoomable:focus-visible {
     outline: 2px solid var(--accent-color);
-    outline-offset: 3px;
+    outline-offset: 4px;
 }
 
-/* paused: a play badge in the middle of the screen */
-.phone.is-paused::before {
-    content: "";
+/* the pause/play button, sized for a finger but drawn small, at the bottom right of the screen */
+.media-toggle {
     position: absolute;
     z-index: 1;
-    left: 50%;
-    top: 50%;
-    width: 26%;
+    right: 6.5%;
+    bottom: 4%;
+    display: grid;
+    place-items: center;
+    width: clamp(20px, 14%, 28px); /* scales with the phone, so it never covers much of a small one */
     aspect-ratio: 1;
-    translate: -50% -50%;
+    padding: 0;
+    border: 1px solid rgb(255 255 255 / 0.18);
     border-radius: 50%;
-    background: rgb(0 0 0 / 0.55) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23fff'%3E%3Cpath d='M5 3.3v9.4a.6.6 0 0 0 .9.5l7.8-4.7a.6.6 0 0 0 0-1L5.9 2.8a.6.6 0 0 0-.9.5z'/%3E%3C/svg%3E") 56% 50% / 46% no-repeat;
-    -webkit-backdrop-filter: blur(6px);
-    backdrop-filter: blur(6px);
-    pointer-events: none;
+    background-color: rgb(0 0 0 / 0.5);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+/* a bigger touch area than it looks */
+.media-toggle::before {
+    content: "";
+    position: absolute;
+    inset: -8px;
+}
+
+.media-toggle:hover,
+.media-toggle:focus-visible {
+    background-color: rgb(0 0 0 / 0.75);
+}
+
+.media-toggle:focus-visible {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
+}
+
+.media-toggle svg {
+    width: 44%;
+    height: 44%;
+}
+
+/* shows pause while playing, play while paused */
+.media-toggle .icon-play,
+.media-toggle.is-paused .icon-pause {
+    display: none;
+}
+
+.media-toggle.is-paused .icon-play {
+    display: block;
+}
+
+/* the larger view uses the prototype popup's full-screen dialog and dimmed backdrop */
+.media-stage {
+    padding: var(--space-xl) var(--space-md);
+}
+
+.media-stage .phone {
+    flex: none;
+    max-width: none;
+    height: min(86svh, 92vw * 872 / 413); /* as tall as the window allows, unless that makes it too wide */
+    cursor: default;
+}
+
+.media-stage .phone .media-toggle {
+    width: 40px;
+}
+
+.media-stage .shot {
+    flex: none;
+    width: auto;
+    height: auto;
+    max-width: min(92vw, 1180px);
+    max-height: 86svh;
+    cursor: default;
 }
 
 /* crops and placeholders */
@@ -1623,10 +1723,15 @@ img.shot {
 .shot.is-actual {
     flex: 0 1 auto;
     max-width: 100%;
-    border-radius: 6px;
+    border-radius: 8px;
+    /* a glint along the edge, then the same layered shadow as the phones */
+    outline-color: rgb(255 255 255 / 0.12);
     box-shadow:
-        0 1px 3px rgb(0 0 0 / 0.16),
-        0 10px 28px rgb(0 0 0 / 0.24);
+        0 0 0 1px rgb(0 0 0 / 0.12),
+        0 1px 1px rgb(0 0 0 / calc(0.1 * var(--object-shadow))),
+        0 3px 6px rgb(0 0 0 / calc(0.1 * var(--object-shadow))),
+        0 12px 24px -4px rgb(0 0 0 / calc(0.16 * var(--object-shadow))),
+        0 32px 56px -16px rgb(0 0 0 / calc(0.28 * var(--object-shadow)));
 }
 
 /* placeholder until the real shot is swapped in: the size and shape of a phone frame,
@@ -1676,10 +1781,10 @@ div.shot > span {
 
 .case-row span:not(.case-row-stack, .case-row-line) {
     flex: 1 1 0;
-    min-width: 0;
+    min-width: min-content; /* never narrower than its longest word, so words don't split */
     padding: var(--space-sm) var(--space-xs);
-    background-color: var(--bg-pill);
-    border: 1px solid var(--border-pill);
+    background-color: var(--bg-diagram);
+    border: 1px solid var(--border-diagram);
     border-radius: 6px;
     color: var(--text-pill);
     font-size: var(--text-2xs);
@@ -1688,7 +1793,6 @@ div.shot > span {
     align-items: center;
     justify-content: center;
     text-align: center;
-    overflow-wrap: anywhere;
 }
 
 .case-row span.is-key {
@@ -1696,14 +1800,14 @@ div.shot > span {
     font-weight: var(--weight-semibold);
 }
 
-/* team page row: a narrow date beside two lines. Each line has one long box and one short one,
+/* team page row: a narrow date and opponent logo beside two lines. Each line has one long box and one short one,
    on opposite sides: opponent + time, then record + network and spread */
 .case-row span.is-date {
     flex-grow: 0.5;
 }
 
 .case-row.is-new .case-row-stack {
-    flex-grow: 3.6;
+    flex-grow: 3.2;
 }
 
 .case-row-line {
@@ -1715,6 +1819,17 @@ div.shot > span {
 
 .case-row span.is-long {
     flex-grow: 2.2;
+}
+
+/* as wide as its text, so the box beside it takes the rest. On narrow screens the two share the line instead */
+.case-row span.is-hug {
+    flex: 0 1 auto;
+}
+
+@media (max-width: 600px) {
+    .case-row span.is-hug {
+        flex: 1 1 0;
+    }
 }
 
 .case-row span.is-left {
