@@ -302,9 +302,11 @@ body {
     transform: translateY(0);
 }
 
-.return-top.visible:hover {
-    transform: translateY(-3px);
-    background-color: var(--bg-thumbnail);
+@media (hover: hover) {
+    .return-top.visible:hover {
+        transform: translateY(-3px);
+        background-color: var(--bg-thumbnail);
+    }
 }
 
 /* Header */
@@ -379,9 +381,21 @@ body {
     transition: color 0.2s ease;
 }
 
-.name a:hover,
+/* Header hover effects only apply where there's a real pointer: phones and iPads keep :hover on whatever was
+   tapped last, which left the name (and the buttons below) looking hovered after a tap */
 .name a:focus-visible {
     color: var(--text-secondary);
+}
+
+@media (hover: hover) {
+    .name a:hover {
+        color: var(--text-secondary);
+    }
+
+    .name a:hover .name-chevron {
+        opacity: 1;
+        transform: translate(-1px, -50%);
+    }
 }
 
 /* Back-to-home chevron: slides in from the name into the side margin on hover */
@@ -403,7 +417,6 @@ body {
     stroke-width: 1; /* matches the name's weight */
 }
 
-.name a:hover .name-chevron,
 .name a:focus-visible .name-chevron {
     opacity: 1;
     transform: translate(-1px, -50%);
@@ -466,9 +479,14 @@ body {
     transition: background-color 0.15s ease;
 }
 
-.hamburger-menu:hover,
 .hamburger-menu[aria-expanded="true"] {
     background-color: var(--bg-thumbnail);
+}
+
+@media (hover: hover) {
+    .hamburger-menu:hover {
+        background-color: var(--bg-thumbnail);
+    }
 }
 
 /* Hamburger: three bars that morph into an X */
@@ -529,11 +547,6 @@ body {
     }
 }
 
-.menu-item:hover,
-.menu-item:focus-visible {
-    background-color: var(--bg-thumbnail);
-}
-
 .expanded-menu{
     position: absolute;
     top: 100%;
@@ -579,9 +592,14 @@ body {
     transition: background-color 0.15s ease;
 }
 
-.menu-item:hover,
 .menu-item:focus-visible {
     background-color: var(--bg-thumbnail);
+}
+
+@media (hover: hover) {
+    .menu-item:hover {
+        background-color: var(--bg-thumbnail);
+    }
 }
 
 /* Current page */
@@ -607,16 +625,24 @@ body {
     display: none;
 }
 
-.menu-item:hover .icon-outline,
 .menu-item:focus-visible .icon-outline,
 .menu-item[aria-current] .icon-outline {
     display: none;
 }
 
-.menu-item:hover .icon-fill,
 .menu-item:focus-visible .icon-fill,
 .menu-item[aria-current] .icon-fill {
     display: block;
+}
+
+@media (hover: hover) {
+    .menu-item:hover .icon-outline {
+        display: none;
+    }
+
+    .menu-item:hover .icon-fill {
+        display: block;
+    }
 }
 
 /* Dark Mode */
@@ -626,14 +652,6 @@ body {
 }
 
 .theme-toggle-btn .moon-icon {
-    display: block;
-}
-
-.theme-toggle-btn:hover .moon-icon {
-    display: none;
-}
-
-.theme-toggle-btn:hover .moon-icon-fill {
     display: block;
 }
 
@@ -647,12 +665,23 @@ body {
     display: block;
 }
 
-:root.dark-theme .theme-toggle-btn:hover .sun-icon {
-    display: none;
-}
+/* filled icon on hover (mouse only; a tap would leave it filled) */
+@media (hover: hover) {
+    .theme-toggle-btn:hover .moon-icon {
+        display: none;
+    }
 
-:root.dark-theme .theme-toggle-btn:hover .sun-icon-fill {
-    display: block;
+    .theme-toggle-btn:hover .moon-icon-fill {
+        display: block;
+    }
+
+    :root.dark-theme .theme-toggle-btn:hover .sun-icon {
+        display: none;
+    }
+
+    :root.dark-theme .theme-toggle-btn:hover .sun-icon-fill {
+        display: block;
+    }
 }
 
 .hero-section {
@@ -740,9 +769,14 @@ body {
     transition: color 0.2s ease;
 }
 
-.scroll-down:hover,
 .scroll-down:focus-visible {
     color: var(--text-secondary);
+}
+
+@media (hover: hover) {
+    .scroll-down:hover {
+        color: var(--text-secondary);
+    }
 }
 
 /* bounce runs on a span: Firefox drops frames animating SVG */
@@ -810,21 +844,37 @@ body {
     box-shadow: inset 0 0 0 1px var(--border-pill);
 }
 
-.case-button.is-secondary:hover,
 .case-button.is-secondary:focus-visible {
     background-color: var(--bg-thumbnail);
     color: var(--accent-color);
 }
 
+@media (hover: hover) {
+    .case-button.is-secondary:hover {
+        background-color: var(--bg-thumbnail);
+        color: var(--accent-color);
+    }
+}
+
 /* main 404 button: hover lightens it in light mode and darkens it in dark mode, instead of turning blue */
-.not-found-links .case-button:not(.is-secondary):hover,
 .not-found-links .case-button:not(.is-secondary):focus-visible {
     background-color: color-mix(in srgb, var(--text-primary) 75%, #fff);
 }
 
-:root.dark-theme .not-found-links .case-button:not(.is-secondary):hover,
+@media (hover: hover) {
+    .not-found-links .case-button:not(.is-secondary):hover {
+        background-color: color-mix(in srgb, var(--text-primary) 75%, #fff);
+    }
+}
+
 :root.dark-theme .not-found-links .case-button:not(.is-secondary):focus-visible {
     background-color: color-mix(in srgb, var(--text-primary) 75%, #000);
+}
+
+@media (hover: hover) {
+    :root.dark-theme .not-found-links .case-button:not(.is-secondary):hover {
+        background-color: color-mix(in srgb, var(--text-primary) 75%, #000);
+    }
 }
 
 /* the arrow nudges right on hover */
@@ -832,9 +882,14 @@ body {
     transition: translate 0.2s ease;
 }
 
-.not-found-links .case-button.is-secondary:hover svg,
 .not-found-links .case-button.is-secondary:focus-visible svg {
     translate: 3px 0;
+}
+
+@media (hover: hover) {
+    .not-found-links .case-button.is-secondary:hover svg {
+        translate: 3px 0;
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -943,10 +998,16 @@ h1.work-header {
 }
 
 /* hover sits on the heading, so the sliding title can't flicker */
-.work-header:hover .work-link,
 .work-link:focus-visible {
     color: var(--accent-color);
     left: 4px;
+}
+
+@media (hover: hover) {
+    .work-header:hover .work-link {
+        color: var(--accent-color);
+        left: 4px;
+    }
 }
 
 .pill-tag {
@@ -1289,9 +1350,14 @@ h1.work-header {
 }
 
 /* hover turns it gray, like the name in the header */
-.case-button:hover,
 .case-button:focus-visible {
     background-color: var(--text-secondary);
+}
+
+@media (hover: hover) {
+    .case-button:hover {
+        background-color: var(--text-secondary);
+    }
 }
 
 /* ===== Prototype popup =====
@@ -1374,9 +1440,14 @@ html:has(.proto-dialog[open]) {
     transition: color 0.2s ease;
 }
 
-.proto-newtab:hover,
 .proto-newtab:focus-visible {
     color: #fff;
+}
+
+@media (hover: hover) {
+    .proto-newtab:hover {
+        color: #fff;
+    }
 }
 
 .proto-close {
@@ -1398,9 +1469,14 @@ html:has(.proto-dialog[open]) {
     transition: background-color 0.2s ease;
 }
 
-.proto-close:hover,
 .proto-close:focus-visible {
     background-color: rgb(255 255 255 / 0.24);
+}
+
+@media (hover: hover) {
+    .proto-close:hover {
+        background-color: rgb(255 255 255 / 0.24);
+    }
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -1696,9 +1772,14 @@ html:has(.proto-dialog[open]) {
     inset: -8px;
 }
 
-.media-toggle:hover,
 .media-toggle:focus-visible {
     background-color: rgb(0 0 0 / 0.75);
+}
+
+@media (hover: hover) {
+    .media-toggle:hover {
+        background-color: rgb(0 0 0 / 0.75);
+    }
 }
 
 .media-toggle:focus-visible {
@@ -1983,19 +2064,34 @@ div.shot > span {
 }
 
 /* Same hover as the card titles: turns blue, arrow nudges outward */
-.pager-link:hover .pager-title,
 .pager-link:focus-visible .pager-title {
     color: var(--accent-color);
 }
 
-.pager-prev:hover svg,
+@media (hover: hover) {
+    .pager-link:hover .pager-title {
+        color: var(--accent-color);
+    }
+}
+
 .pager-prev:focus-visible svg {
     transform: translateX(-4px);
 }
 
-.pager-next:hover svg,
+@media (hover: hover) {
+    .pager-prev:hover svg {
+        transform: translateX(-4px);
+    }
+}
+
 .pager-next:focus-visible svg {
     transform: translateX(4px);
+}
+
+@media (hover: hover) {
+    .pager-next:hover svg {
+        transform: translateX(4px);
+    }
 }
 
 @media (min-width: 768px) {
@@ -2197,17 +2293,27 @@ body:has(.page-nav) .toast {
 }
 
 /* Hover: the closed pill tints as one */
-.page-nav-back:hover,
 .page-nav-back:focus-visible,
-.page-nav-sections:has(.section-toggle[aria-expanded="false"]:hover),
 .page-nav-sections:has(.section-toggle[aria-expanded="false"]:focus-visible) {
     background-color: var(--bg-thumbnail);
 }
 
+@media (hover: hover) {
+    .page-nav-back:hover,
+    .page-nav-sections:has(.section-toggle[aria-expanded="false"]:hover) {
+        background-color: var(--bg-thumbnail);
+    }
+}
+
 /* Open: the chevron dims on hover */
-.section-toggle[aria-expanded="true"]:hover .section-chevron,
 .section-toggle[aria-expanded="true"]:focus-visible .section-chevron {
     color: var(--text-secondary);
+}
+
+@media (hover: hover) {
+    .section-toggle[aria-expanded="true"]:hover .section-chevron {
+        color: var(--text-secondary);
+    }
 }
 
 /* Divider above the progress row, open only */
@@ -2358,9 +2464,14 @@ body:has(.page-nav) .toast {
     background-color: transparent;
 }
 
-.section-list button:hover,
 .section-list button:focus-visible {
     background-color: var(--bg-thumbnail);
+}
+
+@media (hover: hover) {
+    .section-list button:hover {
+        background-color: var(--bg-thumbnail);
+    }
 }
 
 /* Current section */
@@ -2400,9 +2511,14 @@ body:has(.page-nav) .toast {
     transition: color 0.2s ease;
 }
 
-.bigname a:hover,
 .bigname a:focus-visible {
     color: var(--text-secondary);
+}
+
+@media (hover: hover) {
+    .bigname a:hover {
+        color: var(--text-secondary);
+    }
 }
 
 .made-by {
@@ -2433,12 +2549,14 @@ body:has(.page-nav) .toast {
     display: none;
 }
 
-.nav-content:hover .icon-outline {
-    display: none;
-}
+@media (hover: hover) {
+    .nav-content:hover .icon-outline {
+        display: none;
+    }
 
-.nav-content:hover .icon-fill {
-    display: block;
+    .nav-content:hover .icon-fill {
+        display: block;
+    }
 }
 
 .nav-content:focus-visible .icon-outline {
@@ -2476,9 +2594,11 @@ body:has(.page-nav) .toast {
     transition: transform 0.3s ease-out;
 }
 
-.nav-content:hover p::after {
-    transform-origin: left;
-    transform: scaleX(1);
+@media (hover: hover) {
+    .nav-content:hover p::after {
+        transform-origin: left;
+        transform: scaleX(1);
+    }
 }
 
 /* Location isn't a link */
@@ -2486,8 +2606,10 @@ body:has(.page-nav) .toast {
     cursor: default;
 }
 
-.location:hover p::after {
-    transform: scaleX(0);
+@media (hover: hover) {
+    .location:hover p::after {
+        transform: scaleX(0);
+    }
 }
 
 /* shown once script.js fills in the time */
@@ -2616,10 +2738,16 @@ body:has(.page-nav) .toast {
     transition: color 0.2s ease, border-color 0.2s ease;
 }
 
-.download-resume:hover,
 .download-resume:focus-visible {
     color: var(--text-primary);
     border-color: var(--text-primary);
+}
+
+@media (hover: hover) {
+    .download-resume:hover {
+        color: var(--text-primary);
+        border-color: var(--text-primary);
+    }
 }
 
 /* sized to the text, thickened to match the 600 weight */
@@ -2756,9 +2884,14 @@ body:has(.page-nav) .toast {
         border-radius: 0;
     }
 
-    .menu-item:hover,
     .menu-item:focus-visible {
         background: none;
+    }
+
+    @media (hover: hover) {
+        .menu-item:hover {
+            background: none;
+        }
     }
 
     .menu-item > span {
@@ -2778,9 +2911,7 @@ body:has(.page-nav) .toast {
         transition: transform 0.3s ease-out;
     }
 
-    .menu-item:hover > span::after,
     .menu-item:focus-visible > span::after,
-    .nav-dropdown:hover > .menu-item > span::after,
     .nav-dropdown:focus-within > .menu-item > span::after {
         transform-origin: left;
         transform: scaleX(1);
@@ -2814,11 +2945,26 @@ body:has(.page-nav) .toast {
         transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
     }
 
-    .nav-dropdown:hover > .project-menu,
     .nav-dropdown:focus-within > .project-menu {
         opacity: 1;
         visibility: visible;
         transform: translateY(0);
+    }
+
+    /* underline and the Work dropdown on hover: mouse only. On an iPad a tap on Work goes straight to the Work page
+       instead of opening the list and staying stuck open */
+    @media (hover: hover) {
+        .menu-item:hover > span::after,
+        .nav-dropdown:hover > .menu-item > span::after {
+            transform-origin: left;
+            transform: scaleX(1);
+        }
+
+        .nav-dropdown:hover > .project-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
     }
 
     /* spans from "Work" to the right edge of the nav, which grows slightly with the text */
@@ -2849,9 +2995,14 @@ body:has(.page-nav) .toast {
         transition: background-color 0.15s ease;
     }
 
-    .project-menu-item:hover,
     .project-menu-item:focus-visible {
         background-color: var(--bg-thumbnail);
+    }
+
+    @media (hover: hover) {
+        .project-menu-item:hover {
+            background-color: var(--bg-thumbnail);
+        }
     }
 
     /* divider between rows, hidden around the highlighted row */
@@ -2866,9 +3017,16 @@ body:has(.page-nav) .toast {
         transition: opacity 0.15s ease;
     }
 
-    .project-menu-item:is(:hover, :focus-visible)::before,
-    .project-menu-item:is(:hover, :focus-visible) + .project-menu-item::before {
+    .project-menu-item:focus-visible::before,
+    .project-menu-item:focus-visible + .project-menu-item::before {
         opacity: 0;
+    }
+
+    @media (hover: hover) {
+        .project-menu-item:hover::before,
+        .project-menu-item:hover + .project-menu-item::before {
+            opacity: 0;
+        }
     }
 
     /* Project sections: heading 1/3, text 2/3 */
@@ -3059,25 +3217,41 @@ body:has(.page-nav) .toast {
         max-width: var(--slice-content);
     }
 
-    .work-grid .work-card:hover,
     .work-grid .work-card:focus-within {
         flex-grow: 1.1;
         background-color: var(--bg-thumbnail);
     }
 
+    @media (hover: hover) {
+        .work-grid .work-card:hover {
+            flex-grow: 1.1;
+            background-color: var(--bg-thumbnail);
+        }
+    }
+
     /* pills switch to the page color to stay visible */
-    .work-grid .work-card:hover .pill-tag,
     .work-grid .work-card:focus-within .pill-tag {
         background-color: var(--bg-color);
+    }
+
+    @media (hover: hover) {
+        .work-grid .work-card:hover .pill-tag {
+            background-color: var(--bg-color);
+        }
     }
 
     .work-grid .work-thumbnail {
         transition: transform 0.4s ease;
     }
 
-    .work-grid .work-card:hover .work-thumbnail,
     .work-grid .work-card:focus-within .work-thumbnail {
         transform: scale(1.02);
+    }
+
+    @media (hover: hover) {
+        .work-grid .work-card:hover .work-thumbnail {
+            transform: scale(1.02);
+        }
     }
 }
 
@@ -3253,9 +3427,14 @@ body:has(.page-nav) .toast {
         background-color: transparent;
     }
 
-    .toc-list button:hover,
     .toc-list button:focus-visible {
         color: var(--text-primary);
+    }
+
+    @media (hover: hover) {
+        .toc-list button:hover {
+            color: var(--text-primary);
+        }
     }
 
     .toc-list button[aria-current="true"] {
@@ -3294,13 +3473,23 @@ body:has(.page-nav) .toast {
         transition: background-color 0.15s ease;
     }
 
-    .toc-top:hover,
     .toc-top:focus-visible {
         color: var(--text-primary);
     }
 
-    .toc-top:hover .toc-top-icon,
+    @media (hover: hover) {
+        .toc-top:hover {
+            color: var(--text-primary);
+        }
+    }
+
     .toc-top:focus-visible .toc-top-icon {
         background-color: var(--bg-thumbnail);
+    }
+
+    @media (hover: hover) {
+        .toc-top:hover .toc-top-icon {
+            background-color: var(--bg-thumbnail);
+        }
     }
 }
