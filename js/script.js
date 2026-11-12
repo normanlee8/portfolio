@@ -1,54 +1,191 @@
-// Page Fade In: only the first screen fades in. Runs last, once the layout is final
-function pageTop(el) {
-    let top = 0;
-    for (; el; el = el.offsetParent) top += el.offsetTop; // ignores the fade's slide offset
-    return top;
+// Page Reveal: the first screen rises into place, top to bottom. Runs last, once the layout is final.
+// Text slides up from behind its own bottom edge, line by line, with no fade; images and other filled boxes
+// wipe upward; a [data-fade-words] block (the home headline) goes word by word. Only what's on the first
+// screen moves. To move text by the line, each word is set apart in its own span for the reveal (words on one line
+// move together); when it's over, the page gets its original text back, so it wraps normally after
+const REVEAL_START = 0.15; // s: the header drops in first (style.css), and the page follows this far behind
+const REVEAL_LINE_STEP = 0.1; // s between one line and the next
+const REVEAL_WORD_STEP = 0.12; // s between words in a [data-fade-words] block
+const REVEAL_SPREAD = 1.2; // s from the first line to the last, at most: long first screens step faster
+const REVEAL_TEXT_MS = 900; // matches .rv-up in style.css
+const REVEAL_BOX_MS = 1000; // matches .rv-wipe
+
+const isShown = (el) => !el.hidden && getComputedStyle(el).display !== "none";
+
+// Images and anything with its own fill (thumbnails, phones, photos, pills, buttons) reveal as one piece
+function isRevealBox(el) {
+    if (el.matches("img, video, iframe, canvas, picture")) return true;
+    const style = getComputedStyle(el);
+    return style.backgroundColor !== "rgba(0, 0, 0, 0)" || style.backgroundImage !== "none";
 }
 
-// Blocks with their own text or background fade as one piece
-function canSplitFade(el) {
-    if (!el.children.length) return false;
-    if (getComputedStyle(el).backgroundColor !== "rgba(0, 0, 0, 0)") return false;
-    return ![...el.childNodes].some((node) => node.nodeType === Node.TEXT_NODE && node.textContent.trim());
+// An icon or other piece with no text slides up as it is. Plain inline elements can't move, so they just stay put
+function addRevealPiece(el, reveal, inWords) {
+    const display = getComputedStyle(el).display;
+    if (display === "inline" && !(el instanceof SVGElement) && !el.matches("img")) return;
+    reveal.pieces.push({ el, inWords });
 }
 
-function limitFadeToFirstScreen(el, screenBottom, leeway) {
-    const top = pageTop(el);
-    if (top >= screenBottom) {
-        el.removeAttribute("data-fade");
+// Sets each word of a block's text apart in a span, keeping the spaces between them, then puts the text back afterwards.
+// Words break after a hyphen too, so lines wrap where they will once the text is put back
+function splitRevealWords(el, reveal, inWords) {
+    for (const node of [...el.childNodes]) {
+        if (node.nodeType === Node.TEXT_NODE) {
+            if (!node.textContent.trim()) continue;
+            const holder = document.createElement("span");
+            for (const part of node.textContent.split(/(\s+)/)) {
+                if (!part) continue;
+                if (!part.trim()) {
+                    holder.append(part);
+                    continue;
+                }
+                for (const word of part.split(/(?<=-)/)) {
+                    const span = document.createElement("span");
+                    span.className = "rv-word";
+                    span.textContent = word;
+                    holder.append(span);
+                    reveal.pieces.push({ el: span, inWords });
+                }
+            }
+            node.replaceWith(holder);
+            reveal.restores.push(() => holder.replaceWith(node));
+        } else if (node.nodeType === Node.ELEMENT_NODE && isShown(node) && !node.matches("br")) {
+            if (isRevealBox(node)) reveal.pieces.push({ el: node, box: true, inWords });
+            else if (!node.textContent.trim()) addRevealPiece(node, reveal, inWords);
+            else splitRevealWords(node, reveal, inWords); // links, bold text: their words move with the line
+        }
+    }
+}
+
+// Finds what moves inside a [data-fade] block, skipping anything below the first screen
+function collectRevealPieces(el, reveal, inWords) {
+    if (!isShown(el)) return;
+    if (el.getBoundingClientRect().top + window.scrollY >= reveal.screenBottom) return;
+
+    if (isRevealBox(el)) {
+        reveal.pieces.push({ el, box: true, inWords });
         return;
     }
-    if (top + el.offsetHeight <= screenBottom + leeway || !canSplitFade(el)) return;
 
-    // Crosses the fold: fade its children instead
-    const step = el.getAttribute("data-fade");
-    el.removeAttribute("data-fade");
-    for (const child of el.children) {
-        child.setAttribute("data-fade", step);
-        limitFadeToFirstScreen(child, screenBottom, leeway);
+    if (!el.textContent.trim()) {
+        // a group of photos is revealed photo by photo; an icon moves whole
+        if ([...el.querySelectorAll("*")].some(isRevealBox)) {
+            for (const child of el.children) collectRevealPieces(child, reveal, inWords);
+        } else {
+            addRevealPiece(el, reveal, inWords);
+        }
+        return;
     }
+
+    // a block of text (its own words, or only inline pieces like links) is split into words; anything else, child by child
+    const hasOwnText = [...el.childNodes].some((node) => node.nodeType === Node.TEXT_NODE && node.textContent.trim());
+    const allInline = [...el.children].every((child) => !isShown(child) || getComputedStyle(child).display.startsWith("inline"));
+    if (hasOwnText || allInline) splitRevealWords(el, reveal, inWords);
+    else for (const child of el.children) collectRevealPieces(child, reveal, inWords);
 }
 
 function setUpPageFade() {
-    const screenBottom = window.innerHeight; // the page's top screen, not the restored scroll position
-    const leeway = window.innerHeight * 0.1; // up to 10% past the fold still fades whole
-    document.querySelectorAll("[data-fade]").forEach((el) => {
-        if (el.hasAttribute("data-fade")) limitFadeToFirstScreen(el, screenBottom, leeway);
-    });
-
-    // Opened (or restored by a refresh) away from the top: show everything at once instead of waiting
-    function skipFadeIfScrolled() {
-        if (window.scrollY < window.innerHeight / 2) return;
-        document.getAnimations().forEach((a) => {
-            if (a.animationName === "page-fade-in") a.finish();
-        });
+    const blocks = [...document.querySelectorAll("[data-fade]")];
+    if (!blocks.length) return;
+    if (reduceMotion.matches) {
+        blocks.forEach((el) => el.removeAttribute("data-fade"));
+        return;
     }
 
-    skipFadeIfScrolled();
-    window.addEventListener("scroll", skipFadeIfScrolled, { passive: true });
-    window.addEventListener("load", skipFadeIfScrolled);
-    setTimeout(() => window.removeEventListener("scroll", skipFadeIfScrolled), 4000); // the fade is over by then
+    // the page's top screen, not a restored scroll position
+    const reveal = { screenBottom: window.innerHeight, pieces: [], restores: [] };
+    blocks.forEach((el) => collectRevealPieces(el, reveal, el.hasAttribute("data-fade-words")));
+
+    // Group the pieces into lines, top to bottom; pieces whose tops are within half a line of each other share one
+    // (two columns side by side start together)
+    const placed = reveal.pieces
+        .map((piece) => {
+            const box = piece.el.getBoundingClientRect();
+            return { ...piece, top: box.top + window.scrollY, left: box.left, height: box.height };
+        })
+        .filter((piece) => piece.top < reveal.screenBottom)
+        .sort((a, b) => a.top - b.top || a.left - b.left);
+
+    const lines = [];
+    for (const piece of placed) {
+        const line = lines[lines.length - 1];
+        if (line && Math.abs(piece.top - line.top) < Math.min(piece.height, line.height) / 2) line.pieces.push(piece);
+        else lines.push({ top: piece.top, height: piece.height, pieces: [piece] });
+    }
+
+    // Each line starts a step after the one above; a word-by-word line also waits for its last word
+    const step = Math.min(REVEAL_LINE_STEP, REVEAL_SPREAD / Math.max(lines.length - 1, 1));
+    const moving = [];
+    let clock = REVEAL_START;
+    let end = 0;
+    for (const line of lines) {
+        const words = line.pieces.filter((piece) => piece.inWords && !piece.box).sort((a, b) => a.left - b.left);
+        line.pieces.forEach((piece) => {
+            const delay = piece.inWords && !piece.box ? clock + words.indexOf(piece) * REVEAL_WORD_STEP : clock;
+            piece.el.classList.add(piece.box ? "rv-wipe" : "rv-up");
+            piece.el.style.animationDelay = `${delay.toFixed(2)}s`;
+            moving.push(piece.el);
+            end = Math.max(end, delay * 1000 + (piece.box ? REVEAL_BOX_MS : REVEAL_TEXT_MS));
+        });
+        clock += step + Math.max(words.length - 1, 0) * REVEAL_WORD_STEP;
+    }
+
+    blocks.forEach((el) => el.removeAttribute("data-fade")); // the pieces hold themselves back from here
+
+    // Put the page back as it was
+    let done = false;
+    function finishReveal() {
+        if (done) return;
+        done = true;
+        clearTimeout(timer);
+        window.removeEventListener("scroll", skipIfScrolled);
+        moving.forEach((el) => {
+            el.classList.remove("rv-up", "rv-wipe");
+            el.style.removeProperty("animation-delay");
+        });
+        reveal.restores.forEach((restore) => restore());
+    }
+
+    // Opened (or restored by a refresh) away from the top: show everything at once instead of waiting
+    function skipIfScrolled() {
+        if (window.scrollY >= window.innerHeight / 2) finishReveal();
+    }
+
+    const timer = setTimeout(finishReveal, end + 100);
+    skipIfScrolled();
+    window.addEventListener("scroll", skipIfScrolled, { passive: true });
+    window.addEventListener("load", skipIfScrolled, { once: true });
 }
+
+// Scroll effects: everything that follows the scroll updates together, once per frame.
+// Each effect measures the page and returns what it will change; the changes are made only after every
+// effect has measured, so the browser lays the page out once per frame instead of once per measurement.
+// An effect returns nothing when nothing changed, so a scroll that changes nothing touches nothing
+const scrollEffects = [];
+let scrollFrame = 0;
+
+function addScrollEffect(effect) {
+    scrollEffects.push(effect);
+}
+
+function runScrollEffects() {
+    scrollFrame = 0;
+    const y = Math.max(window.scrollY, 0); // iOS can overscroll above the top
+    const height = window.innerHeight;
+    const scrollable = document.documentElement.scrollHeight - height;
+    const view = { y, height, progress: scrollable > 0 ? Math.min(y / scrollable, 1) : 0 };
+    const changes = scrollEffects.map((effect) => effect(view));
+    changes.forEach((change) => change && change());
+}
+
+function requestScrollEffects() {
+    if (!scrollFrame) scrollFrame = requestAnimationFrame(runScrollEffects);
+}
+
+window.addEventListener('scroll', requestScrollEffects, { passive: true });
+window.addEventListener('resize', requestScrollEffects);
+// the page can also grow without a scroll or resize (images, fonts, the side list), which moves the progress
+if ('ResizeObserver' in window) new ResizeObserver(requestScrollEffects).observe(document.body);
 
 // Title Fade + Header Stroke
 const heroTitle = document.querySelector('.title');
@@ -58,32 +195,44 @@ const header = document.querySelector('.header');
 const FADE_DISTANCE = 8; // px of scroll to fully fade out
 const ARROW_FADE_DISTANCE = 200; // px of scroll for the arrow to fully fade out
 
-function updateOnScroll() {
-    const progress = Math.min(window.scrollY / FADE_DISTANCE, 1);
-    heroTitle.style.opacity = 1 - progress;
-    header.classList.toggle('scrolled', progress === 1);
-    const arrowOpacity = 1 - Math.min(window.scrollY / ARROW_FADE_DISTANCE, 1);
-    scrollDownArrow.style.opacity = arrowOpacity;
-    // invisible arrow can't be clicked
-    scrollDownArrow.closest('.scroll-down').style.visibility = arrowOpacity === 0 ? 'hidden' : '';
-}
-
 // Only the home page has a hero title; other pages use .perma-line instead
 if (heroTitle) {
-    window.addEventListener('scroll', updateOnScroll, { passive: true });
-    updateOnScroll(); // correct state if the page loads already scrolled
+    const scrollDown = scrollDownArrow.closest('.scroll-down');
+    let lastTitle = null;
+    let lastArrow = null;
+
+    addScrollEffect(({ y }) => {
+        const progress = Math.min(y / FADE_DISTANCE, 1);
+        const arrowOpacity = 1 - Math.min(y / ARROW_FADE_DISTANCE, 1);
+        if (progress === lastTitle && arrowOpacity === lastArrow) return null;
+        lastTitle = progress;
+        lastArrow = arrowOpacity;
+        return () => {
+            heroTitle.style.opacity = 1 - progress;
+            header.classList.toggle('scrolled', progress === 1);
+            scrollDownArrow.style.opacity = arrowOpacity;
+            // invisible arrow can't be clicked
+            scrollDown.style.visibility = arrowOpacity === 0 ? 'hidden' : '';
+        };
+    });
 }
 
-// Scroll Progress
-function updateScrollProgress() {
-    const scrollable = document.documentElement.scrollHeight - window.innerHeight;
-    const progress = scrollable > 0 ? Math.min(window.scrollY / scrollable, 1) : 0;
-    header.style.setProperty('--scroll-progress', progress);
-}
+// Scroll Progress: the line under the header fills as you read. It's its own element, scaled, so moving it
+// restyles nothing else in the header and needs no layout
+const headerProgress = document.createElement('span');
+headerProgress.className = 'header-progress';
+headerProgress.setAttribute('aria-hidden', 'true');
+header.append(headerProgress);
+let lastScrollProgress = null;
 
-window.addEventListener('scroll', updateScrollProgress, { passive: true });
-window.addEventListener('resize', updateScrollProgress);
-updateScrollProgress();
+addScrollEffect(({ progress }) => {
+    const scale = progress.toFixed(4);
+    if (scale === lastScrollProgress) return null;
+    lastScrollProgress = scale;
+    return () => {
+        headerProgress.style.transform = `scaleX(${scale})`;
+    };
+});
 
 // Work Dropdown: never runs past the header's right edge; long titles wrap instead
 const projectMenu = document.querySelector('.project-menu');
@@ -504,15 +653,16 @@ document.querySelectorAll(".work-grid .work-card").forEach((card) => {
 // Return to Top
 const returnTopBtn = document.querySelector(".return-top");
 
-function updateReturnTop() {
-    // Show once the user has scrolled past one full viewport height
-    returnTopBtn.classList.toggle("visible", window.scrollY > window.innerHeight);
-}
-
 if (returnTopBtn) {
-    window.addEventListener("scroll", updateReturnTop, { passive: true });
-    window.addEventListener("resize", updateReturnTop);
-    updateReturnTop(); // correct state if the page loads already scrolled
+    let lastVisible = null;
+
+    // Show once the user has scrolled past one full viewport height
+    addScrollEffect(({ y, height }) => {
+        const visible = y > height;
+        if (visible === lastVisible) return null;
+        lastVisible = visible;
+        return () => returnTopBtn.classList.toggle("visible", visible);
+    });
 
     returnTopBtn.addEventListener("click", () => {
         window.scrollTo({ top: 0 });
@@ -566,13 +716,13 @@ if (pageNav) {
     function goToSection(i) {
         pinnedSection = i;
         sectionHeaders[i].scrollIntoView();
-        updatePageNav();
+        requestScrollEffects();
     }
 
     function unpinSection() {
         if (pinnedSection === null) return;
         pinnedSection = null;
-        updatePageNav();
+        requestScrollEffects();
     }
 
     // The visitor's scrolling releases it; the smooth scroll after a click doesn't
@@ -616,39 +766,53 @@ if (pageNav) {
     // Return to Top: shown after a screen of scrolling, hidden before it reaches Previous / Next Project (or the footer)
     const tocStop = document.querySelector(".project-pager") || document.querySelector(".section-footer");
 
-    function updateTocOverlap() {
-        tocTop.classList.toggle("is-shown", window.scrollY > window.innerHeight);
-        tocTop.classList.toggle("is-covered", tocStop.getBoundingClientRect().top < tocTop.getBoundingClientRect().bottom);
-    }
+    const sectionNames = sectionHeaders.map((h) => h.textContent.trim());
+    const shown = { ring: null, label: null, current: null, tocShown: null, tocCovered: null }; // what the page shows now
 
-    function updatePageNav() {
-        const scrollable = document.documentElement.scrollHeight - window.innerHeight;
-        const progress = scrollable > 0 ? Math.min(window.scrollY / scrollable, 1) : 0;
+    addScrollEffect(({ y, height, progress }) => {
+        const ring = (progress * 100).toFixed(1);
         const percent = Math.round(progress * 100);
         const atEnd = percent === 100; // matches the ring reading 100%
-        progressPercent.textContent = `${percent}%`;
-        progressFill.style.strokeDasharray = `${progress * 100} 100`;
 
-        // Current section: last header past a third of the screen; none at the end
-        const line = window.innerHeight / 3;
+        // Current section: last header past a third of the screen; none at the end.
+        // Headers run down the page in order, so the first one below the line ends the search
+        const line = height / 3;
         let current = -1;
-        sectionHeaders.forEach((h, i) => {
-            if (h.getBoundingClientRect().top <= line) current = i;
-        });
+        for (let i = 0; i < sectionHeaders.length; i++) {
+            if (sectionHeaders[i].getBoundingClientRect().top > line) break;
+            current = i;
+        }
         if (atEnd) current = -1;
 
         // a clicked section wins
         const pinned = pinnedSection !== null;
         if (pinned) current = pinnedSection;
 
-        if (atEnd && !pinned) sectionLabel.textContent = "The End";
-        else sectionLabel.textContent = current >= 0 ? sectionHeaders[current].textContent.trim() : "Scroll Down";
-        [sectionItems, tocItems].forEach((items) => items.forEach((btn, i) => {
-            if (i === current) btn.setAttribute("aria-current", "true");
-            else btn.removeAttribute("aria-current");
-        }));
-        updateTocOverlap();
-    }
+        const label = atEnd && !pinned ? "The End" : current >= 0 ? sectionNames[current] : "Scroll Down";
+
+        const tocShown = y > height;
+        const tocCovered = tocStop.getBoundingClientRect().top < tocTop.getBoundingClientRect().bottom;
+
+        const next = { ring, label, current, tocShown, tocCovered };
+        if (Object.keys(next).every((key) => next[key] === shown[key])) return null;
+
+        return () => {
+            if (ring !== shown.ring) {
+                progressPercent.textContent = `${percent}%`;
+                progressFill.style.strokeDasharray = `${ring} 100`;
+            }
+            if (label !== shown.label) sectionLabel.textContent = label;
+            if (current !== shown.current) {
+                [sectionItems, tocItems].forEach((items) => items.forEach((btn, i) => {
+                    if (i === current) btn.setAttribute("aria-current", "true");
+                    else btn.removeAttribute("aria-current");
+                }));
+            }
+            if (tocShown !== shown.tocShown) tocTop.classList.toggle("is-shown", tocShown);
+            if (tocCovered !== shown.tocCovered) tocTop.classList.toggle("is-covered", tocCovered);
+            Object.assign(shown, next);
+        };
+    });
 
     sectionToggle.addEventListener("click", () => {
         setSectionMenu(sectionMenu.classList.contains("hidden")); // open if currently hidden
@@ -662,13 +826,12 @@ if (pageNav) {
         if (e.key === "Escape") setSectionMenu(false);
     });
 
-    window.addEventListener("scroll", updatePageNav, { passive: true });
-    window.addEventListener("resize", updatePageNav);
-    updatePageNav();
 }
 
-// Screen recordings: they play on their own. A small button in the corner of each screen pauses or resumes it.
-// With reduced motion on, they start paused and wait for that button
+// Screen recordings: they play on their own while on screen. A small button in the corner of each screen pauses or resumes it.
+// With reduced motion on, they start paused and wait for that button.
+// They're marked data-autoplay (not autoplay) and preload="none", so nothing downloads until a recording nears the screen
+const userPaused = new WeakSet(); // recordings the visitor paused stay paused when they scroll back
 const PAUSE_ICON = '<svg class="icon-pause" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><rect x="3.5" y="2.5" width="3" height="11" rx="1"/><rect x="9.5" y="2.5" width="3" height="11" rx="1"/></svg>';
 const PLAY_ICON = '<svg class="icon-play" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M5 3.3v9.4a.6.6 0 0 0 .9.5l7.8-4.7a.6.6 0 0 0 0-1L5.9 2.8a.6.6 0 0 0-.9.5z"/></svg>';
 
@@ -686,24 +849,41 @@ function addMediaToggle(video) {
 
     btn.addEventListener("click", (e) => {
         e.stopPropagation(); // pausing doesn't also open the larger view
-        if (video.paused) video.play().catch(show);
-        else video.pause();
+        if (video.paused) {
+            userPaused.delete(video);
+            video.play().catch(show);
+        } else {
+            userPaused.add(video);
+            video.pause();
+        }
     });
     video.addEventListener("play", show);
     video.addEventListener("pause", show);
-    // autoplay may not have started yet; the button shows pause unless the visitor (or reduced motion) paused it
-    if (video.autoplay) btn.classList.remove("is-paused");
+    // it may not have started yet; the button shows pause unless the visitor (or reduced motion) paused it
+    if ("autoplay" in video.dataset) btn.classList.remove("is-paused");
     else show();
     btn.setAttribute("aria-label", btn.classList.contains("is-paused") ? "Play video" : "Pause video");
     video.parentElement.append(btn);
 }
 
-document.querySelectorAll(".phone > video").forEach((video) => {
+const recordings = document.querySelectorAll(".phone > video");
+
+// Plays a recording as it nears the screen and pauses it once it's off, so only the ones in view download and decode
+const recordingWatcher = "IntersectionObserver" in window && new IntersectionObserver((entries) => {
+    entries.forEach(({ target: video, isIntersecting }) => {
+        if (!isIntersecting) video.pause();
+        else if (!userPaused.has(video)) video.play().catch(() => {});
+    });
+}, { rootMargin: "200px 0px" });
+
+recordings.forEach((video) => {
     if (reduceMotion.matches) {
-        video.removeAttribute("autoplay");
-        video.pause();
+        delete video.dataset.autoplay;
+        userPaused.add(video);
     }
     addMediaToggle(video);
+    if (recordingWatcher) recordingWatcher.observe(video);
+    else if (!userPaused.has(video)) video.play().catch(() => {}); // old browsers: just play
 });
 
 // Larger view: clicking (or Enter / Space on) a phone or a crop opens it big over a dimmed page.
@@ -772,10 +952,14 @@ if (zoomables.length && typeof HTMLDialogElement === "function") {
         const video = copy.querySelector("video");
         if (video) {
             video.muted = true;
+            video.preload = "auto"; // even when paused, show the frame it's on rather than the poster
             video.currentTime = smallVideo.currentTime;
-            video.autoplay = false;
+            delete video.dataset.autoplay;
             addMediaToggle(video);
-            if (!smallVideo.paused) video.play().catch(() => {});
+            if (!smallVideo.paused) {
+                video.play().catch(() => {});
+                smallVideo.pause(); // hidden under the larger view, so it doesn't need to keep decoding
+            }
         }
 
         mediaStage.replaceChildren(copy);
@@ -794,8 +978,14 @@ if (zoomables.length && typeof HTMLDialogElement === "function") {
         const smallVideo = openItem.querySelector("video");
         if (video && smallVideo) {
             smallVideo.currentTime = video.currentTime;
-            if (video.paused) smallVideo.pause();
-            else smallVideo.play().catch(() => {});
+            // a pause or play in the larger view carries over to the small one
+            if (video.paused) {
+                userPaused.add(smallVideo);
+                smallVideo.pause();
+            } else {
+                userPaused.delete(smallVideo);
+                smallVideo.play().catch(() => {});
+            }
         }
         if (copy) await animateView(copy, false);
         finishClose();
@@ -845,4 +1035,5 @@ if (zoomables.length && typeof HTMLDialogElement === "function") {
 }
 
 // Run last, once the layout is final
+runScrollEffects(); // correct state if the page loads already scrolled
 setUpPageFade();

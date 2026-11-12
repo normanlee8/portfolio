@@ -32,10 +32,8 @@
             }
         }
     </script>
+    <link rel="preload" href="/assets/fonts/figtree-latin.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="/css/style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
     <script src="/js/script.js" defer></script>
 </head>
 <body>
@@ -126,7 +124,8 @@
         MEDIA SLOTS: a placeholder is a <div class="shot"> with its shot number.
         A full phone screen goes in a phone frame, which draws the border and the status bar (1:46, island, signal, Wi-Fi, battery):
             <div class="phone"><img src="/images/apple-sports/02a-yesterday.webp?v=2" alt="..." width="624" height="1353" loading="lazy"></div>
-            <div class="phone"><video src="..." poster="..." autoplay muted loop playsinline></video></div>
+            <div class="phone"><video src="..." poster="..." data-autoplay muted loop playsinline preload="none"></video></div>
+        data-autoplay (not autoplay) so it only downloads and plays once it scrolls into view (script.js).
         The file's own status bar is painted out first, so the frame's is the only one showing.
         A crop goes in bare: <img class="shot is-actual"> shows it at its real size, <img class="shot is-wide"> fills the width.
         Phones and crops open in a larger view on click (script.js); recordings also get a small pause/play button.
@@ -189,7 +188,7 @@
             <figure class="case-figure">
                 <div class="case-stage">
                     <!-- SHOT 1: screen recording of the whole flow, 36s loop. Plays on its own; a click opens it larger, and its small button pauses it (script.js) -->
-                    <div class="phone"><video src="/images/apple-sports/01-full-demo.mp4?v=1" poster="/images/apple-sports/01-full-demo.webp?v=1" width="480" height="1040" autoplay muted loop playsinline preload="metadata" aria-label="Screen recording of the whole feature: the Previous tab, a team page opened from the league menu, and a team page opened from a game's card."></video></div>
+                    <div class="phone"><video src="/images/apple-sports/01-full-demo.mp4?v=1" poster="/images/apple-sports/01-full-demo.webp?v=1" width="480" height="1040" data-autoplay muted loop playsinline preload="none" aria-label="Screen recording of the whole feature: the Previous tab, a team page opened from the league menu, and a team page opened from a game's card."></video></div>
                 </div>
                 <figcaption>The whole feature in 36 seconds.</figcaption>
             </figure>
@@ -246,8 +245,8 @@
                     <!-- SHOT 3: Figma, the main list on its new Previous tab -->
                     <div class="phone"><img src="/images/apple-sports/03-previous-tab.webp?v=2" alt="The main list on the new Previous tab, with finished games grouped by date" width="624" height="1353" loading="lazy" decoding="async"></div>
                     <!-- SHOTS 3a, 3b: screen recordings, 10s loops. MP4 (H.264), no audio, each with a poster frame. They play on their own; a click opens one larger, and its small button pauses it (script.js) -->
-                    <div class="phone"><video src="/images/apple-sports/03a-from-game-card.mp4?v=2" poster="/images/apple-sports/03a-from-game-card.webp?v=2" width="480" height="1040" autoplay muted loop playsinline preload="metadata" aria-label="Screen recording: tapping a team's logo in a game's card opens that team's page."></video></div>
-                    <div class="phone"><video src="/images/apple-sports/03b-from-league-menu.mp4?v=2" poster="/images/apple-sports/03b-from-league-menu.webp?v=2" width="480" height="1040" autoplay muted loop playsinline preload="metadata" aria-label="Screen recording: choosing a team in the league menu opens that team's page."></video></div>
+                    <div class="phone"><video src="/images/apple-sports/03a-from-game-card.mp4?v=2" poster="/images/apple-sports/03a-from-game-card.webp?v=2" width="480" height="1040" data-autoplay muted loop playsinline preload="none" aria-label="Screen recording: tapping a team's logo in a game's card opens that team's page."></video></div>
+                    <div class="phone"><video src="/images/apple-sports/03b-from-league-menu.mp4?v=2" poster="/images/apple-sports/03b-from-league-menu.webp?v=2" width="480" height="1040" data-autoplay muted loop playsinline preload="none" aria-label="Screen recording: choosing a team in the league menu opens that team's page."></video></div>
                 </div>
                 <figcaption>The new Previous tab, then the two ways into a team page: from a game's card, or from the league menu.</figcaption>
             </figure>
