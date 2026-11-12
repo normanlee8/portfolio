@@ -2912,12 +2912,14 @@ body:has(.page-nav) .toast {
     }
 
     .menu-item:focus-visible > span::after,
-    .nav-dropdown:focus-within > .menu-item > span::after {
+    .nav-dropdown:has(:focus-visible) > .menu-item > span::after {
         transform-origin: left;
         transform: scaleX(1);
     }
 
-    /* Work dropdown: opens on hover or keyboard focus.
+    /* Work dropdown: opens on mouse hover or keyboard focus, never on a tap (a tap on Work goes straight to the Work page).
+       :focus-visible, not :focus-within: touch browsers can focus a link when it's tapped, and Back can return to
+       the page with Work still focused, which would leave the list open.
        Fills the header's height, so the menu starts just below the header line
        and the space between them stays hoverable */
     .expanded-menu {
@@ -2945,14 +2947,13 @@ body:has(.page-nav) .toast {
         transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
     }
 
-    .nav-dropdown:focus-within > .project-menu {
+    .nav-dropdown:has(:focus-visible) > .project-menu {
         opacity: 1;
         visibility: visible;
         transform: translateY(0);
     }
 
-    /* underline and the Work dropdown on hover: mouse only. On an iPad a tap on Work goes straight to the Work page
-       instead of opening the list and staying stuck open */
+    /* underline and the Work dropdown on hover: mouse only, so an iPad doesn't hold the first tap to open the list */
     @media (hover: hover) {
         .menu-item:hover > span::after,
         .nav-dropdown:hover > .menu-item > span::after {
