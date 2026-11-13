@@ -152,7 +152,7 @@ if (protoDialog && protoLink && typeof protoDialog.showModal === 'function') {
     const PHONE_W = 393 + 24; // screen plus bezel
     const PHONE_H = 852 + 24;
 
-    // shrink the phone to fit the window, leaving room for the margins and the "new tab" link
+    // shrink the phone to fit the window, leaving a margin above and below it
     function fitPrototype() {
         const scale = Math.min(1, (window.innerHeight - 120) / PHONE_H, (window.innerWidth - 48) / PHONE_W);
         protoPhone.style.setProperty('--proto-scale', scale.toFixed(3));
@@ -161,9 +161,15 @@ if (protoDialog && protoLink && typeof protoDialog.showModal === 'function') {
     protoLink.addEventListener('click', (e) => {
         if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return; // still opens a new tab
         e.preventDefault();
-        if (!protoFrame.src) protoFrame.src = protoFrame.dataset.src; // load on first open only
+        protoFrame.src = protoFrame.dataset.src; // a fresh load each time, so it always starts on its home screen
         fitPrototype();
         protoDialog.showModal();
+    });
+
+    // unload it on close (by any route: button, backdrop or Esc), so it stops running and the next open starts over.
+    // The close event arrives a moment after closing, so it skips the unload if the popup has been opened again
+    protoDialog.addEventListener('close', () => {
+        if (!protoDialog.open) protoFrame.src = 'about:blank';
     });
 
     window.addEventListener('resize', fitPrototype);
@@ -780,8 +786,9 @@ recordings.forEach((video) => {
 });
 
 // Larger view: clicking (or Enter / Space on) a phone or a crop opens it big over a dimmed page.
-// The copy inside is fresh: a recording picks up where the small one was, and has its own pause button
-const zoomables = document.querySelectorAll(".case-stage > .phone, .case-stage > .shot.is-actual");
+// The copy inside is fresh: a recording picks up where the small one was, and has its own pause button.
+// Left / Right step through the other items in the same group (one gray card), stopping at either end
+const zoomables = document.querySelectorAll(".case-stage > .phone, .case-stage > .shot.is-actual, .case-shot > .shot.is-actual");
 
 if (zoomables.length && typeof HTMLDialogElement === "function") {
     const mediaDialog = document.createElement("dialog");
@@ -825,11 +832,18 @@ if (zoomables.length && typeof HTMLDialogElement === "function") {
         return Promise.all(moves.map((m) => m.finished)).catch(() => {});
     }
 
-    async function openLarger(item) {
-        if (busy || mediaDialog.open) return;
-        busy = true;
-        openItem = item;
+    // The items shown alongside this one (same card), for Left / Right
+    const groupOf = (item) => [...zoomables].filter((z) => z.closest(".case-stage") === item.closest(".case-stage"));
 
+    // Names the open item's place in its group, e.g. "Larger view, 2 of 5"
+    function labelView() {
+        const group = groupOf(openItem);
+        const place = group.length > 1 ? `, ${group.indexOf(openItem) + 1} of ${group.length}` : "";
+        mediaDialog.setAttribute("aria-label", `Larger view${place}`);
+    }
+
+    // A fresh copy of a small item for the larger view; a recording carries on from where the small one is
+    function copyForView(item) {
         const copy = item.cloneNode(true);
         copy.classList.remove("is-zoomable");
         copy.removeAttribute("tabindex");
@@ -854,12 +868,53 @@ if (zoomables.length && typeof HTMLDialogElement === "function") {
                 smallVideo.pause(); // hidden under the larger view, so it doesn't need to keep decoding
             }
         }
+        return copy;
+    }
 
+    // The small item takes over where the large copy left off: a pause or play in the larger view carries over
+    function handBack(copy, item) {
+        const video = copy?.querySelector("video");
+        const smallVideo = item.querySelector("video");
+        if (!video || !smallVideo) return;
+        smallVideo.currentTime = video.currentTime;
+        if (video.paused) {
+            userPaused.add(smallVideo);
+            smallVideo.pause();
+        } else {
+            userPaused.delete(smallVideo);
+            smallVideo.play().catch(() => {});
+        }
+    }
+
+    async function openLarger(item) {
+        if (busy || mediaDialog.open) return;
+        busy = true;
+        openItem = item;
+        const copy = copyForView(item);
         mediaStage.replaceChildren(copy);
+        labelView();
         mediaDialog.showModal();
         item.style.visibility = "hidden"; // the small one seems to lift off the page into the larger view
         await animateView(copy, true);
         busy = false;
+    }
+
+    // Left / Right: the next item in the same group takes the larger view's place, with a quick crossfade.
+    // The small items swap too, so closing shrinks the view back into whichever one is showing
+    function stepLarger(direction) {
+        if (busy || !mediaDialog.open || !openItem) return;
+        const group = groupOf(openItem);
+        const next = group[group.indexOf(openItem) + direction];
+        if (!next) return; // stops at either end
+
+        handBack(mediaStage.firstElementChild, openItem);
+        openItem.style.visibility = "";
+        openItem = next;
+        const copy = copyForView(next);
+        mediaStage.replaceChildren(copy);
+        next.style.visibility = "hidden";
+        labelView();
+        if (!reduceMotion.matches) copy.animate({ opacity: [0, 1] }, { duration: 200, easing: "ease-out" });
     }
 
     // The copy shrinks back into its spot, then the small one takes over where the large one left off
@@ -867,19 +922,7 @@ if (zoomables.length && typeof HTMLDialogElement === "function") {
         if (busy || !mediaDialog.open) return;
         busy = true;
         const copy = mediaStage.firstElementChild;
-        const video = copy?.querySelector("video");
-        const smallVideo = openItem.querySelector("video");
-        if (video && smallVideo) {
-            smallVideo.currentTime = video.currentTime;
-            // a pause or play in the larger view carries over to the small one
-            if (video.paused) {
-                userPaused.add(smallVideo);
-                smallVideo.pause();
-            } else {
-                userPaused.delete(smallVideo);
-                smallVideo.play().catch(() => {});
-            }
-        }
+        handBack(copy, openItem);
         if (copy) await animateView(copy, false);
         finishClose();
         busy = false;
@@ -909,6 +952,14 @@ if (zoomables.length && typeof HTMLDialogElement === "function") {
     });
 
     closeBtn.addEventListener("click", closeLarger);
+
+    mediaDialog.addEventListener("keydown", (e) => {
+        if (e.altKey || e.ctrlKey || e.metaKey) return;
+        if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+            e.preventDefault();
+            stepLarger(e.key === "ArrowLeft" ? -1 : 1);
+        }
+    });
 
     // clicking the dimmed area closes it
     mediaDialog.addEventListener("click", (e) => {

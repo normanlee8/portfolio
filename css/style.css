@@ -1360,6 +1360,39 @@ h1.work-header {
     }
 }
 
+/* an outside link: the arrow points up and to the right (45°), and turns to point right (90°) on hover */
+/* Drawn as lines (not a filled shape) at a whole-pixel size, so it stays sharp when turned; the line is about
+   as thick as the button text's strokes, with rounded ends like the letters */
+.case-button-arrow {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    margin-left: calc(var(--space-xs) * -1); /* a little closer to the text than the logo is */
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.75;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    rotate: -45deg;
+    transition: rotate 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.case-button.is-external:focus-visible .case-button-arrow {
+    rotate: 0deg;
+}
+
+@media (hover: hover) {
+    .case-button.is-external:hover .case-button-arrow {
+        rotate: 0deg;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .case-button-arrow {
+        transition: none;
+    }
+}
+
 /* ===== Prototype popup =====
    The live prototype in a phone frame, scaled to fit the window (--proto-scale, set by script.js).
    On phones it fills the screen instead. */
@@ -1432,24 +1465,6 @@ html:has(.proto-dialog[open]) {
     background-color: #05070d; /* the prototype's own background, while it loads */
 }
 
-.proto-newtab {
-    font-size: var(--text-xs);
-    color: rgb(255 255 255 / 0.75);
-    text-decoration: underline;
-    text-underline-offset: 3px;
-    transition: color 0.2s ease;
-}
-
-.proto-newtab:focus-visible {
-    color: #fff;
-}
-
-@media (hover: hover) {
-    .proto-newtab:hover {
-        color: #fff;
-    }
-}
-
 .proto-close {
     position: fixed;
     top: var(--space-md);
@@ -1512,8 +1527,7 @@ html:has(.proto-dialog[open]) {
         box-shadow: none;
     }
 
-    .proto-phone::after,
-    .proto-newtab {
+    .proto-phone::after {
         display: none;
     }
 
@@ -1551,6 +1565,52 @@ html:has(.proto-dialog[open]) {
 
 .case-moments .case-moment-label {
     color: var(--accent-color);
+}
+
+/* fan quotes, stacked: the comment as written, then its upvotes and where it's from (linked to the original) */
+.case-quotes {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.case-quote {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    padding: var(--space-sm) 0 var(--space-sm) var(--space-md);
+    border-left: 2px solid var(--accent-color);
+}
+
+.case-quote blockquote {
+    font-size: var(--text-md);
+    font-weight: var(--weight-medium);
+    line-height: var(--leading-snug);
+    color: var(--text-primary);
+}
+
+.case-quote figcaption {
+    font-size: var(--text-xs);
+    color: var(--text-secondary);
+}
+
+.case-quote figcaption a {
+    text-decoration: underline;
+    text-decoration-color: color-mix(in srgb, var(--text-secondary) 50%, transparent);
+    text-underline-offset: 3px;
+    transition: color 0.2s ease, text-decoration-color 0.2s ease;
+}
+
+.case-quote figcaption a:focus-visible {
+    color: var(--accent-color);
+    text-decoration-color: currentColor;
+}
+
+@media (hover: hover) {
+    .case-quote figcaption a:hover {
+        color: var(--accent-color);
+        text-decoration-color: currentColor;
+    }
 }
 
 /* rejected alternatives */
@@ -1860,6 +1920,67 @@ img.shot {
         0 3px 6px rgb(0 0 0 / calc(0.1 * var(--object-shadow))),
         0 12px 24px -4px rgb(0 0 0 / calc(0.16 * var(--object-shadow))),
         0 32px 56px -16px rgb(0 0 0 / calc(0.28 * var(--object-shadow)));
+}
+
+/* labeled screenshots of other apps, sized by the figure's own width so they stay readable:
+   two per row with an odd last one centered, and three per row (the second row centered) once there's room.
+   The grid has twice as many columns as screenshots per row, so each spans two and a row can sit half a step in */
+.case-figure:has(> .case-gallery) {
+    container-type: inline-size;
+}
+
+.case-stage.case-gallery {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--space-lg) var(--space-md);
+    align-items: start;
+}
+
+.case-gallery > .case-shot {
+    grid-column: span 2;
+}
+
+.case-gallery > .case-shot:last-child:nth-child(odd) {
+    grid-column: 2 / span 2;
+}
+
+@container (min-width: 34rem) {
+    .case-stage.case-gallery {
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+
+    .case-gallery > .case-shot:last-child:nth-child(odd) {
+        grid-column: span 2;
+    }
+
+    /* five: three on top, and the last two centered under them */
+    .case-gallery > .case-shot:nth-child(4):nth-last-child(2) {
+        grid-column: 2 / span 2;
+    }
+}
+
+.case-shot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+/* the screenshots differ in height, so each shows the same top portion (the shortest one's shape) and the labels
+   line up; the larger view shows the whole screenshot */
+.case-shot .shot {
+    width: 100%;
+    max-width: none;
+    aspect-ratio: 430 / 800;
+    object-fit: cover;
+    object-position: top;
+}
+
+.case-shot figcaption {
+    font-size: var(--text-xs);
+    font-weight: var(--weight-medium);
+    color: var(--text-secondary);
+    text-align: center;
 }
 
 /* placeholder until the real shot is swapped in: the size and shape of a phone frame,
