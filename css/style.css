@@ -1665,10 +1665,13 @@ html:has(.proto-dialog[open]) {
     gap: var(--space-md);
 }
 
-/* black bezel, titanium edge, dynamic island over the prototype's status bar */
+/* black bezel, titanium edge, dynamic island over the prototype's status bar.
+   Scaled with transform, not zoom: Safari zooms an iframe's box but not the page inside it,
+   which left the prototype short of the frame with white showing to the right and below */
 .proto-phone {
     position: relative;
-    zoom: var(--proto-scale, 1);
+    flex: none;
+    transform: scale(var(--proto-scale, 1));
     padding: 12px;
     border-radius: 64px;
     background-color: #0B0B0C;
@@ -1755,7 +1758,7 @@ html:has(.proto-dialog[open]) {
 /* phones: the prototype fills the screen, no frame */
 @media (max-width: 500px) {
     .proto-phone {
-        zoom: 1;
+        transform: none;
         padding: 0;
         border-radius: 0;
         box-shadow: none;
@@ -3396,12 +3399,286 @@ body:has(.page-nav) .toast {
     color: var(--text-secondary);
 }
 
-/* Fun and job duties: one item per line, with a small gap so long items that wrap still read as separate items */
+/* Job duties: one item per line, with a small gap so long items that wrap still read as separate items */
 .fun-list,
 .duty-list {
     display: flex;
     flex-direction: column;
     gap: var(--space-xs);
+}
+
+/* ===== About: skills as chips ===== */
+.skill-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+    padding: 0;
+    list-style: none;
+}
+
+.skill-chips li {
+    padding: 0.2em 0.75em;
+    border: 1px solid var(--border-pill);
+    border-radius: 999px;
+    background-color: var(--bg-pill);
+    color: var(--text-pill);
+    font-size: var(--text-xs);
+    line-height: var(--leading-snug);
+}
+
+/* ===== About: Tidbits, as a bento grid =====
+   Cards of different sizes, each led by something to look at. Phones and tablets: two columns.
+   1024px+: four columns, with the teams card taking a 2 x 2 block. The menu runs across the bottom */
+.fun-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas:
+        "teams teams"
+        "boba boba"
+        "psych games"
+        "menu menu";
+    gap: var(--space-sm);
+}
+
+@media (min-width: 1024px) {
+    .fun-teams {
+        min-height: 15rem;
+    }
+
+    .fun-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        grid-template-areas:
+            "teams teams boba boba"
+            "teams teams psych games"
+            "menu menu menu menu";
+    }
+}
+
+.fun-teams { grid-area: teams; }
+.fun-ticket { grid-area: boba; }
+.fun-psych { grid-area: psych; }
+.fun-games { grid-area: games; }
+.fun-menu { grid-area: menu; }
+
+.fun-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    padding: var(--space-md);
+    background-color: var(--bg-stage);
+    border: 1px solid var(--border-stage);
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+/* the question: small caps in the accent color, like the case study's card labels */
+.fun-label {
+    margin-bottom: var(--space-xs);
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--accent-color);
+}
+
+/* the answer: big */
+.fun-value,
+.fun-values {
+    font-size: var(--text-lg);
+    font-weight: var(--weight-medium);
+    line-height: var(--leading-tight);
+    color: var(--text-primary);
+}
+
+.fun-big {
+    font-size: var(--text-3xl);
+    font-weight: var(--weight-semibold);
+    letter-spacing: -0.03em;
+}
+
+.fun-values {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    padding: 0;
+    list-style: none;
+}
+
+.fun-note {
+    font-size: var(--text-xs);
+    font-style: italic;
+    color: var(--text-secondary);
+}
+
+/* ----- teams: logos large, each over a faint wash of its team's color ----- */
+.fun-teams {
+    background:
+        radial-gradient(45% 70% at 12% 100%, rgb(170 0 0 / 0.16), transparent 70%),
+        radial-gradient(45% 70% at 50% 110%, rgb(29 66 138 / 0.2), transparent 70%),
+        radial-gradient(45% 70% at 88% 100%, rgb(253 90 30 / 0.16), transparent 70%),
+        var(--bg-stage);
+}
+
+.fun-team-list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-sm);
+    margin-block: auto; /* centered in the space below the label */
+    padding: var(--space-md) 0;
+    list-style: none;
+}
+
+.fun-team-list li {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-sm);
+    font-size: var(--text-md);
+    font-weight: var(--weight-medium);
+    color: var(--text-primary);
+}
+
+.fun-team-logo {
+    width: clamp(3.25rem, 8vw, 6rem);
+    height: clamp(3.25rem, 8vw, 6rem);
+    object-fit: contain;
+    filter: drop-shadow(0 6px 10px rgb(0 0 0 / 0.18));
+}
+
+/* ----- boba: an order ticket ----- */
+.fun-ticket {
+    --notch: 0.7rem;
+    --stub: calc(var(--space-md) + 1.45rem + var(--space-sm)); /* from the bottom edge up to the tear line: one row of options */
+    /* half-circle notches cut into both sides, level with the tear line */
+    -webkit-mask:
+        radial-gradient(circle var(--notch) at 0 calc(100% - var(--stub)), transparent 98%, #000) left / 51% 100% no-repeat,
+        radial-gradient(circle var(--notch) at 100% calc(100% - var(--stub)), transparent 98%, #000) right / 51% 100% no-repeat;
+    mask:
+        radial-gradient(circle var(--notch) at 0 calc(100% - var(--stub)), transparent 98%, #000) left / 51% 100% no-repeat,
+        radial-gradient(circle var(--notch) at 100% calc(100% - var(--stub)), transparent 98%, #000) right / 51% 100% no-repeat;
+}
+
+/* the options, below a dashed tear line that runs between the notches */
+.fun-order {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    margin: auto calc(-1 * var(--space-md)) 0; /* the tear line runs from notch to notch */
+    padding: var(--space-sm) var(--space-md) 0;
+    border-top: 1px dashed var(--line-faint);
+    list-style: none;
+}
+
+.fun-order li {
+    padding: 0.1em 0.6em;
+    border: 1px solid var(--border-pill);
+    border-radius: 999px;
+    background-color: var(--bg-pill);
+    color: var(--text-pill);
+    font-size: var(--text-2xs);
+}
+
+/* ----- games: each name led by its logo ----- */
+.fun-logos li {
+    display: flex;
+    align-items: center;
+    gap: 0.55em;
+}
+
+.fun-logo {
+    flex: none;
+    width: 1.5em;
+    height: 1.5em;
+    object-fit: contain;
+}
+
+/* ----- last meal: a card like the others, laid out like a menu: centered, three courses ----- */
+.fun-menu {
+    align-items: center;
+    gap: var(--space-lg);
+    padding: var(--space-xl) var(--space-lg);
+    text-align: center;
+}
+
+.fun-menu-head {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.fun-menu-title {
+    font-size: var(--text-3xl);
+    font-weight: var(--weight-semibold);
+    line-height: var(--leading-tight);
+    letter-spacing: -0.03em;
+    color: var(--text-primary);
+}
+
+/* courses side by side once there's room, stacked on phones */
+.fun-courses {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+    gap: var(--space-xl) var(--space-lg);
+    width: 100%;
+    max-width: 64rem;
+}
+
+.fun-course {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+/* course names: spaced capitals with a small diamond under each */
+.fun-course-name {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-sm);
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-semibold);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+}
+
+.fun-course-name::after {
+    content: "";
+    width: 5px;
+    height: 5px;
+    background-color: var(--text-secondary);
+    rotate: 45deg;
+}
+
+.fun-dishes {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    padding: 0;
+    list-style: none;
+}
+
+.fun-dishes li {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2em;
+}
+
+.fun-dish {
+    font-size: var(--text-md);
+    font-weight: var(--weight-medium);
+    color: var(--text-primary);
+}
+
+.fun-detail {
+    max-width: 26ch;
+    font-size: var(--text-2xs);
+    line-height: var(--leading-snug);
+    color: var(--text-secondary);
+    text-wrap: balance;
 }
 
 /* small note under an About label, like "Snack portions please" */
@@ -3692,7 +3969,8 @@ body:has(.page-nav) .toast {
         column-gap: var(--column-gap);
     }
 
-    .resume-header {
+    .resume-header,
+    .fun-grid {
         grid-column: 1 / -1;
     }
 

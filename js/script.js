@@ -287,7 +287,7 @@ let toastTimer;
 function showToast() {
     toast.classList.add("show");
     clearTimeout(toastTimer); // restart the timer if clicked again
-    toastTimer = setTimeout(() => toast.classList.remove("show"), 2000);
+    toastTimer = setTimeout(() => toast.classList.remove("show"), 3000); // on screen for 3 seconds
 }
 
 // Only run on pages that have the footer
