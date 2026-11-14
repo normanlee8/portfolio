@@ -1950,50 +1950,47 @@ html:has(.proto-dialog[open]) {
 
 /* On the page, the bar folds down to just its button so it doesn't pull the eye from the recording.
    Pointing at the phone (or tabbing to the button) opens the whole bar; the larger view always shows it */
-:not(.media-stage) > .phone > .media-controls:not(:has(:focus-visible)) {
-    --toggle-size: 100%;
-    --toggle-fill: transparent;
-    left: 6%; /* the same corner the open bar starts from, so the button stays put as it opens */
-    right: auto;
-    bottom: 3.5%;
-    width: clamp(20px, 14%, 28px);
-    padding: 0;
+:not(.media-stage) > .phone > .media-controls {
+    padding: 2px 10px 2px 2px; /* 28px tall, so folded it's a 28px circle */
 }
 
-:not(.media-stage) > .phone > .media-controls:not(:has(:focus-visible)) > :not(.media-toggle) {
-    display: none;
-}
-
+/* With a pointer, the folded bar is clipped to the circle around its button, and the clip eases open to
+   the right and back closed. Clipped parts can't be clicked, so the timeline only works once it's showing */
 @media (hover: hover) {
-    :not(.media-stage) > .phone:hover > .media-controls {
-        --toggle-size: initial;
-        --toggle-fill: initial;
-        left: 6%;
-        right: 6%;
-        bottom: 3.5%;
-        width: auto;
-        padding: 3px 10px 3px 3px;
+    :not(.media-stage) > .phone > .media-controls {
+        clip-path: inset(0 0 0 0 round 999px);
     }
 
-    :not(.media-stage) > .phone:hover > .media-controls > :not(.media-toggle) {
-        display: block;
-    }
-}
-
-/* opening, the bar grows rightward out of the button */
-@media (hover: hover) and (prefers-reduced-motion: no-preference) {
-    :not(.media-stage) > .phone:hover > .media-controls {
-        animation: media-bar-open 0.25s cubic-bezier(0.2, 0, 0, 1);
-    }
-}
-
-@keyframes media-bar-open {
-    from {
+    :not(.media-stage) > .phone > .media-controls:not(:has(:focus-visible)) {
+        --toggle-fill: transparent;
         clip-path: inset(0 calc(100% - 28px) 0 0 round 999px);
     }
 
-    to {
+    :not(.media-stage) > .phone:hover > .media-controls {
+        --toggle-fill: initial;
         clip-path: inset(0 0 0 0 round 999px);
+    }
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    :not(.media-stage) > .phone > .media-controls {
+        transition: clip-path 0.35s cubic-bezier(0.2, 0, 0, 1);
+    }
+}
+
+/* On touch screens there's nothing to point with, so the bar simply stays folded to its button
+   (sized to the phone, and easy to tap); tapping the recording opens the larger view with the full bar */
+@media (hover: none) {
+    :not(.media-stage) > .phone > .media-controls:not(:has(:focus-visible)) {
+        --toggle-size: 100%;
+        --toggle-fill: transparent;
+        right: auto;
+        width: clamp(20px, 14%, 28px);
+        padding: 0;
+    }
+
+    :not(.media-stage) > .phone > .media-controls:not(:has(:focus-visible)) > :not(.media-toggle) {
+        display: none;
     }
 }
 
