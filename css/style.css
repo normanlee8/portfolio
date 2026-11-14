@@ -1939,6 +1939,43 @@ img.shot {
     text-align: center;
 }
 
+/* single-row screenshots in two columns (one on narrow screens, where two would be too small to read).
+   The shorter column spreads its rows out, so both columns end level */
+.case-figure:has(> .case-row-shots) {
+    container-type: inline-size;
+}
+
+.case-stage.case-row-shots {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    gap: var(--space-sm);
+}
+
+.case-row-col {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: var(--space-sm);
+    width: min(373px, 100%); /* real size at most */
+}
+
+.case-row-col > .shot {
+    width: 100%;
+    max-width: none;
+}
+
+@container (min-width: 34rem) {
+    .case-stage.case-row-shots {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        align-items: stretch;
+    }
+
+    .case-row-col {
+        width: 100%;
+    }
+}
+
 /* placeholder until the real shot is swapped in: the size and shape of a phone frame,
    drawn with an outline and no padding so it takes exactly the width a phone would beside it */
 div.shot {

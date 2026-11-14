@@ -182,7 +182,7 @@
                 </div>
                 <div>
                     <dt>Why it matters</dt>
-                    <dd>Fans can't easily see how their team has been doing or when it plays next, so they turn to other apps like ESPN for something Apple Sports could do itself.</dd>
+                    <dd>Fans can't see how their team has been doing lately or what its schedule looks like past the next week, so they turn to other apps like ESPN for something Apple Sports could do itself.</dd>
                 </div>
                 <div>
                     <dt>Solution</dt>
@@ -275,7 +275,7 @@
                     <figcaption><a href="https://www.reddit.com/r/apple/comments/1lk76w8/comment/mzqvw5n/" target="_blank" rel="noopener noreferrer">1 upvote, r/apple</a> · June 2025</figcaption>
                 </figure>
             </div>
-            <p class="section-content">Die-hard and casual fans want different levels of detail, but they ask the same two questions: <em class="case-em">how has my team been doing, and when do they play next?</em></p>
+            <p class="section-content">Die-hard and casual fans want different levels of detail, but they ask the same two questions: <em class="case-em">how has my team been doing, and what's their schedule?</em></p>
         </div>
 
         <!-- Solution -->
@@ -396,16 +396,30 @@
         <div class="section-item">
             <h2 class="section-header">The Hardest Decision</h2>
             <p class="case-lede">Breaking the app's game row to fit the date and the network.</p>
-            <p class="section-content">In its lists of games, Apple Sports shows each game as one row: team, record, time, record, team, with the date as a heading above. A team page needs the date and the TV network in every row, and squeezing both into that layout made it cluttered.</p>
+            <p class="section-content">In its lists of games, Apple Sports lays out each game as a row of five columns: away team, away record, time, home record, and home team, with the date as a heading above. A team page needs the date and the TV network in every row, and there was no room for both without crowding it.</p>
             <figure class="case-figure">
-                <div class="case-stage">
-                    <!-- SHOTS 5a, 5b: row layouts I didn't go with. Replace each placeholder with a crop shown at its real size:
-                         <img class="shot is-actual" src="/images/apple-sports/05a-row-option.webp" alt="..." width="..." height="..." loading="lazy" decoding="async">
-                         Add or remove placeholders to match how many there are -->
-                    <div class="shot is-wide"><span>5a: Row layout I didn't use</span></div>
-                    <div class="shot is-wide"><span>5b: Row layout I didn't use</span></div>
+                <!-- SHOTS 5: single rows from rounds of testing (the Heat's upcoming games), each a 2x crop.
+                     Two columns, split in reading order where their heights come closest; the shorter one spreads out to end level.
+                     They open larger on click, and the arrow keys step through them (script.js) -->
+                <div class="case-stage case-row-shots">
+                    <div class="case-row-col">
+                        <img class="shot is-actual" src="/images/apple-sports/05-try1.webp?v=1" alt="A game row with the date on top, both teams' logos and records, the time and betting line in the middle, and the TV networks on a line underneath" width="373" height="104" loading="lazy" decoding="async">
+                        <img class="shot is-actual" src="/images/apple-sports/05-try2.webp?v=1" alt="A game row with the date on top, both teams' logos and records, and the TV network under the time and betting line" width="373" height="125" loading="lazy" decoding="async">
+                        <img class="shot is-actual" src="/images/apple-sports/05-try3-1.webp?v=1" alt="A game row with the date on the left, the opponent's record and logo, then the time, betting line, and network on the right" width="373" height="74" loading="lazy" decoding="async">
+                        <img class="shot is-actual" src="/images/apple-sports/05-try3-2.webp?v=1" alt="A game row with the date, the opponent's logo, then its name and record, with the time, betting line, and network on the right" width="373" height="61" loading="lazy" decoding="async">
+                        <img class="shot is-actual" src="/images/apple-sports/05-try3-3.webp?v=1" alt="A game row with the date and network, the time and betting line in the middle, then the opponent's record and logo" width="373" height="61" loading="lazy" decoding="async">
+                        <img class="shot is-actual" src="/images/apple-sports/05-try3-4.webp?v=1" alt="A game row with the date, the time with the betting line and network under it, then the opponent's record and logo" width="373" height="61" loading="lazy" decoding="async">
+                    </div>
+                    <div class="case-row-col">
+                        <img class="shot is-actual" src="/images/apple-sports/05-try3-5.webp?v=1" alt="A game row with the date, the opponent's record and logo, then the time with the betting line and network under it" width="373" height="61" loading="lazy" decoding="async">
+                        <img class="shot is-actual" src="/images/apple-sports/05-try3-7.webp?v=1" alt="A game row with the date, then the opponent's name, logo, and record across the row, with the time, betting line, and network on the right" width="373" height="61" loading="lazy" decoding="async">
+                        <img class="shot is-actual" src="/images/apple-sports/05-prototype-1.webp?v=1" alt="A game row with the date and time on the left, the Hornets' logo, their record and the betting line, and Amazon Prime Video on the right" width="373" height="85" loading="lazy" decoding="async">
+                        <img class="shot is-actual" src="/images/apple-sports/05-prototype-2.webp?v=1" alt="A game row with the date on top, the Heat's logo, Amazon Prime Video beside it, the time and betting line in the middle, and the Hornets' record and logo" width="373" height="85" loading="lazy" decoding="async">
+                        <img class="shot is-actual" src="/images/apple-sports/05-prototype-3.webp?v=1" alt="A game row with the date on top, the Heat's logo, its local networks beside it, the time and betting line in the middle, and the Hornets' record and logo" width="373" height="85" loading="lazy" decoding="async">
+                        <img class="shot is-actual" src="/images/apple-sports/05-prototype-4.webp?v=1" alt="A game row with the date on top, the local networks on the left instead of the Heat's logo, the time and betting line in the middle, and the Hornets' record and logo" width="373" height="85" loading="lazy" decoding="async">
+                    </div>
                 </div>
-                <figcaption>Earlier versions that squeezed everything into the existing row.</figcaption>
+                <figcaption>Row layouts I tried before the final design.</figcaption>
             </figure>
             <figure class="case-figure">
                 <div class="case-rows">
@@ -424,7 +438,7 @@
                 </div>
                 <figcaption>Row anatomy, before and after.</figcaption>
             </figure>
-            <p class="section-content">I wanted each row to be readable at a glance while still having everything a fan needs to plan around a game: when is it, who is it against, and where to watch it. With games spread across ESPN, Prime Video, Peacock, and more, where to watch matters as much as when, so the network sits right under the time. I shortened long network names so the rows stay clean.</p>
+            <p class="section-content">I wanted each row to be readable at a glance while still having everything a fan needs to plan around a game: when is it, who is it against, and where to watch it. It's difficult to keep track with games spread across ESPN, Prime Video, Peacock, local broadcasts, and more. I shortened long network names so the rows stay clean and kept the spread as a signal for the favored winner.</p>
             <p class="case-tradeoff"><span>Tradeoff</span>These rows look different from the rest of the app, but they keep its clean, minimal style.</p>
             <figure class="case-figure">
                 <div class="case-stage">

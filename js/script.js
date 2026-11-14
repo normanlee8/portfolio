@@ -788,7 +788,7 @@ recordings.forEach((video) => {
 // Larger view: clicking (or Enter / Space on) a phone or a crop opens it big over a dimmed page.
 // The copy inside is fresh: a recording picks up where the small one was, and has its own pause button.
 // Left / Right step through the other items in the same group (one gray card), stopping at either end
-const zoomables = document.querySelectorAll(".case-stage > .phone, .case-stage > .shot.is-actual, .case-shot > .shot.is-actual");
+const zoomables = document.querySelectorAll(".case-stage > .phone, .case-stage > .shot.is-actual, .case-shot > .shot.is-actual, .case-row-col > .shot.is-actual");
 
 if (zoomables.length && typeof HTMLDialogElement === "function") {
     const mediaDialog = document.createElement("dialog");
