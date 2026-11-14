@@ -165,6 +165,10 @@
                     <dt class="detail-label">Team</dt>
                     <dd class="content-description">Solo Project</dd>
                 </div>
+                <div class="detail-item">
+                    <dt class="detail-label">Scope</dt>
+                    <dd class="content-description">NBA</dd>
+                </div>
             </dl>
         </div>
 
@@ -174,21 +178,25 @@
             <dl class="case-tldr">
                 <div>
                     <dt>Problem</dt>
-                    <dd>Apple Sports has no way to follow a single team. Results vanish after a day, and upcoming games are buried among every other team and sport.</dd>
+                    <dd>Apple Sports has no page for a single team. The Yesterday tab drops results after a day, the Upcoming tab only reaches about a week ahead, and a favorite team's games are mixed in with the user's other favorites.</dd>
+                </div>
+                <div>
+                    <dt>Why it matters</dt>
+                    <dd>Fans can't easily see how their team has been doing or when it plays next, so they turn to other apps like ESPN for something Apple Sports could do itself.</dd>
                 </div>
                 <div>
                     <dt>Solution</dt>
-                    <dd>A team page with recent results and the upcoming schedule, opened from the places where you've already shown interest in that team.</dd>
+                    <dd>A team page with recent results and the upcoming schedule, opened from screens Apple Sports already has.</dd>
                 </div>
                 <div>
                     <dt>Constraint</dt>
-                    <dd>Add as little interface as possible. Keep what makes it Apple Sports: fast, current, and minimal.</dd>
+                    <dd>Keep the app light, so it still feels like Apple Sports: fast, current, and minimal.</dd>
                 </div>
             </dl>
             <figure class="case-figure">
                 <div class="case-stage">
                     <!-- SHOT 1: screen recording of the whole flow, 36s loop. Plays on its own; a click opens it larger, and its small button pauses it (script.js) -->
-                    <div class="phone"><video src="/images/apple-sports/01-full-demo.mp4?v=1" poster="/images/apple-sports/01-full-demo.webp?v=1" width="480" height="1040" data-autoplay muted loop playsinline preload="none" aria-label="Screen recording of the whole feature: the Previous tab, a team page opened from the league menu, and a team page opened from a game's card."></video></div>
+                    <div class="phone"><video src="/images/apple-sports/01-full-demo.mp4?v=1" poster="/images/apple-sports/01-full-demo.webp?v=1" width="480" height="1040" data-autoplay muted loop playsinline preload="none" aria-label="Screen recording of the whole feature: the Previous tab, a team page opened from the menu, and a team page opened from a game's card."></video></div>
                 </div>
                 <figcaption>The whole feature in 36 seconds.</figcaption>
             </figure>
@@ -207,10 +215,44 @@
             </div>
         </div>
 
-        <!-- Problem -->
+        <!-- Background: how the app works today, for readers who haven't used it -->
         <div class="section-item" data-fade="2">
+            <h2 class="section-header">How Apple Sports Works</h2>
+            <p class="case-lede">Built for checking scores at a glance.</p>
+            <p class="section-content">Apple Sports is Apple's sports app. Users pick their favorite teams and leagues, such as the Warriors (NBA), 49ers (NFL), Giants (MLB), NBA, NFL, and MLB.</p>
+            <p class="section-content">The home screen combines every favorite into one list of games. Swiping left moves to another screens: <em class="case-em">My Teams</em>, which puts all favorite teams on one screen, then one screen per favorite league, like <em class="case-em">NBA</em> or <em class="case-em">NFL</em>.</p>
+            <p class="section-content">Every screen sorts its games into three tabs: <em class="case-em">Yesterday</em>, <em class="case-em">Today</em>, and <em class="case-em">Upcoming</em>. Tapping a game opens its <em class="case-em">game card</em>, a sheet that slides up with that game's details. The button at the top of each screen opens a <em class="case-em">menu</em> for jumping to another screen, like My Teams or a league.</p>
+            <p class="section-content">This project works within the NBA screens.</p>
+        </div>
+
+        <!-- Problem -->
+        <div class="section-item" data-fade="3">
             <h2 class="section-header">The Problem</h2>
-            <p class="section-content">The main list only covers a few days in each direction. Previous stops at yesterday, and Upcoming shows the next few games mixed in with every other team. To follow one team, fans leave for ESPN, Yahoo, or theScore.</p>
+            <p class="case-lede">There's no place to see one team's schedule or recent results.</p>
+            <p class="section-content">Favoriting a team is the closest thing, but it falls short in three ways:</p>
+            <ul class="case-moments">
+                <li>
+                    <p class="case-moment-label">Results vanish after a day</p>
+                    <p>The Yesterday tab only shows yesterday's games. If the Warriors played Monday, their score is gone by Wednesday.</p>
+                </li>
+                <li>
+                    <p class="case-moment-label">Upcoming stops after a week</p>
+                    <p>It shows who a team plays next week, but nothing after that, so the rest of the month stays hidden.</p>
+                </li>
+                <li>
+                    <p class="case-moment-label">Favorites are mixed together</p>
+                    <p>My Teams lists every favorite team together, and the home screen adds favorite leagues on top, so one team's games are hard to pick out.</p>
+                </li>
+            </ul>
+            <p class="section-content">It's worse in sports with infrequent games. In the NFL, the Yesterday tab is empty most days.</p>
+            <figure class="case-figure">
+                <div class="case-stage">
+                    <!-- SHOT 2b: real iPhone screenshot of the NFL page's Yesterday tab on a day with no games -->
+                    <div class="phone"><img src="/images/apple-sports/02b-yesterday-empty.webp?v=3" alt="Apple Sports' NFL page on the Yesterday tab, reading No Events Yesterday, with the AFC standings below" width="624" height="1353" loading="lazy" decoding="async"></div>
+                </div>
+                <figcaption>Apple Sports today: the NFL page's Yesterday tab on a day without games.</figcaption>
+            </figure>
+            <p class="section-content">Fans who want to check on their favorite team either want the ability in Apple Sports or use another app instead, such as:</p>
             <!-- Fan comments from r/apple's thread on the June 2025 redesign, quoted as written and linked to the original.
                  Upvote counts as of November 2026; the ESPN quote trims the comment after "schedule" -->
             <div class="case-quotes">
@@ -233,36 +275,14 @@
                     <figcaption><a href="https://www.reddit.com/r/apple/comments/1lk76w8/comment/mzqvw5n/" target="_blank" rel="noopener noreferrer">1 upvote, r/apple</a> · June 2025</figcaption>
                 </figure>
             </div>
-            <p class="section-content">Die-hard and casual fans want different levels of depth, but they ask the same two questions: <em class="case-em">how has my team been doing, and when do they play next?</em></p>
-            <ul class="case-moments">
-                <li>
-                    <p class="case-moment-label">Monday's game, gone by Wednesday</p>
-                    <p>The Warriors played Monday. On Wednesday, the Yesterday tab only shows Tuesday's games, so their result is already gone.</p>
-                </li>
-                <li>
-                    <p class="case-moment-label">Are they winning lately?</p>
-                    <p>There's no way to see a team's last five games anywhere in the app.</p>
-                </li>
-                <li>
-                    <p class="case-moment-label">Is a tough stretch coming?</p>
-                    <p>Upcoming shows only the next few games, buried among other teams. Planning a week, let alone a month, is impossible.</p>
-                </li>
-            </ul>
-            <p class="section-content">It's sharper in weekly sports. In the NFL, the Yesterday tab is empty most days.</p>
-            <figure class="case-figure">
-                <div class="case-stage">
-                    <!-- SHOT 2b: real iPhone screenshot of the NFL page's Yesterday tab on a day with no games -->
-                    <div class="phone"><img src="/images/apple-sports/02b-yesterday-empty.webp?v=3" alt="Apple Sports' NFL page on the Yesterday tab, reading No Events Yesterday, with the AFC standings below" width="624" height="1353" loading="lazy" decoding="async"></div>
-                </div>
-                <figcaption>Apple Sports today. On a day with no games, the Yesterday tab is empty.</figcaption>
-            </figure>
+            <p class="section-content">Die-hard and casual fans want different levels of detail, but they ask the same two questions: <em class="case-em">how has my team been doing, and when do they play next?</em></p>
         </div>
 
         <!-- Solution -->
-        <div class="section-item" data-fade="3">
+        <div class="section-item" data-fade="4">
             <h2 class="section-header">The Solution</h2>
-            <p class="case-lede">Turn Yesterday into Previous, which shows the most recent games, and give every team its own page.</p>
-            <p class="section-content">While brainstorming solutions, I looked at how popular apps like ESPN, Yahoo Sports, Google Search, CBS Sports, and theScore handle a team's schedule and results.</p>
+            <p class="case-lede">Give every team its own page, with its recent results and upcoming schedule.</p>
+            <p class="section-content">While brainstorming, I looked at how ESPN, Yahoo Sports, Google Search, CBS Sports, and theScore show a team's schedule and results. All five have team pages and tapping a team's logo opens its page. All but Google Search groups their games by month.</p>
             <figure class="case-figure">
                 <!-- SHOTS R1-R5: the same team (the Warriors) in five other apps, November 2026. iPhone screenshots below the status bar,
                      so no phone frame: each is a labeled crop that opens larger on click (script.js). Width/height are the screen size in points -->
@@ -290,48 +310,60 @@
                 </div>
                 <figcaption>The Warriors' schedule and results in five other apps.</figcaption>
             </figure>
+            <p class="section-content">The new team page opens from screens Apple Sports already has, so nothing else changes. Below the team logo are the team's record and that day's game, if there is one. The game either shows the start time or final score. Under that, there is a switch for <em class="case-em">Upcoming</em> and <em class="case-em">Previous Games</em>, with the games grouped by month.</p>
+            <p class="section-content">The Yesterday tab on every screen also becomes <em class="case-em">Previous</em>, which keeps showing the most recent games instead of going empty.</p>
             <figure class="case-figure">
                 <div class="case-stage">
-                    <!-- SHOT 3: Figma, the main list on its new Previous tab -->
-                    <div class="phone"><img src="/images/apple-sports/03-previous-tab.webp?v=2" alt="The main list on the new Previous tab, with finished games grouped by date" width="624" height="1353" loading="lazy" decoding="async"></div>
+                    <!-- SHOT 3: Figma, the NBA screen on its new Previous tab -->
+                    <div class="phone"><img src="/images/apple-sports/03-previous-tab.webp?v=2" alt="Apple Sports' NBA screen on the new Previous tab, with finished games grouped by date" width="624" height="1353" loading="lazy" decoding="async"></div>
                     <!-- Figma, the Warriors' team page on each tab: Upcoming (the same file as shot 6b), then Previous Games (shot 3c) -->
                     <div class="phone"><img src="/images/apple-sports/06b-team-warriors.webp?v=2" alt="The Golden State Warriors' team page on its Upcoming tab: today's game against the Heat, then the rest of March and April, each with the date, opponent, time, and network" width="624" height="1353" loading="lazy" decoding="async"></div>
                     <div class="phone"><img src="/images/apple-sports/03c-team-previous.webp?v=1" alt="The Golden State Warriors' team page on its Previous Games tab, with recent results grouped by month" width="624" height="1353" loading="lazy" decoding="async"></div>
                 </div>
-                <figcaption>The new Previous tab, then a team's page: its upcoming games, and its previous games.</figcaption>
+                <figcaption>The NBA screen's Previous tab, which replaces Yesterday, then the Warriors' team page on Upcoming and on Previous Games.</figcaption>
             </figure>
         </div>
 
         <!-- Decision 1 -->
         <div class="section-item">
             <h2 class="section-header">Where It Lives</h2>
-            <p class="case-lede">Two entry points, one layer deep. Not three, and not one.</p>
-            <p class="section-content">A team page opens from two places: a team's logo in a game's card, and the team's name in the league menu. Both are moments when you've already shown interest in that team. It opens inside the existing slide-up card, so it adds one layer and nothing about the main app changes.</p>
+            <p class="case-lede">A team page opens from places where that team is already on screen.</p>
+            <ul class="case-moments">
+                <li>
+                    <p class="case-moment-label">From a game card</p>
+                    <p><span class="case-em">Tap a team's logo.</span> The logo is already on every game card, and every app I looked at open a team page this way.</p>
+                </li>
+                <li>
+                    <p class="case-moment-label">From the menu</p>
+                    <p><span class="case-em">Choose a favorite team.</span> The menu lists My Teams but not the teams in it, so I added each favorite team to it.</p>
+                </li>
+            </ul>
+            <p class="section-content">Either way, the page opens inside the same slide-up sheet, so it adds one layer and nothing else in the app changes.</p>
             <figure class="case-figure">
                 <div class="case-stage">
                     <!-- SHOTS 3a, 3b: screen recordings, 10s loops. MP4 (H.264), no audio, each with a poster frame. They play on their own; a click opens one larger, and its small button pauses it (script.js) -->
                     <div class="phone"><video src="/images/apple-sports/03a-from-game-card.mp4?v=2" poster="/images/apple-sports/03a-from-game-card.webp?v=2" width="480" height="1040" data-autoplay muted loop playsinline preload="none" aria-label="Screen recording: tapping a team's logo in a game's card opens that team's page."></video></div>
-                    <div class="phone"><video src="/images/apple-sports/03b-from-league-menu.mp4?v=2" poster="/images/apple-sports/03b-from-league-menu.webp?v=2" width="480" height="1040" data-autoplay muted loop playsinline preload="none" aria-label="Screen recording: choosing a team in the league menu opens that team's page."></video></div>
+                    <div class="phone"><video src="/images/apple-sports/03b-from-league-menu.mp4?v=2" poster="/images/apple-sports/03b-from-league-menu.webp?v=2" width="480" height="1040" data-autoplay muted loop playsinline preload="none" aria-label="Screen recording: choosing a favorite team from the menu opens that team's page."></video></div>
                 </div>
-                <figcaption>The two ways into a team page: from a game's card, or from the league menu.</figcaption>
+                <figcaption>The two ways into a team page: tapping a team's logo on a game card, or choosing a favorite team from the menu.</figcaption>
             </figure>
-            <p class="section-content">I considered the alternatives on either side and rejected both.</p>
-            <ul class="case-rejected">
+            <p class="section-content">I also considered one more way in, and one fewer:</p>
+            <ul class="case-moments">
                 <li>
-                    <p class="case-rejected-label">Tap a logo in the main list</p>
-                    <p>A third entry point, and it shrinks the area you tap to open the game card.</p>
+                    <p class="case-moment-label">A third entry point</p>
+                    <p><span class="case-em">Tapping a logo right in the list of games.</span> It would shrink the area that opens a game's card, as shown below.</p>
                 </li>
                 <li>
-                    <p class="case-rejected-label">Game card only, no menu entry</p>
-                    <p>You could only reach your team on days it appears in the list. The teams were already in the menu, so I gave them somewhere to go.</p>
+                    <p class="case-moment-label">A single entry point</p>
+                    <p><span class="case-em">The game card only.</span> A team's page would only be reachable on days the team plays, since that's the only time its game card is in the list. The menu makes it reachable any day.</p>
                 </li>
             </ul>
             <figure class="case-figure">
                 <div class="case-stage">
                     <!-- SHOT 4: Figma crop, annotated. The first three games, with the logo tap targets (red) marked against the card's hit area (green) -->
-                    <img class="shot is-actual" src="/images/apple-sports/04-card-vs-logo.webp?v=2" alt="The first three games in the main list. In the first row, the two team logos are shaded red and the rest of the row is shaded green." width="393" height="314" loading="lazy" decoding="async">
+                    <img class="shot is-actual" src="/images/apple-sports/04-card-vs-logo.webp?v=2" alt="The first three games on the NBA screen. In the first row, the two team logos are shaded red and the rest of the row is shaded green." width="393" height="314" loading="lazy" decoding="async">
                 </div>
-                <figcaption>Logo tap targets (red) would cut into the area that opens the game card (green).</figcaption>
+                <figcaption>Tapping anywhere in a game's row opens its card (green). Tappable logos (red) would take over both ends of the row, leaving less room to open the card and making mis-taps more likely.</figcaption>
             </figure>
         </div>
 
@@ -339,7 +371,7 @@
         <div class="section-item">
             <h2 class="section-header">What I Left Out</h2>
             <p class="case-lede">Rosters, news, and stats.</p>
-            <p class="section-content">Each would bloat a page built to be quick. Schedules and results are different: they aren't new content, just the games the app already shows, filtered to one team. That makes them a core function, not an add-on.</p>
+            <p class="section-content">Each would bloat a page built to be quick. What stayed is information Apple Sports already has, its games, results, and TV networks, gathered in one place for one team.</p>
             <div class="case-in-out">
                 <div>
                     <p class="case-in-out-label">In</p>
@@ -364,7 +396,17 @@
         <div class="section-item">
             <h2 class="section-header">The Hardest Decision</h2>
             <p class="case-lede">Breaking the app's game row to fit the date and the network.</p>
-            <p class="section-content">Apple Sports shows a game as team, record, time, record, team, with the date above. I needed to add the date and the TV network, and squeezing both into that row made it cluttered.</p>
+            <p class="section-content">In its lists of games, Apple Sports shows each game as one row: team, record, time, record, team, with the date as a heading above. A team page needs the date and the TV network in every row, and squeezing both into that layout made it cluttered.</p>
+            <figure class="case-figure">
+                <div class="case-stage">
+                    <!-- SHOTS 5a, 5b: row layouts I didn't go with. Replace each placeholder with a crop shown at its real size:
+                         <img class="shot is-actual" src="/images/apple-sports/05a-row-option.webp" alt="..." width="..." height="..." loading="lazy" decoding="async">
+                         Add or remove placeholders to match how many there are -->
+                    <div class="shot is-wide"><span>5a: Row layout I didn't use</span></div>
+                    <div class="shot is-wide"><span>5b: Row layout I didn't use</span></div>
+                </div>
+                <figcaption>Earlier versions that squeezed everything into the existing row.</figcaption>
+            </figure>
             <figure class="case-figure">
                 <div class="case-rows">
                     <div class="case-row-group">
@@ -382,14 +424,14 @@
                 </div>
                 <figcaption>Row anatomy, before and after.</figcaption>
             </figure>
-            <p class="section-content">The network drove the change. With games spread across ESPN, Prime Video, Peacock, and more, knowing where to watch is genuinely hard, and seeing the network shows at a glance which games are on national TV. I shortened long network names to keep the rows clean.</p>
-            <p class="case-tradeoff"><span>Tradeoff</span>These rows look different from the rest of the app, but they keep its clean, minimal style. It's different, not foreign.</p>
+            <p class="section-content">I wanted each row to be readable at a glance while still having everything a fan needs to plan around a game: when is it, who is it against, and where to watch it. With games spread across ESPN, Prime Video, Peacock, and more, where to watch matters as much as when, so the network sits right under the time. I shortened long network names so the rows stay clean.</p>
+            <p class="case-tradeoff"><span>Tradeoff</span>These rows look different from the rest of the app, but they keep its clean, minimal style.</p>
             <figure class="case-figure">
                 <div class="case-stage">
                     <!-- SHOT 5: Figma crop. Four upcoming rows at real size (a 3x image shown at its 1x width) -->
                     <img class="shot is-actual" src="/images/apple-sports/05-upcoming-rows.webp?v=2" alt="Four upcoming Heat games. Each row has the date, the opponent and its record, and the time with the TV network and betting line under it." width="342" height="267" loading="lazy" decoding="async">
                 </div>
-                <figcaption>The upcoming schedule. The network sits under the time.</figcaption>
+                <figcaption>The upcoming schedule rows.</figcaption>
             </figure>
         </div>
 
@@ -404,7 +446,7 @@
                 </div>
                 <div>
                     <dt>Type</dt>
-                    <dd>SF Pro throughout, with SF Pro Rounded only for times, as Apple Sports does.</dd>
+                    <dd>SF Pro throughout, with SF Pro Rounded only for times.</dd>
                 </div>
                 <div>
                     <dt>Color</dt>
@@ -416,24 +458,14 @@
                 </div>
                 <div>
                     <dt>Spacing</dt>
-                    <dd>Measured from the existing app, then held to one scale.</dd>
+                    <dd>A 4-point scale throughout.</dd>
                 </div>
             </dl>
-            <figure class="case-figure">
-                <ol class="case-scale" aria-label="Spacing scale in points">
-                    <li style="--pt: 4"><span class="case-scale-box"></span>4</li>
-                    <li style="--pt: 8"><span class="case-scale-box"></span>8</li>
-                    <li style="--pt: 12"><span class="case-scale-box"></span>12</li>
-                    <li style="--pt: 16"><span class="case-scale-box"></span>16</li>
-                    <li style="--pt: 24"><span class="case-scale-box"></span>24</li>
-                </ol>
-                <figcaption>The spacing scale, in points.</figcaption>
-            </figure>
             <figure class="case-figure">
                 <div class="case-stage">
                     <!-- SHOTS 6a, 6b: Figma, two teams' pages to show the gradient system -->
                     <div class="phone"><img src="/images/apple-sports/06b-team-warriors.webp?v=2" alt="Golden State Warriors team page in blue, showing upcoming games" width="624" height="1353" loading="lazy" decoding="async"></div>
-                    <div class="phone"><img src="/images/apple-sports/06a-team-heat.webp?v=2" alt="Miami Heat team page in red, showing previous games" width="624" height="1353" loading="lazy" decoding="async"></div>
+                    <div class="phone"><img src="/images/apple-sports/06a-team-heat.webp?v=3" alt="Miami Heat team page in red, showing upcoming games" width="624" height="1353" loading="lazy" decoding="async"></div>
                 </div>
                 <figcaption>The same page, in each team's colors.</figcaption>
             </figure>
@@ -453,24 +485,31 @@
                 </div>
                 <div>
                     <dt>Retention</dt>
-                    <dd>Whether people who follow one team keep using the app over time.</dd>
+                    <dd>Whether people with a favorite team keep using the app over time.</dd>
                 </div>
             </dl>
-            <p class="case-tradeoff"><span>Biggest risk</span>Discoverability. Apple tends to keep features out of sight. A one-time tip when the app opens, like the built-in tips iOS already uses, would point out the feature without cluttering the interface.</p>
+            <p class="case-tradeoff"><span>Biggest risk</span>Discoverability. Team pages only open from a logo or the menu, so users may never find them. A one-time tip when the app opens, like the built-in tips iOS already uses, would point them out without cluttering the interface.</p>
             <figure class="case-figure">
                 <div class="case-stage">
                     <!-- SHOTS 7, 7b: Figma, the one-time tip on launch and in a game's card -->
-                    <div class="phone"><img src="/images/apple-sports/07-launch-tip.webp?v=2" alt="Apple Sports' main list with a tip that reads Discover Team Pages: explore upcoming and previous games for your team" width="624" height="1353" loading="lazy" decoding="async"></div>
+                    <div class="phone"><img src="/images/apple-sports/07-launch-tip.webp?v=2" alt="Apple Sports' NBA screen with a tip that reads Discover Team Pages: explore upcoming and previous games for your team" width="624" height="1353" loading="lazy" decoding="async"></div>
                     <div class="phone"><img src="/images/apple-sports/07b-game-card-tip.webp?v=2" alt="A game's card with a tip that reads Discover Team Pages: tap on the team logo to explore upcoming and previous games" width="624" height="1353" loading="lazy" decoding="async"></div>
                 </div>
                 <figcaption>A one-time tip: on launch, and in a game's card.</figcaption>
             </figure>
         </div>
 
+        <!-- Next steps -->
+        <div class="section-item">
+            <h2 class="section-header">Next Steps</h2>
+            <p class="case-lede">Bring team pages to every sport Apple Sports covers.</p>
+            <p class="section-content">This concept covers the NBA only. Next, I'd extend it to every sport in the app and make sure the layout holds up to each sport's differences. In some sports, for example, a game has no single opponent, or no opponent record to show, so the row would need to adapt.</p>
+        </div>
+
         <!-- Reflection -->
         <div class="section-item">
             <h2 class="section-header">What I Learned</h2>
-            <p class="case-lede">The feature was simple. The hard part was deciding where it lives, what it leaves out, and how far to move from the existing design.</p>
+            <p class="case-lede">Most of the work was in the decisions: where the page lives, what it leaves out, and how far to move from the existing design.</p>
             <p class="section-content">A small, well-placed addition can solve a real problem without changing what makes a product good.</p>
         </div>
     </div>
