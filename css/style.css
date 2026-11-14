@@ -1116,109 +1116,155 @@ h1.work-header {
     margin-top: -0.09em;
 }
 
-/* ===== Apple Sports cover: four phones in a staggered row =====
-   Sized in cqh (thumbnail height), so the row keeps its size when a Work slice widens on hover.
+/* ===== Apple Sports cover: a team page, taken apart =====
+   Three phones lie on a tilted floor. The middle one is the Warriors' team page with its parts lifting off
+   the screen: the list of games, today's game above it, and the logo on top. Pointing at the cover lifts them higher.
+   The other two are the Heat's page and the NBA screen.
+
+   The floor is drawn flat, then turned and squashed (rotate, then scaleY) to look like it's seen from above.
+   Nothing here is real 3D: seen this way, "up off the screen" is just a slide along one diagonal of the floor,
+   so lifts, the phone's thickness and the shadows are all plain offsets along that diagonal.
+   Sized in cqh (thumbnail height), so it keeps its size when a Work slice widens on hover.
    Light by default; :root.dark-theme switches to the night version */
 .cover-screens {
     --cover-bg:
-        radial-gradient(60% 70% at 50% 110%, rgb(29 66 138 / 0.32), transparent 70%),
-        radial-gradient(40% 50% at 92% 0%, rgb(255 199 44 / 0.22), transparent 70%),
-        radial-gradient(45% 60% at 0% 20%, rgb(29 66 138 / 0.12), transparent 70%),
-        linear-gradient(180deg, #F4F6FB, #DAE2F0);
-    --cover-glow: rgb(56 110 220 / 0.28);
-    --cover-shadow: 15 25 55;
-    --cover-shadow-strength: 0.5;
-    --cover-edge: #9A9AA0; /* titanium */
+        radial-gradient(70% 90% at 50% 45%, #F7F5F1, transparent 75%),
+        linear-gradient(165deg, #EAE7E1, #D3CFC6);
+    --cover-pool: rgb(47 99 207 / 0.16);
+    --cover-shadow: 43 42 39;
+    --cover-shadow-strength: 0.7;
+    --cover-edge: #C9C7C2;   /* titanium: the rim around the glass */
+    --cover-side-a: #E3E1DC; /* the side's bright top line */
+    --cover-side-b: #9C9A95; /* the side */
+    --cover-side-c: #6E6C68; /* its bottom line */
     position: absolute;
     inset: 0;
-    z-index: -2; /* under the year's shade */
+    z-index: -2;
     overflow: hidden;
     border-radius: inherit;
     container-type: size;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
     background: var(--cover-bg);
 }
 
 :root.dark-theme .cover-screens {
     --cover-bg:
-        radial-gradient(60% 70% at 50% 110%, rgb(29 66 138 / 0.95), transparent 70%),
-        radial-gradient(40% 50% at 92% 0%, rgb(255 199 44 / 0.16), transparent 70%),
-        radial-gradient(45% 60% at 0% 20%, rgb(29 66 138 / 0.35), transparent 70%),
-        #070B16;
-    --cover-glow: rgb(56 110 220 / 0.45);
+        radial-gradient(70% 90% at 50% 45%, #45443F, transparent 75%),
+        linear-gradient(165deg, #2F2E2C, #1C1C1A);
+    --cover-pool: rgb(64 120 235 / 0.26);
     --cover-shadow: 0 0 0;
     --cover-shadow-strength: 1;
-    --cover-edge: #48484A;
+    --cover-edge: #8A8985;
+    --cover-side-a: #A8A6A1;
+    --cover-side-b: #5F5E5A;
+    --cover-side-c: #3A3937;
 }
 
-/* the year's shade lies over the phones; let the cursor pass through to them */
-.work-thumbnail:has(.cover-screens)::before {
-    pointer-events: none;
-}
-
-/* on the light version the year reads dark, without the photo shade */
-:root:not(.dark-theme) .work-thumbnail:has(.cover-screens) {
-    color: var(--text-primary);
-}
-
-:root:not(.dark-theme) .work-thumbnail:has(.cover-screens)::before {
-    content: none;
-}
-
-/* soft glow behind the phones */
+/* a pool of blue light on the floor under the middle phone */
 .cover-screens::before {
     content: "";
     position: absolute;
     left: 50%;
-    top: 55%;
-    width: 120cqh;
-    height: 70cqh;
+    top: 58%;
+    width: 170cqh;
+    height: 90cqh;
     translate: -50% -50%;
-    border-radius: 50%;
-    background: var(--cover-glow);
-    filter: blur(14cqh);
-    z-index: -1;
+    background: radial-gradient(closest-side, var(--cover-pool), transparent);
 }
 
-/* phone: black bezel, titanium edge, layered shadow (close and crisp, then wide and soft) */
+/* no photo here, so the year needs no shade behind it; on the light version it reads dark */
+.work-thumbnail:has(.cover-screens)::before {
+    content: none;
+}
+
+:root:not(.dark-theme) .work-thumbnail:has(.cover-screens) {
+    color: var(--text-primary);
+}
+
+/* the floor: the three phones in a row, turned and squashed */
+.cover-floor {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    display: flex;
+    align-items: flex-start;
+    gap: 16cqh;
+    translate: calc(-50% + 0cqh) calc(-50% + 8cqh);
+    transform: scaleY(0.6157) rotate(35deg);
+}
+
+/* phone: black bezel, titanium rim, a flat side made of stacked slices, then its shadow on the floor */
 .cover-phone {
-    --h: 84cqh;
-    --bezel: 1.1cqh;
-    --screen-w: calc((var(--h) - 2 * var(--bezel)) * 560 / 1214);
+    --w: 66cqh;
+    --bezel: 1.3cqh;
+    --screen-w: calc(var(--w) - 2 * var(--bezel));
     --s: var(--cover-shadow-strength);
-    --glow: 0 0 0 transparent;
     position: relative;
     flex: none;
-    height: var(--h);
-    width: calc(var(--screen-w) + 2 * var(--bezel));
-    margin: 17cqh 1.5cqh 0; /* spacing lives here: cqh on the row itself would measure the wrong box */
+    width: var(--w);
     padding: var(--bezel);
-    border-radius: 6.6cqh;
+    border-radius: calc(var(--w) * 0.168);
     background-color: #0B0B0C;
     box-shadow:
         0 0 0 0.3cqh var(--cover-edge),
-        0 0.6cqh 1.2cqh rgb(var(--cover-shadow) / calc(0.35 * var(--s))),
-        0 3cqh 6cqh rgb(var(--cover-shadow) / calc(0.4 * var(--s))),
-        0 8cqh 16cqh rgb(var(--cover-shadow) / calc(0.45 * var(--s))),
-        var(--glow);
-    transition: translate 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+        0.19cqh 0.27cqh 0 0.3cqh var(--cover-side-a),
+        0.37cqh 0.53cqh 0 0.3cqh color-mix(in srgb, var(--cover-side-a) 45%, var(--cover-side-b)),
+        0.56cqh 0.80cqh 0 0.3cqh var(--cover-side-b),
+        0.75cqh 1.06cqh 0 0.3cqh var(--cover-side-b),
+        0.93cqh 1.33cqh 0 0.3cqh var(--cover-side-b),
+        1.12cqh 1.60cqh 0 0.3cqh var(--cover-side-b),
+        1.30cqh 1.86cqh 0 0.3cqh var(--cover-side-b),
+        1.49cqh 2.13cqh 0 0.3cqh var(--cover-side-b),
+        1.68cqh 2.39cqh 0 0.3cqh var(--cover-side-b),
+        1.86cqh 2.66cqh 0 0.3cqh var(--cover-side-b),
+        2.05cqh 2.93cqh 0 0.3cqh var(--cover-side-b),
+        2.24cqh 3.19cqh 0 0.3cqh var(--cover-side-b),
+        2.42cqh 3.46cqh 0 0.3cqh var(--cover-side-b),
+        2.61cqh 3.73cqh 0 0.3cqh var(--cover-side-b),
+        2.79cqh 3.99cqh 0 0.3cqh var(--cover-side-b),
+        2.98cqh 4.26cqh 0 0.3cqh var(--cover-side-b),
+        3.17cqh 4.52cqh 0 0.3cqh var(--cover-side-b),
+        3.35cqh 4.79cqh 0 0.3cqh var(--cover-side-b),
+        3.54cqh 5.06cqh 0 0.3cqh var(--cover-side-b),
+        3.73cqh 5.32cqh 0 0.3cqh var(--cover-side-b),
+        3.91cqh 5.59cqh 0 0.3cqh var(--cover-side-b),
+        4.10cqh 5.85cqh 0 0.3cqh var(--cover-side-b),
+        4.29cqh 6.12cqh 0 0.3cqh var(--cover-side-b),
+        4.47cqh 6.39cqh 0 0.3cqh var(--cover-side-b),
+        4.66cqh 6.65cqh 0 0.3cqh var(--cover-side-b),
+        4.84cqh 6.92cqh 0 0.3cqh var(--cover-side-c),
+        5.03cqh 7.18cqh 0 0.3cqh var(--cover-side-c),
+        8.98cqh 7.59cqh 5cqh rgb(var(--cover-shadow) / calc(0.4 * var(--s))),
+        22.39cqh 18.03cqh 14cqh rgb(var(--cover-shadow) / calc(0.4 * var(--s)));
 }
 
-.work-thumbnail .cover-phone img {
+/* the phones on either side sit further along the floor, so the row steps */
+.cover-phone:first-child {
+    translate: 0 26cqh;
+}
+
+.cover-phone:last-child {
+    translate: 0 -22cqh;
+}
+
+/* and sit back a little: dimmer and slightly out of focus, so the eye goes to the middle one */
+.cover-phone:first-child,
+.cover-phone:last-child {
+    filter: blur(0.3cqh) brightness(0.82);
+}
+
+.work-thumbnail .cover-screens img {
     position: static;
     inset: auto;
     z-index: auto;
     display: block;
     width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 5.5cqh;
+    height: auto;
+    object-fit: fill;
+    border-radius: calc(var(--w) * 0.168 - var(--bezel));
 }
 
-/* dynamic island, lined up with the screenshots' status bar */
-.cover-phone::after {
+/* dynamic island, lined up with the screenshots' status bar (::before, so the lifted parts pass over it) */
+.cover-phone::before {
     content: "";
     position: absolute;
     left: 50%;
@@ -1230,25 +1276,137 @@ h1.work-header {
     background-color: #000;
 }
 
-/* staggered heights; every phone runs off the bottom edge */
-.cover-phone:nth-child(odd) {
-    margin-top: 27cqh;
+/* the side button and Camera Control on the long side, slanted so they stand upright on it */
+.cover-key {
+    position: absolute;
+    left: calc(100% + 0.3cqh);
+    top: 27%;
+    width: 2.01cqh;
+    height: 10%;
+    border-radius: 0.5cqh;
+    background-color: color-mix(in srgb, var(--cover-side-a) 30%, var(--cover-side-b));
+    box-shadow: 0 0 0 0.12cqh rgb(0 0 0 / 0.22);
+    transform-origin: 0 0;
+    transform: translate(1.51cqh, 2.16cqh) skewY(55.00deg);
 }
 
-/* the team page pair glows slightly */
-.cover-phone:nth-child(n + 3) {
-    --glow: 0 0 10cqh rgb(56 110 220 / 0.3);
+/* Camera Control sits flush, so it's darker than the side instead of lighter */
+.cover-key.is-flush {
+    top: 60%;
+    height: 7%;
+    background-color: color-mix(in srgb, var(--cover-side-c) 70%, var(--cover-side-b));
+    box-shadow: none;
 }
 
-/* each phone rises while the cursor is over it, and settles back when it leaves */
+/* the charging port on the bottom end, with a row of speaker holes on either side */
+.cover-port {
+    position: absolute;
+    left: 50%;
+    top: calc(100% + 0.3cqh);
+    width: 13%;
+    height: 2.44cqh;
+    border-radius: 999px;
+    background-color: #0B0B0C;
+    transform-origin: 0 0;
+    transform: translate(calc(-50% + 1.66cqh), 2.37cqh) skewX(35.00deg);
+}
+
+.cover-port::before,
+.cover-port::after {
+    content: "";
+    position: absolute;
+    top: 22%;
+    height: 56%;
+    width: 150%;
+    background: radial-gradient(circle closest-side, #0B0B0C 80%, transparent) 0 0 / 20% 100% repeat-x;
+}
+
+.cover-port::before {
+    right: 150%;
+}
+
+.cover-port::after {
+    left: 150%;
+}
+
+/* A part of the middle screen, lifted off it by --lift. Each is a slab with a thin lit rim and two slices
+   of thickness, and throws its shadow straight back down onto the empty spot it came from.
+   Placed by fractions of the screen (measured from the screenshot) */
+.work-thumbnail .cover-screens .cover-layer {
+    --screen-h: calc(var(--screen-w) * 2556 / 1179);
+    position: absolute;
+    left: calc(var(--bezel) + var(--screen-w) * var(--at-x));
+    top: calc(var(--bezel) + var(--screen-h) * var(--at-y));
+    width: calc(var(--screen-w) * var(--at-w));
+    border-radius: calc(var(--screen-w) * 0.0407);
+    outline: 0.2cqh solid rgb(255 255 255 / 0.16);
+    outline-offset: -0.2cqh;
+    translate: calc(var(--lift) * -0.932) calc(var(--lift) * -1.331);
+    box-shadow:
+        0.28cqh 0.40cqh 0 rgb(120 150 215 / 0.55),
+        0.56cqh 0.80cqh 0 rgb(40 60 110 / 0.75),
+        calc(var(--lift) * 0.932) calc(var(--lift) * 1.331) calc(0.45 * var(--lift)) rgb(0 0 0 / 0.6);
+    transition:
+        translate 0.8s cubic-bezier(0.22, 1, 0.36, 1) var(--wait, 0s),
+        box-shadow 0.8s cubic-bezier(0.22, 1, 0.36, 1) var(--wait, 0s);
+}
+
+.cover-layer.is-list {
+    --at-x: 0.0611;
+    --at-y: 0.4284;
+    --at-w: 0.8779;
+    --lift: 3cqh;
+}
+
+.cover-layer.is-today {
+    --at-x: 0.0611;
+    --at-y: 0.3392;
+    --at-w: 0.8779;
+    --lift: 7.5cqh;
+    --wait: 0.05s;
+}
+
+.work-thumbnail .cover-screens .cover-layer.is-logo {
+    --at-x: 0.3647;
+    --at-y: 0.1745;
+    --at-w: 0.268;
+    --lift: 18cqh;
+    --wait: 0.1s;
+    border-radius: 50%;
+}
+
+/* pointing at the cover (or at its slice on the Work page, or tabbing to its project) lifts the parts higher */
+.work-card:focus-within .cover-layer.is-list {
+    --lift: 7cqh;
+}
+
+.work-card:focus-within .cover-layer.is-today {
+    --lift: 15cqh;
+}
+
+.work-card:focus-within .cover-layer.is-logo {
+    --lift: 29cqh;
+}
+
 @media (hover: hover) {
-    .cover-phone:hover {
-        translate: 0 -5cqh;
+    .work-thumbnail:hover .cover-layer.is-list,
+    .work-grid .work-card:hover .cover-layer.is-list {
+        --lift: 7cqh;
+    }
+
+    .work-thumbnail:hover .cover-layer.is-today,
+    .work-grid .work-card:hover .cover-layer.is-today {
+        --lift: 15cqh;
+    }
+
+    .work-thumbnail:hover .cover-layer.is-logo,
+    .work-grid .work-card:hover .cover-layer.is-logo {
+        --lift: 29cqh;
     }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .cover-phone {
+    .work-thumbnail .cover-screens .cover-layer {
         transition: none;
     }
 }
