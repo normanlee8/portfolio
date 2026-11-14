@@ -216,7 +216,15 @@ themeToggleBtn.addEventListener("click", () => {
         localStorage.setItem("theme", isDarkNow ? "dark" : "light");
     }
 
-    applyTheme();
+    // The page eases from one theme to the other (style.css).
+    // Without view transitions, or with reduced motion on, it just switches
+    const page = document.documentElement;
+    if (!document.startViewTransition || reduceMotion.matches) {
+        applyTheme();
+        return;
+    }
+    page.classList.add("theme-switching");
+    document.startViewTransition(applyTheme).finished.catch(() => {}).then(() => page.classList.remove("theme-switching"));
 });
 
 // Re-check when a page is shown, including from Back/Forward
@@ -417,6 +425,35 @@ document.querySelectorAll(".work-thumbnail .view-project").forEach((pill) => {
             lastTime = 0;
             frame = requestAnimationFrame(step);
         }
+    });
+});
+
+// The Apple Sports cover leans with the cursor: --px / --py say where the cursor is over it (-1 to 1),
+// and style.css slides the floor a little one way and the lifted parts further the other
+document.querySelectorAll(".work-thumbnail .cover-screens").forEach((cover) => {
+    const thumb = cover.closest(".work-thumbnail");
+    let frame = 0;
+    let px = 0;
+    let py = 0;
+
+    function lean() {
+        frame = 0;
+        cover.style.setProperty("--px", px.toFixed(3));
+        cover.style.setProperty("--py", py.toFixed(3));
+    }
+
+    thumb.addEventListener("pointermove", (e) => {
+        if (e.pointerType !== "mouse" || reduceMotion.matches) return;
+        const rect = thumb.getBoundingClientRect();
+        px = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+        py = ((e.clientY - rect.top) / rect.height) * 2 - 1;
+        if (!frame) frame = requestAnimationFrame(lean);
+    });
+
+    thumb.addEventListener("pointerleave", () => {
+        px = 0;
+        py = 0;
+        if (!frame) frame = requestAnimationFrame(lean);
     });
 });
 

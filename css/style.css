@@ -128,7 +128,7 @@
     --page-edge: max(var(--space-md), calc((100% - 1440px) / 2 + var(--space-md)));
 
     /* Header Blur */
-    --header-bg: rgba(236, 234, 229, 0.8);
+    --header-bg: rgba(236, 234, 229, 0.62);
 }
 
 /* Dark Mode */
@@ -161,7 +161,7 @@
     --color-pink:   #FF6EA8;
 
     /* Header Blur */
-    --header-bg: rgba(42, 42, 40, 0.8);
+    --header-bg: rgba(42, 42, 40, 0.6);
 }
 
 html {
@@ -320,9 +320,12 @@ body {
     position: sticky;
     top: 0;
     z-index: 100;
+    /* glass: a light tint over a deep blur, with the colors behind it turned up so they glow through
+       instead of going gray */
     background-color: var(--header-bg);
-    -webkit-backdrop-filter: blur(8px);
-    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    backdrop-filter: blur(20px) saturate(180%);
+    view-transition-name: site-header; /* stays put while pages change under it */
 }
 
 /* Header line: track (::before) and scroll progress (.header-progress, added and scaled by script.js) */
@@ -735,11 +738,11 @@ body {
 }
 
 /* 32 → 64px from 393px, smaller below so the lines still fit; always two lines */
-/* the headline: one short line, 36 → 72px, set slightly tight */
+/* the headline: one short line, 36 → 96px, set tight */
 .hero-text {
-    font-size: clamp(2.25rem, 9cqi, 4.5rem);
+    font-size: clamp(2.25rem, 10cqi, 6rem);
     line-height: var(--leading-none);
-    letter-spacing: -0.025em;
+    letter-spacing: -0.035em;
     white-space: nowrap;
 }
 
@@ -1041,6 +1044,7 @@ h1.work-header {
     /* same faint ring as the About photos */
     outline: 1px solid var(--line-faint);
     outline-offset: -1px;
+    transition: scale 0.2s ease;
 }
 
 /* Photo fills the frame */
@@ -1116,6 +1120,63 @@ h1.work-header {
     margin-top: -0.09em;
 }
 
+/* ===== Press feedback: things give a little under the finger or the mouse button ===== */
+.case-button:active,
+.pager-link:active,
+a.work-thumbnail:active {
+    scale: 0.97;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .case-button:active,
+    .pager-link:active,
+    a.work-thumbnail:active {
+        scale: none;
+    }
+}
+
+/* ===== Page transitions =====
+   Going from one page to the next cross-fades instead of blinking, and the Apple Sports cover grows from a
+   thumbnail into the case study's header (and back). Browsers without view transitions just load the page */
+@media (prefers-reduced-motion: no-preference) {
+    @view-transition {
+        navigation: auto;
+    }
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+    animation-duration: 0.3s;
+}
+
+.work-thumbnail:has(.cover-screens) {
+    view-transition-name: cover-apple-sports;
+}
+
+::view-transition-group(cover-apple-sports) {
+    animation-duration: 0.55s;
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* a page reached through a transition skips its load-in fade: the transition is the entrance
+   (the class is set in each page's <head>) */
+:root.from-transition [data-fade] {
+    animation: none;
+}
+
+/* Switching themes: the whole page eases from one theme to the other (script.js starts it).
+   The header and cover join the page for this one, so everything fades together */
+:root.theme-switching .header,
+:root.theme-switching .work-thumbnail {
+    view-transition-name: none;
+}
+
+:root.theme-switching::view-transition-old(root),
+:root.theme-switching::view-transition-new(root) {
+    animation-duration: 0.45s;
+    animation-timing-function: ease-in-out;
+}
+
 /* ===== Apple Sports cover: a team page, taken apart =====
    Three phones lie on a tilted floor. The middle one is the Warriors' team page with its parts lifting off
    the screen: the list of games, today's game above it, and the logo on top. Pointing at the cover lifts them higher.
@@ -1188,7 +1249,9 @@ h1.work-header {
     display: flex;
     align-items: flex-start;
     gap: 16cqh;
-    translate: calc(-50% + 0cqh) calc(-50% + 8cqh);
+    /* --px / --py: where the cursor is over the cover, -1 to 1 (script.js). The floor slides a little away from it */
+    translate: calc(-50% + var(--px, 0) * -1cqh) calc(-50% + 8cqh + var(--py, 0) * -1cqh);
+    transition: translate 0.6s cubic-bezier(0.22, 1, 0.36, 1);
     transform: scaleY(0.6157) rotate(35deg);
 }
 
@@ -1341,14 +1404,22 @@ h1.work-header {
     border-radius: calc(var(--screen-w) * 0.0407);
     outline: 0.2cqh solid rgb(255 255 255 / 0.16);
     outline-offset: -0.2cqh;
+    /* Two separate motions, so neither interrupts the other:
+       translate lifts the part straight up off the screen (and settles it back), slowly and one part after another;
+       transform leans it toward the cursor, more for higher parts, so the screen seems to have real depth */
     translate: calc(var(--lift) * -0.932) calc(var(--lift) * -1.331);
+    transform: translate(
+        calc((var(--px, 0) * 0.819 + var(--py, 0) * 0.932) * var(--depth)),
+        calc((var(--px, 0) * -0.574 + var(--py, 0) * 1.331) * var(--depth))
+    );
     box-shadow:
         0.28cqh 0.40cqh 0 rgb(120 150 215 / 0.55),
         0.56cqh 0.80cqh 0 rgb(40 60 110 / 0.75),
         calc(var(--lift) * 0.932) calc(var(--lift) * 1.331) calc(0.45 * var(--lift)) rgb(0 0 0 / 0.6);
     transition:
         translate 0.8s cubic-bezier(0.22, 1, 0.36, 1) var(--wait, 0s),
-        box-shadow 0.8s cubic-bezier(0.22, 1, 0.36, 1) var(--wait, 0s);
+        box-shadow 0.8s cubic-bezier(0.22, 1, 0.36, 1) var(--wait, 0s),
+        transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .cover-layer.is-list {
@@ -1356,6 +1427,7 @@ h1.work-header {
     --at-y: 0.4284;
     --at-w: 0.8779;
     --lift: 3cqh;
+    --depth: 0.7cqh;
 }
 
 .cover-layer.is-today {
@@ -1363,6 +1435,7 @@ h1.work-header {
     --at-y: 0.3392;
     --at-w: 0.8779;
     --lift: 7.5cqh;
+    --depth: 1.5cqh;
     --wait: 0.05s;
 }
 
@@ -1371,6 +1444,7 @@ h1.work-header {
     --at-y: 0.1745;
     --at-w: 0.268;
     --lift: 18cqh;
+    --depth: 2.6cqh;
     --wait: 0.1s;
     border-radius: 50%;
 }
@@ -1406,6 +1480,7 @@ h1.work-header {
 }
 
 @media (prefers-reduced-motion: reduce) {
+    .cover-floor,
     .work-thumbnail .cover-screens .cover-layer {
         transition: none;
     }
@@ -1505,7 +1580,7 @@ h1.work-header {
     color: var(--bg-color);
     font-size: var(--text-base);
     font-weight: var(--weight-medium);
-    transition: background-color 0.2s ease;
+    transition: background-color 0.2s ease, scale 0.15s ease;
 }
 
 /* hover turns it gray, like the name in the header */
@@ -2542,6 +2617,7 @@ div.shot > span {
     flex-direction: column;
     gap: var(--space-sm);
     width: fit-content;
+    transition: scale 0.15s ease;
 }
 
 .pager-next {
@@ -3757,7 +3833,7 @@ body:has(.page-nav) .toast {
     }
 
     .work-grid .work-thumbnail {
-        transition: transform 0.4s ease;
+        transition: transform 0.4s ease, scale 0.2s ease;
     }
 
     .work-grid .work-card:focus-within .work-thumbnail {

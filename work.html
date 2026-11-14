@@ -24,6 +24,10 @@
     <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=3">
     <!-- Load Theme -->
     <script>
+        // Arriving through a page transition: skip the load-in fade (style.css)
+        addEventListener("pagereveal", (e) => {
+            if (e.viewTransition) document.documentElement.classList.add("from-transition");
+        });
         {
             const savedTheme = localStorage.getItem("theme");
             const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
