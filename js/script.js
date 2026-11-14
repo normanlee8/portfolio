@@ -727,18 +727,34 @@ if (pageNav) {
 
 }
 
-// Screen recordings: they play on their own while on screen. A small button in the corner of each screen pauses or resumes it.
+// Screen recordings: they play on their own while on screen. A small bar along the bottom of each screen has
+// play/pause, a timeline to drag back and forth (and stop on any frame), and the time. On the page it folds
+// down to just the button until the phone is pointed at (style.css); the larger view always shows all of it.
 // With reduced motion on, they start paused and wait for that button.
 // They're marked data-autoplay (not autoplay) and preload="none", so nothing downloads until a recording nears the screen
 const userPaused = new WeakSet(); // recordings the visitor paused stay paused when they scroll back
 const PAUSE_ICON = '<svg class="icon-pause" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><rect x="3.5" y="2.5" width="3" height="11" rx="1"/><rect x="9.5" y="2.5" width="3" height="11" rx="1"/></svg>';
 const PLAY_ICON = '<svg class="icon-play" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M5 3.3v9.4a.6.6 0 0 0 .9.5l7.8-4.7a.6.6 0 0 0 0-1L5.9 2.8a.6.6 0 0 0-.9.5z"/></svg>';
+const SEEK_STEPS = 1000; // the timeline's resolution
 
-function addMediaToggle(video) {
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "media-toggle";
-    btn.innerHTML = PAUSE_ICON + PLAY_ICON;
+const formatTime = (seconds) => {
+    const s = Math.floor(seconds || 0);
+    return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+};
+
+function addMediaControls(video) {
+    const bar = document.createElement("div");
+    bar.className = "media-controls";
+    bar.innerHTML =
+        `<button type="button" class="media-toggle">${PAUSE_ICON}${PLAY_ICON}</button>` +
+        `<input type="range" class="media-seek" min="0" max="${SEEK_STEPS}" step="1" value="0" aria-label="Video position">` +
+        '<span class="media-time" aria-hidden="true"><span class="media-time-now">0:00</span><span class="media-time-total"></span></span>';
+    const btn = bar.querySelector(".media-toggle");
+    const seek = bar.querySelector(".media-seek");
+    const now = bar.querySelector(".media-time-now");
+    const total = bar.querySelector(".media-time-total");
+    let dragging = false;
+    let frame = 0;
 
     function show() {
         const paused = video.paused;
@@ -746,8 +762,26 @@ function addMediaToggle(video) {
         btn.setAttribute("aria-label", paused ? "Play video" : "Pause video");
     }
 
-    btn.addEventListener("click", (e) => {
-        e.stopPropagation(); // pausing doesn't also open the larger view
+    // the bar follows the video: every frame while it plays, and after any jump
+    function sync() {
+        const duration = video.duration;
+        if (!dragging && duration) seek.value = Math.round((video.currentTime / duration) * SEEK_STEPS);
+        seek.style.setProperty("--progress", `${(seek.value / SEEK_STEPS) * 100}%`);
+        now.textContent = formatTime(video.currentTime);
+        seek.setAttribute("aria-valuetext", `${formatTime(video.currentTime)} of ${formatTime(duration)}`);
+    }
+
+    function follow() {
+        sync();
+        frame = requestAnimationFrame(follow);
+    }
+
+    function showDuration() {
+        total.textContent = ` / ${formatTime(video.duration)}`;
+        sync();
+    }
+
+    btn.addEventListener("click", () => {
         if (video.paused) {
             userPaused.delete(video);
             video.play().catch(show);
@@ -756,13 +790,44 @@ function addMediaToggle(video) {
             video.pause();
         }
     });
-    video.addEventListener("play", show);
-    video.addEventListener("pause", show);
+
+    // dragging the timeline moves the video to that point; a paused video stays paused on that frame
+    seek.addEventListener("pointerdown", () => {
+        dragging = true;
+        if (video.readyState === 0) video.preload = "metadata"; // a recording that hasn't loaded yet starts now
+    });
+    seek.addEventListener("input", () => {
+        if (video.duration) video.currentTime = (seek.value / SEEK_STEPS) * video.duration;
+        sync();
+    });
+    seek.addEventListener("change", () => {
+        dragging = false;
+        sync();
+    });
+    seek.addEventListener("pointerup", () => (dragging = false));
+
+    video.addEventListener("play", () => {
+        show();
+        cancelAnimationFrame(frame);
+        frame = requestAnimationFrame(follow);
+    });
+    video.addEventListener("pause", () => {
+        show();
+        cancelAnimationFrame(frame);
+        sync();
+    });
+    video.addEventListener("seeked", sync);
+    video.addEventListener("loadedmetadata", showDuration);
+    if (video.readyState >= 1) showDuration();
+
+    // clicks on the bar stay on the bar: they don't also open (or close) the larger view
+    bar.addEventListener("click", (e) => e.stopPropagation());
+
     // it may not have started yet; the button shows pause unless the visitor (or reduced motion) paused it
     if ("autoplay" in video.dataset) btn.classList.remove("is-paused");
     else show();
     btn.setAttribute("aria-label", btn.classList.contains("is-paused") ? "Play video" : "Pause video");
-    video.parentElement.append(btn);
+    video.parentElement.append(bar);
 }
 
 const recordings = document.querySelectorAll(".phone > video");
@@ -780,15 +845,16 @@ recordings.forEach((video) => {
         delete video.dataset.autoplay;
         userPaused.add(video);
     }
-    addMediaToggle(video);
+    addMediaControls(video);
     if (recordingWatcher) recordingWatcher.observe(video);
     else if (!userPaused.has(video)) video.play().catch(() => {}); // old browsers: just play
 });
 
 // Larger view: clicking (or Enter / Space on) a phone or a crop opens it big over a dimmed page.
-// The copy inside is fresh: a recording picks up where the small one was, and has its own pause button.
-// Left / Right step through the other items in the same group (one gray card), stopping at either end
-const zoomables = document.querySelectorAll(".case-stage > .phone, .case-stage > .shot.is-actual, .case-shot > .shot.is-actual, .case-row-col > .shot.is-actual");
+// The copy inside is fresh: a recording picks up where the small one was, and has its own controls.
+// When its card holds more than one item, a bar at the bottom steps through them (previous, "2 of 3", next),
+// as do Left / Right and, on touch screens, a sideways swipe. It stops at either end
+const zoomables = document.querySelectorAll(".case-stage > .phone, .case-stage > .shot.is-actual, .case-shot > .shot.is-actual, .case-row-col > .shot.is-actual, .case-aside > .phone");
 
 if (zoomables.length && typeof HTMLDialogElement === "function") {
     const mediaDialog = document.createElement("dialog");
@@ -797,11 +863,19 @@ if (zoomables.length && typeof HTMLDialogElement === "function") {
     mediaDialog.innerHTML =
         '<button type="button" class="proto-close" aria-label="Close larger view">' +
         '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/></svg>' +
-        '</button><div class="proto-stage media-stage"></div>';
+        '</button><div class="proto-stage media-stage"></div>' +
+        '<div class="media-nav">' +
+        '<button type="button" class="media-nav-btn" data-step="-1" aria-label="Previous"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"><path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/></svg></button>' +
+        '<span class="media-count" aria-live="polite"></span>' +
+        '<button type="button" class="media-nav-btn" data-step="1" aria-label="Next"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"><path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"/></svg></button>' +
+        '</div>';
     document.body.append(mediaDialog);
     const mediaStage = mediaDialog.querySelector(".media-stage");
 
     const closeBtn = mediaDialog.querySelector(".proto-close");
+    const mediaNav = mediaDialog.querySelector(".media-nav");
+    const mediaCount = mediaDialog.querySelector(".media-count");
+    const [prevBtn, nextBtn] = mediaDialog.querySelectorAll(".media-nav-btn");
     let openItem = null; // the small item now shown larger
     let busy = false; // an opening or closing move is running
 
@@ -825,6 +899,7 @@ if (zoomables.length && typeof HTMLDialogElement === "function") {
         const moves = [
             copy.animate({ transform: frames(moved, "none") }, options),
             closeBtn.animate({ opacity: frames(0, 1) }, options),
+            mediaNav.animate({ opacity: frames(0, 1) }, options),
         ];
         try {
             moves.push(mediaDialog.animate({ opacity: frames(0, 1) }, { ...options, pseudoElement: "::backdrop" }));
@@ -835,11 +910,17 @@ if (zoomables.length && typeof HTMLDialogElement === "function") {
     // The items shown alongside this one (same card), for Left / Right
     const groupOf = (item) => [...zoomables].filter((z) => z.closest(".case-stage") === item.closest(".case-stage"));
 
-    // Names the open item's place in its group, e.g. "Larger view, 2 of 5"
+    // Shows the open item's place in its group, e.g. "2 of 5", and only offers the directions that go somewhere
     function labelView() {
         const group = groupOf(openItem);
-        const place = group.length > 1 ? `, ${group.indexOf(openItem) + 1} of ${group.length}` : "";
-        mediaDialog.setAttribute("aria-label", `Larger view${place}`);
+        const index = group.indexOf(openItem);
+        const inSet = group.length > 1;
+        const place = inSet ? `${index + 1} of ${group.length}` : "";
+        mediaDialog.setAttribute("aria-label", inSet ? `Larger view, ${place}` : "Larger view");
+        mediaDialog.classList.toggle("has-nav", inSet);
+        mediaCount.textContent = place;
+        prevBtn.disabled = index <= 0;
+        nextBtn.disabled = index >= group.length - 1;
     }
 
     // A fresh copy of a small item for the larger view; a recording carries on from where the small one is
@@ -850,7 +931,7 @@ if (zoomables.length && typeof HTMLDialogElement === "function") {
         copy.removeAttribute("role");
         copy.removeAttribute("aria-label");
         copy.style.visibility = "";
-        copy.querySelector(".media-toggle")?.remove();
+        copy.querySelector(".media-controls")?.remove();
 
         const img = copy.matches("img") ? copy : copy.querySelector("img");
         if (img) img.loading = "eager";
@@ -862,7 +943,7 @@ if (zoomables.length && typeof HTMLDialogElement === "function") {
             video.preload = "auto"; // even when paused, show the frame it's on rather than the poster
             video.currentTime = smallVideo.currentTime;
             delete video.dataset.autoplay;
-            addMediaToggle(video);
+            addMediaControls(video);
             if (!smallVideo.paused) {
                 video.play().catch(() => {});
                 smallVideo.pause(); // hidden under the larger view, so it doesn't need to keep decoding
@@ -953,16 +1034,39 @@ if (zoomables.length && typeof HTMLDialogElement === "function") {
 
     closeBtn.addEventListener("click", closeLarger);
 
+    [prevBtn, nextBtn].forEach((btn) => btn.addEventListener("click", () => stepLarger(Number(btn.dataset.step))));
+
     mediaDialog.addEventListener("keydown", (e) => {
         if (e.altKey || e.ctrlKey || e.metaKey) return;
+        if (e.target.matches(".media-seek")) return; // on a timeline, the arrows move through the video instead
         if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
             e.preventDefault();
             stepLarger(e.key === "ArrowLeft" ? -1 : 1);
         }
     });
 
+    // Touch: a sideways swipe steps through the set (not on a recording's controls, where it drags the timeline)
+    const SWIPE_MIN = 50; // px
+    let swipeStart = null;
+    let justSwiped = false;
+    mediaStage.addEventListener("pointerdown", (e) => {
+        swipeStart = e.pointerType !== "mouse" && !e.target.closest(".media-controls") ? { x: e.clientX, y: e.clientY } : null;
+    });
+    mediaStage.addEventListener("pointerup", (e) => {
+        if (!swipeStart) return;
+        const dx = e.clientX - swipeStart.x;
+        const dy = e.clientY - swipeStart.y;
+        swipeStart = null;
+        if (Math.abs(dx) < SWIPE_MIN || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+        justSwiped = true; // the tap the swipe ends in shouldn't close the view
+        setTimeout(() => (justSwiped = false), 400);
+        stepLarger(dx < 0 ? 1 : -1);
+    });
+    mediaStage.addEventListener("pointercancel", () => (swipeStart = null));
+
     // clicking the dimmed area closes it
     mediaDialog.addEventListener("click", (e) => {
+        if (justSwiped) return;
         if (e.target === mediaDialog || e.target === mediaStage) closeLarger();
     });
 

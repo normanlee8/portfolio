@@ -195,10 +195,10 @@
             </dl>
             <figure class="case-figure">
                 <div class="case-stage">
-                    <!-- SHOT 1: screen recording of the whole flow, 36s loop. Plays on its own; a click opens it larger, and its small button pauses it (script.js) -->
+                    <!-- SHOT 1: screen recording of the whole flow, 35s loop. Plays on its own; a click opens it larger, and its small button pauses it (script.js) -->
                     <div class="phone"><video src="/images/apple-sports/01-full-demo.mp4?v=1" poster="/images/apple-sports/01-full-demo.webp?v=1" width="480" height="1040" data-autoplay muted loop playsinline preload="none" aria-label="Screen recording of the whole feature: the Previous tab, a team page opened from the menu, and a team page opened from a game's card."></video></div>
                 </div>
-                <figcaption>The whole feature in 36 seconds.</figcaption>
+                <figcaption>The whole feature in 35 seconds.</figcaption>
             </figure>
             <div class="case-actions">
                 <!-- Opens the prototype in a popup (script.js); without JS, or with Ctrl/Cmd-click, it opens in a new tab -->
@@ -322,6 +322,17 @@
                 </div>
                 <figcaption>The NBA screen's Previous tab, which replaces Yesterday, then the Warriors' team page on Upcoming and on Previous Games.</figcaption>
             </figure>
+            <!-- Also added: the Series section, with the game card beside it in one panel (the phone drops below the text when there isn't room) -->
+            <div class="case-aside">
+                <div class="case-aside-text">
+                    <p class="case-aside-label">Also added</p>
+                    <p class="case-aside-title">A Series section on the game card</p>
+                    <p>It shows every meeting between the two teams this season. Apple Sports already shows a series during the playoffs, and I extended it to the regular season.</p>
+                    <p>I assumed head-to-head history helps in rivalries and when teams meet several times in a short stretch, but I haven't tested it. It reuses games the app already has, and it collapses so it doesn't crowd the card.</p>
+                </div>
+                <!-- SHOT 3d: Figma, the Warriors vs Heat game card with its Series section -->
+                <div class="phone"><img src="/images/apple-sports/03d-game-card-series.webp?v=1" alt="The Warriors vs Heat game card: the betting odds, then a Series section listing the teams' four meetings this season, with the next game on Thursday, May 21, today's game, and two final scores" width="624" height="1353" loading="lazy" decoding="async"></div>
+            </div>
         </div>
 
         <!-- Decision 1 -->
@@ -500,6 +511,10 @@
                 <div>
                     <dt>Retention</dt>
                     <dd>Whether people with a favorite team keep using the app over time.</dd>
+                </div>
+                <div>
+                    <dt>Series</dt>
+                    <dd>Whether people open the game card's Series section, to test the assumption behind it.</dd>
                 </div>
             </dl>
             <p class="case-tradeoff"><span>Biggest risk</span>Discoverability. Team pages only open from a logo or the menu, so users may never find them. A one-time tip when the app opens, like the built-in tips iOS already uses, would point them out without cluttering the interface.</p>
