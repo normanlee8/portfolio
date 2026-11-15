@@ -71,6 +71,10 @@
 
     --accent-color: var(--color-blue); /* links, hover and progress */
 
+    /* the home page's location arrow, turned to point right: marks the current section in both section lists
+       (used as a mask, so it takes the accent color; the view box is shifted so the turned shape sits centered) */
+    --section-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='1.7 1.2 24 24'%3E%3Cpath transform='rotate(90 12 13.17)' d='M12 2.5 19.5 20.5 12 16.5 4.5 20.5Z' stroke='%23000' stroke-width='1.5' stroke-linejoin='round'/%3E%3C/svg%3E");
+
     --font-primary: "Figtree", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 
     /* Typography Scale (1rem = 16px). Fluid sizes scale from 393px to 1280px */
@@ -266,47 +270,6 @@ body {
 @media (prefers-reduced-motion: reduce) {
     [data-fade] {
         animation: none;
-    }
-}
-
-.return-top {
-    position: fixed;
-    bottom: var(--space-xl);
-    left: max(var(--space-lg), calc((100% - 1440px) / 2 + var(--space-lg)));
-    z-index: 999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    cursor: pointer;
-    background-color: var(--bg-color);
-    color: var(--text-secondary);
-    border: 1px solid var(--line-color);
-    box-shadow: 0 4px 16px var(--shadow-color);
-
-    /* Hidden until the page is scrolled */
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    transform: translateY(8px);
-
-    transition: transform 0.2s ease, opacity 0.2s ease,
-                background-color 0.2s ease, visibility 0.2s;
-}
-
-.return-top.visible {
-    opacity: 1;
-    visibility: visible;
-    pointer-events: auto;
-    transform: translateY(0);
-}
-
-@media (hover: hover) {
-    .return-top.visible:hover {
-        transform: translateY(-3px);
-        background-color: var(--bg-thumbnail);
     }
 }
 
@@ -2815,7 +2778,7 @@ div.shot > span {
     --page-nav-height: 56px;
     position: fixed;
     left: 50%;
-    bottom: var(--space-lg);
+    bottom: var(--space-md);
     z-index: 998;
     display: flex;
     align-items: flex-end; /* the back button stays at the bottom while the panel grows */
@@ -2826,12 +2789,12 @@ div.shot > span {
 
 /* room for the bar */
 body:has(.page-nav) {
-    padding-bottom: calc(var(--page-nav-height, 56px) + var(--space-lg) + var(--space-md));
+    padding-bottom: calc(var(--page-nav-height, 56px) + 2 * var(--space-md));
 }
 
 /* toast sits above the bar */
 body:has(.page-nav) .toast {
-    bottom: calc(56px + var(--space-lg) + var(--space-sm));
+    bottom: calc(56px + var(--space-md) + var(--space-sm));
     max-width: min(360px, calc(100vw - 2 * var(--space-lg)));
 }
 
@@ -3046,14 +3009,15 @@ body:has(.page-nav) .toast {
     transition: background-color 0.15s ease;
 }
 
-/* dot on every item, filled for the current one */
+/* the arrow beside the current item (room is kept on every item, so names line up) */
 .section-list button::before {
     content: "";
     flex-shrink: 0;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
+    width: 12px;
+    height: 12px;
     background-color: transparent;
+    -webkit-mask: var(--section-arrow) center / contain no-repeat;
+    mask: var(--section-arrow) center / contain no-repeat;
 }
 
 .section-list button:focus-visible {
@@ -3691,7 +3655,7 @@ body:has(.page-nav) .toast {
 @media (min-width: 768px) {
     /* gap between the 1/3 and 2/3 columns */
     :root {
-        --column-gap: 4rem; /* 64px */
+        --column-gap: 5rem; /* 80px */
     }
 
     /* Header: nav links replace the hamburger */
@@ -4143,17 +4107,19 @@ body:has(.page-nav) .toast {
 @media (min-width: 1280px) {
     /* Project and About: side list replaces the bottom bar */
     :root {
-        --toc-width: 14rem; /* list column, including the gap */
+        --toc-list: 12rem; /* the list itself */
+        --toc-width: calc(var(--toc-list) + var(--column-gap)); /* its column, including the gap before it */
     }
 
     .page-nav {
         display: none;
     }
 
-    /* About intro: the bio starts where the resume's right column does
-       (list column + a third of what's left after the gap, then the gap) */
+    /* About intro: lined up with the resume below it. The photos take the headings' third, the bio the
+       content column, and the list's column on the right stays empty */
     .about-intro {
-        grid-template-columns: calc(var(--toc-width) + (100% - var(--toc-width) - var(--column-gap)) / 3) minmax(0, 1fr);
+        grid-template-columns: calc((100% - var(--column-gap)) / 3) minmax(0, 1fr); /* 100% already leaves out the list's column */
+        padding-right: calc(var(--space-md) + var(--toc-width));
     }
 
     /* The freed space holds three circles: you top left, the kitten in the
@@ -4193,10 +4159,13 @@ body:has(.page-nav) .toast {
         bottom: var(--space-xl);
     }
 
-    /* sections container (set by script.js): list | sections */
+    /* sections container (set by script.js): sections | list. The list sits on the right, so the
+       content lands nearer the middle of the screen */
     .toc-host {
         display: grid;
-        grid-template-columns: var(--toc-width) minmax(0, 1fr);
+        grid-template-columns: minmax(0, 1fr) var(--toc-width);
+        grid-auto-flow: row dense; /* the list comes first in the page but sits in the second column, so the
+                                      sections fill in beside it from its first row instead of below it */
         column-gap: 0;
     }
 
@@ -4206,18 +4175,19 @@ body:has(.page-nav) .toast {
 
     .toc-host > .section-item,
     .toc-host > .resume-item {
-        grid-column: 2;
+        grid-column: 1;
     }
 
-    /* sticky list; --toc-offset is extra top space, removed when stuck */
+    /* sticky list; --toc-offset is extra top space, removed when stuck. The gap before it keeps it clear of
+       the content, the same space as between the headings and the content */
     .toc-host > .page-toc {
         display: block;
-        grid-column: 1;
+        grid-column: 2;
         align-self: start;
         position: sticky;
         top: calc(var(--header-height) + var(--space-lg) - var(--toc-offset, 0px));
         padding-top: var(--toc-offset, 0px);
-        padding-right: var(--space-lg);
+        padding-left: var(--column-gap);
     }
 
     /* one closing line across the page */
@@ -4240,7 +4210,8 @@ body:has(.page-nav) .toast {
     /* shown after a screen of scrolling, hidden at the footer (script.js) */
     .toc-top {
         position: fixed;
-        left: var(--page-edge);
+        right: var(--page-edge);
+        width: var(--toc-list); /* lined up with the list above it */
         z-index: 50;
         opacity: 0;
         visibility: hidden;
@@ -4271,12 +4242,13 @@ body:has(.page-nav) .toast {
         gap: var(--space-xs);
     }
 
-    /* dot marks the current section */
+    /* the current section is marked with the home page's location arrow, turned to point at it */
     .toc-list button {
+        --marker: 12px;
         display: flex;
         align-items: center;
         gap: var(--space-sm);
-        margin-left: calc(-6px - var(--space-sm)); /* dot hangs into the margin */
+        margin-left: calc(-1 * var(--marker) - var(--space-sm)); /* the arrow hangs into the margin */
         padding: var(--space-xs) 0;
         border: none;
         background: none;
@@ -4291,10 +4263,11 @@ body:has(.page-nav) .toast {
     .toc-list button::before {
         content: "";
         flex-shrink: 0;
-        width: 6px;
-        height: 6px;
-        border-radius: 50%;
+        width: var(--marker);
+        height: var(--marker);
         background-color: transparent;
+        -webkit-mask: var(--section-arrow) center / contain no-repeat;
+        mask: var(--section-arrow) center / contain no-repeat;
     }
 
     .toc-list button:focus-visible {
@@ -4322,7 +4295,7 @@ body:has(.page-nav) .toast {
         flex-direction: column;
         align-items: flex-start;
         gap: var(--space-sm);
-        bottom: var(--space-xl);
+        bottom: var(--space-md); /* level with the bottom bar on smaller screens */
         border: none;
         background: none;
         color: var(--text-secondary);

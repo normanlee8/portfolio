@@ -586,25 +586,6 @@ document.querySelectorAll(".work-grid .work-card").forEach((card) => {
     });
 });
 
-// Return to Top
-const returnTopBtn = document.querySelector(".return-top");
-
-if (returnTopBtn) {
-    let lastVisible = null;
-
-    // Show once the user has scrolled past one full viewport height
-    addScrollEffect(({ y, height }) => {
-        const visible = y > height;
-        if (visible === lastVisible) return null;
-        lastVisible = visible;
-        return () => returnTopBtn.classList.toggle("visible", visible);
-    });
-
-    returnTopBtn.addEventListener("click", () => {
-        window.scrollTo({ top: 0 });
-    });
-}
-
 // Page Navigation (About + project pages)
 const pageNav = document.querySelector(".page-nav");
 
@@ -619,13 +600,15 @@ if (pageNav) {
     const sectionHeaders = [...document.querySelectorAll(".section-header, .resume-header")];
 
     // Go back if the visitor came from this site; otherwise follow the link
-    backBtn.addEventListener("click", (e) => {
+    function goBack(e) {
         const cameFromSite = document.referrer && new URL(document.referrer).origin === location.origin;
         if (cameFromSite && history.length > 1) {
             e.preventDefault();
             history.back();
         }
-    });
+    }
+
+    backBtn.addEventListener("click", goBack);
 
     function setSectionMenu(open) {
         sectionMenu.classList.toggle("hidden", !open);
