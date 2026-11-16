@@ -327,6 +327,27 @@ body {
     opacity: 1;
 }
 
+/* Screens wider than the page: the glass stops at the content's edges instead of running 24px past them,
+   where anything colorful scrolling under it (a cover, a screenshot) would glow past the content.
+   The theme button steps in from the right edge so the icon has the same space on both sides: 20px to the
+   divider (16px plus the button's 4px padding) and 20px to the edge */
+@media (min-width: 1441px) {
+    .header {
+        margin-inline: var(--space-md);
+        padding-inline: 0;
+    }
+
+    .header::before,
+    .header-progress {
+        left: 0;
+        right: 0;
+    }
+
+    .nav-container {
+        margin-right: calc(var(--space-lg) / 2);
+    }
+}
+
 /* Landing Page */
 .section-hero {
     display: flex;
@@ -3860,12 +3881,13 @@ body:has(.page-nav) .toast {
         }
     }
 
-    /* Project sections: heading, then text, 32px apart. The heading column keeps the width it has with the
-       shared gap (a third of what's left after it), so all the space the narrower gap frees goes to the text */
+    /* Project sections: heading, then text, 48px apart. The heading column is a third of the row (after the
+       shared gap) less 2rem: 1rem pays for the wider gap here, and 1rem goes to the text, so headings sit a
+       little narrower and the text gets more room */
     .section-item {
         display: grid;
-        grid-template-columns: calc((100% - var(--column-gap)) / 3) minmax(0, 1fr);
-        column-gap: 2rem;
+        grid-template-columns: calc((100% - var(--column-gap)) / 3 - 2rem) minmax(0, 1fr);
+        column-gap: 3rem;
         row-gap: var(--space-md);
         align-items: start;
     }
