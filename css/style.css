@@ -3375,6 +3375,11 @@ body:has(.page-nav) .toast {
     font-size: var(--text-lg);
 }
 
+/* the "@" between a job title and its company, in the quieter secondary color */
+.label-at {
+    color: var(--text-secondary);
+}
+
 /* keeps "@ Company" together */
 .keep-together {
     white-space: nowrap;
