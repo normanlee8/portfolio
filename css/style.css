@@ -4012,32 +4012,40 @@ body:has(.page-nav) .toast {
         min-height: calc(100svh - var(--header-height) - var(--text-2xl) * 1.15 - 2 * var(--space-lg) - 1px);
     }
 
+    /* A slice: the cover, then the details. Pointing at one (or tabbing into it) opens it up: it widens while
+       the other two narrow and dim, and a line lights along its top */
     .work-grid .work-card {
+        --open: 1.15; /* how much wider the open slice gets; the other two share what's left */
+        position: relative;
+        isolation: isolate;
         flex: 1 1 0;
         min-width: 0;
         width: auto;
         padding: var(--space-xl) var(--space-md) var(--space-lg);
         border-bottom: 1px solid var(--line-color); /* matches the footer's lines */
         border-right: 1px solid var(--line-faint);
-        transition: flex-grow 0.4s ease, background-color 0.4s ease;
+        box-shadow: inset 0 2px 0 transparent;
+        transition: flex-grow 0.55s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.4s ease, box-shadow 0.4s ease;
     }
 
     .work-grid .work-card:first-child {
         border-left: 1px solid var(--line-faint);
     }
 
-    /* content keeps its normal width, so text doesn't reflow on hover */
+    /* text keeps the width of a narrowed slice, so it never reflows as slices open and close */
     .work-grid .work-card > * {
-        --slice-content: calc(100cqi / 3 - 2 * var(--space-md) - 1px);
+        --slice-content: calc(100cqi / (2 + var(--open)) - 2 * var(--space-md) - 1px);
         width: var(--slice-content);
         flex-shrink: 0;
+        transition: opacity 0.4s ease;
     }
 
-    /* thumbnail widens with the slice at a fixed height */
+    /* the cover runs the slice's full width at a fixed height, so it widens as its slice opens */
     .work-grid .work-card > .work-thumbnail {
         width: auto;
-        height: calc(var(--slice-content) * 9 / 16);
+        height: calc((100cqi / 3 - 2 * var(--space-md)) * 9 / 16);
         aspect-ratio: auto;
+        transition: opacity 0.4s ease, transform 0.4s ease, scale 0.2s ease;
     }
 
     .work-grid .work-card > .work-header {
@@ -4045,16 +4053,16 @@ body:has(.page-nav) .toast {
         max-width: var(--slice-content);
     }
 
+    /* the open slice */
     .work-grid .work-card:focus-within {
-        flex-grow: 1.1;
+        flex-grow: var(--open);
         background-color: var(--bg-thumbnail);
+        box-shadow: inset 0 2px 0 var(--accent-color);
     }
 
-    @media (hover: hover) {
-        .work-grid .work-card:hover {
-            flex-grow: 1.1;
-            background-color: var(--bg-thumbnail);
-        }
+    /* its cover grows a touch */
+    .work-grid .work-card:focus-within .work-thumbnail {
+        transform: scale(1.005);
     }
 
     /* pills switch to the page color to stay visible */
@@ -4062,23 +4070,33 @@ body:has(.page-nav) .toast {
         background-color: var(--bg-color);
     }
 
+    /* the other two step back */
+    .work-grid:has(.work-card:focus-within) .work-card:not(:focus-within) > * {
+        opacity: 0.7;
+    }
+
     @media (hover: hover) {
+        .work-grid .work-card:hover {
+            flex-grow: var(--open);
+            background-color: var(--bg-thumbnail);
+            box-shadow: inset 0 2px 0 var(--accent-color);
+        }
+
+        .work-grid .work-card:hover .work-thumbnail {
+            transform: scale(1.005);
+        }
+
         .work-grid .work-card:hover .pill-tag {
             background-color: var(--bg-color);
         }
-    }
 
-    .work-grid .work-thumbnail {
-        transition: transform 0.4s ease, scale 0.2s ease;
-    }
+        .work-grid:has(.work-card:hover) .work-card:not(:hover) > * {
+            opacity: 0.7;
+        }
 
-    .work-grid .work-card:focus-within .work-thumbnail {
-        transform: scale(1.02);
-    }
-
-    @media (hover: hover) {
-        .work-grid .work-card:hover .work-thumbnail {
-            transform: scale(1.02);
+        /* the slice under the pointer wins over one that only has keyboard focus */
+        .work-grid:has(.work-card:hover) .work-card:hover > * {
+            opacity: 1;
         }
     }
 }
@@ -4092,7 +4110,7 @@ body:has(.page-nav) .toast {
 /* Reduced motion: Work slices don't animate */
 @media (min-width: 1024px) and (prefers-reduced-motion: reduce) {
     .work-grid .work-card,
-    .work-grid .work-thumbnail {
+    .work-grid .work-card > * {
         transition: none;
     }
 }
