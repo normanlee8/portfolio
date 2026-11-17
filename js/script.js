@@ -573,6 +573,16 @@ if (photoCluster) {
     });
 }
 
+// About, boba order ticket: the notches sit level with the tear line above the options, wherever it lands
+// (the options wrap to more rows on narrow cards). Measured, then kept up to date as the card resizes
+document.querySelectorAll(".fun-ticket").forEach((ticket) => {
+    const order = ticket.querySelector(".fun-order");
+    if (!order || !window.ResizeObserver) return;
+    const place = () => ticket.style.setProperty("--tear-y", `${order.offsetTop + ticket.clientTop}px`);
+    new ResizeObserver(place).observe(ticket);
+    place();
+});
+
 // Work page: the whole card opens its project
 document.querySelectorAll(".work-grid .work-card").forEach((card) => {
     const link = card.querySelector(".work-link");

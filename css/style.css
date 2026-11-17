@@ -3412,8 +3412,9 @@ body:has(.page-nav) .toast {
 }
 
 /* ===== About: Tidbits, as a bento grid =====
-   Cards of different sizes, each led by something to look at. Phones and tablets: two columns.
-   1024px+: four columns, with the teams card taking a 2 x 2 block. The menu runs across the bottom */
+   Cards of different sizes, each led by something to look at, in the content column like every other section.
+   Phones and tablets: the teams and the boba order each get a row. 1024px+: two by two, then the menu.
+   Cards in a row share a height, so each is paired with one of similar size: teams with Psych, boba with games */
 .fun-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -3426,16 +3427,11 @@ body:has(.page-nav) .toast {
 }
 
 @media (min-width: 1024px) {
-    .fun-teams {
-        min-height: 15rem;
-    }
-
     .fun-grid {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
         grid-template-areas:
-            "teams teams boba boba"
-            "teams teams psych games"
-            "menu menu menu menu";
+            "teams psych"
+            "boba games"
+            "menu menu";
     }
 }
 
@@ -3498,6 +3494,7 @@ body:has(.page-nav) .toast {
 
 /* ----- teams: logos large, each over a faint wash of its team's color ----- */
 .fun-teams {
+    container-type: inline-size; /* the logos size to the card */
     background:
         radial-gradient(45% 70% at 12% 100%, rgb(170 0 0 / 0.16), transparent 70%),
         radial-gradient(45% 70% at 50% 110%, rgb(29 66 138 / 0.2), transparent 70%),
@@ -3510,7 +3507,7 @@ body:has(.page-nav) .toast {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: var(--space-sm);
     margin-block: auto; /* centered in the space below the label */
-    padding: var(--space-md) 0;
+    padding: var(--space-xs) 0 0;
     list-style: none;
 }
 
@@ -3525,8 +3522,8 @@ body:has(.page-nav) .toast {
 }
 
 .fun-team-logo {
-    width: clamp(3.25rem, 8vw, 6rem);
-    height: clamp(3.25rem, 8vw, 6rem);
+    width: clamp(2.75rem, 18cqi, 4rem);
+    height: clamp(2.75rem, 18cqi, 4rem);
     object-fit: contain;
     filter: drop-shadow(0 6px 10px rgb(0 0 0 / 0.18));
 }
@@ -3535,13 +3532,15 @@ body:has(.page-nav) .toast {
 .fun-ticket {
     --notch: 0.7rem;
     --stub: calc(var(--space-md) + 1.45rem + var(--space-sm)); /* from the bottom edge up to the tear line: one row of options */
-    /* half-circle notches cut into both sides, level with the tear line */
+    /* half-circle notches cut into both sides, level with the tear line. script.js measures where the tear
+       line is (--tear-y), so they follow it when the options wrap; without the script they assume one row */
+    --notch-y: var(--tear-y, calc(100% - var(--stub)));
     -webkit-mask:
-        radial-gradient(circle var(--notch) at 0 calc(100% - var(--stub)), transparent 98%, #000) left / 51% 100% no-repeat,
-        radial-gradient(circle var(--notch) at 100% calc(100% - var(--stub)), transparent 98%, #000) right / 51% 100% no-repeat;
+        radial-gradient(circle var(--notch) at 0 var(--notch-y), transparent 98%, #000) left / 51% 100% no-repeat,
+        radial-gradient(circle var(--notch) at 100% var(--notch-y), transparent 98%, #000) right / 51% 100% no-repeat;
     mask:
-        radial-gradient(circle var(--notch) at 0 calc(100% - var(--stub)), transparent 98%, #000) left / 51% 100% no-repeat,
-        radial-gradient(circle var(--notch) at 100% calc(100% - var(--stub)), transparent 98%, #000) right / 51% 100% no-repeat;
+        radial-gradient(circle var(--notch) at 0 var(--notch-y), transparent 98%, #000) left / 51% 100% no-repeat,
+        radial-gradient(circle var(--notch) at 100% var(--notch-y), transparent 98%, #000) right / 51% 100% no-repeat;
 }
 
 /* the options, below a dashed tear line that runs between the notches */
@@ -3581,30 +3580,16 @@ body:has(.page-nav) .toast {
 /* ----- last meal: a card like the others, laid out like a menu: centered, three courses ----- */
 .fun-menu {
     align-items: center;
-    gap: var(--space-lg);
-    padding: var(--space-xl) var(--space-lg);
+    gap: var(--space-md);
+    padding: var(--space-lg);
     text-align: center;
-}
-
-.fun-menu-head {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.fun-menu-title {
-    font-size: var(--text-3xl);
-    font-weight: var(--weight-semibold);
-    line-height: var(--leading-tight);
-    letter-spacing: -0.03em;
-    color: var(--text-primary);
 }
 
 /* courses side by side once there's room, stacked on phones */
 .fun-courses {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
-    gap: var(--space-xl) var(--space-lg);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
+    gap: var(--space-lg);
     width: 100%;
     max-width: 64rem;
 }
@@ -3613,15 +3598,11 @@ body:has(.page-nav) .toast {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: var(--space-md);
+    gap: var(--space-sm);
 }
 
-/* course names: spaced capitals with a small diamond under each */
+/* course names: spaced capitals */
 .fun-course-name {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--space-sm);
     font-size: var(--text-2xs);
     font-weight: var(--weight-semibold);
     letter-spacing: 0.18em;
@@ -3629,18 +3610,10 @@ body:has(.page-nav) .toast {
     color: var(--text-secondary);
 }
 
-.fun-course-name::after {
-    content: "";
-    width: 5px;
-    height: 5px;
-    background-color: var(--text-secondary);
-    rotate: 45deg;
-}
-
 .fun-dishes {
     display: flex;
     flex-direction: column;
-    gap: var(--space-md);
+    gap: var(--space-sm);
     padding: 0;
     list-style: none;
 }
@@ -3955,8 +3928,7 @@ body:has(.page-nav) .toast {
         column-gap: var(--column-gap);
     }
 
-    .resume-header,
-    .fun-grid {
+    .resume-header {
         grid-column: 1 / -1;
     }
 

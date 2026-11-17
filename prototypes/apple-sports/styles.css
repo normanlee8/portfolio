@@ -1,0 +1,1232 @@
+/*
+  SF Pro + SF Pro Rounded.
+  Apple devices use the installed system fonts. Elsewhere, Apple's font files
+  (developer.apple.com/fonts) live in ./fonts — the font license doesn't allow hosting them on the web.
+
+  SF Pro is the variable file: its weight, width and optical-size axes let one font
+  draw small text with the Text design and large text with the Display design, like iOS.
+*/
+@font-face { font-family: "SF Pro"; font-weight: 1 1000; font-stretch: 30% 150%; src: url("fonts/SF-Pro.ttf") format("truetype"); }
+@font-face { font-family: "SF Pro Rounded"; font-weight: 400; src: local("SF Pro Rounded"), local("SFProRounded-Regular"), url("fonts/SF-Pro-Rounded-Regular.otf") format("opentype"); }
+@font-face { font-family: "SF Pro Rounded"; font-weight: 500; src: local("SF Pro Rounded Medium"), local("SFProRounded-Medium"), url("fonts/SF-Pro-Rounded-Medium.otf") format("opentype"); }
+@font-face { font-family: "SF Pro Rounded"; font-weight: 600; src: local("SF Pro Rounded Semibold"), local("SFProRounded-Semibold"), url("fonts/SF-Pro-Rounded-Semibold.otf") format("opentype"); }
+@font-face { font-family: "SF Pro Rounded"; font-weight: 700; src: local("SF Pro Rounded Bold"), local("SFProRounded-Bold"), url("fonts/SF-Pro-Rounded-Bold.otf") format("opentype"); }
+
+:root {
+  --text: #ffffff;
+  --text-secondary: rgba(235, 240, 255, 0.55);
+  --text-tertiary: rgba(235, 240, 255, 0.45);
+  --hairline: rgba(255, 255, 255, 0.12);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro", system-ui, sans-serif;
+  --font-rounded: ui-rounded, "SF Pro Rounded", var(--font);
+  /* Space at the top for the status bar: the drawn iPhone bar on a computer,
+     the phone's own (safe area) on a real phone — see the media query below */
+  --status-h: 54px;
+  /* Game sheet's top edge: the "Sports" baseline, 50px below the status bar */
+  --sheet-top: calc(var(--status-h) + 50px);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  display: grid;
+  place-items: center;
+  background: #05070d;
+  font-family: var(--font);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+/* ---------- Device frame ---------- */
+.phone {
+  position: relative;
+  width: 393px;
+  height: 852px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: linear-gradient(180deg, #004088 0%, #06102d 60%);
+}
+
+/* Fill the screen on a real phone */
+@media (max-width: 430px) {
+  body {
+    display: block;
+  }
+  .phone {
+    width: 100%;
+    height: 100dvh;
+  }
+}
+
+/* On a real phone (narrow + touch), the phone shows its own status bar: hide
+   the drawn time and icons and leave its safe area instead — the real status
+   bar's height when added to the Home Screen (full screen), or a small gap
+   under Safari's toolbar in a normal tab */
+@media (max-width: 430px) and (pointer: coarse) {
+  :root {
+    --status-h: max(env(safe-area-inset-top, 0px), 12px);
+  }
+  .status-bar > * {
+    visibility: hidden;
+  }
+}
+
+/* ---------- Status bar ---------- */
+.status-bar {
+  position: relative;
+  z-index: 40; /* stays visible over the game sheet's backdrop */
+  height: var(--status-h);
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 26px 0 52px;
+}
+
+.status-time {
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+}
+
+.status-icons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ---------- App header ---------- */
+.app-header {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 13px 0 14px;
+  height: 66px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  font-size: 33px;
+  font-weight: 600;
+  letter-spacing: -0.6px;
+  line-height: 1;
+}
+
+.apple-logo {
+  width: 29px;
+  height: 31px;
+  margin-top: -6px;
+}
+
+.league-pill {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  height: 46px;
+  padding: 0 17px 0 15px;
+  border-radius: 999px;
+  border: 1px solid var(--glass-border);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.05));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 4px 14px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* The menu grows out of the button, so the button steps aside while it's open
+   (otherwise its corner shows past the menu's rounder corner) */
+.league-pill[aria-expanded="true"] {
+  visibility: hidden;
+}
+
+.league-logo {
+  width: 12px;
+  height: 23px;
+}
+
+/* ---------- League / team menu ---------- */
+/* Invisible layer that catches taps outside the open menu */
+.menu-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 15;
+  display: none;
+}
+
+.menu-scrim.is-open {
+  display: block;
+}
+
+/* Grows down and to the left out of the NBA button. app.js pins its top-right
+   corner to the button's top-right corner and sets --from-sx / --from-sy so the
+   closed state is exactly the button's size. */
+.league-menu {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 20;
+  width: 215px;
+  padding: 16px 12px;
+  /* Concentric with the avatar (Apple's rule: outer radius = inner radius + gap):
+     27px avatar radius + 16px gap + 1px border */
+  border-radius: 44px;
+  border: 1px solid var(--glass-border);
+  background: linear-gradient(180deg, #004088 0%, #06102d 100%);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+  transform-origin: top right;
+  transform: scale(var(--from-sx, 0.34), var(--from-sy, 0.11));
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    transform 0.32s cubic-bezier(0.32, 0.72, 0, 1),
+    opacity 0.2s ease,
+    visibility 0s linear 0.32s;
+}
+
+.league-menu.is-open {
+  transform: none;
+  opacity: 1;
+  visibility: visible;
+  transition:
+    transform 0.32s cubic-bezier(0.32, 0.72, 0, 1),
+    opacity 0.15s ease;
+}
+
+/* 12px menu padding + 4px puts the avatar 16px from the top and left edges,
+   so its curve follows the menu's top-left corner */
+.menu-top {
+  display: flex;
+  align-items: center;
+  height: 54px;
+  padding-left: 4px;
+  margin-bottom: 10px;
+}
+
+.menu-avatar {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: #d9d9d9;
+}
+
+.menu-icon-button,
+.menu-edit {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.menu-icon-button {
+  display: grid;
+  place-items: center;
+  margin-left: auto;
+}
+
+.menu-edit {
+  margin: 0 0 0 20px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.menu-items {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  width: 100%;
+  height: 44px;
+  padding-left: 12px;
+  border-radius: 999px;
+  font-size: 17px;
+  font-weight: 400;
+  text-align: left;
+}
+
+.menu-item.is-selected {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.menu-icon {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+img.menu-icon {
+  width: 32px;
+  height: 32px;
+  margin: 0 -4px;
+}
+
+img.menu-icon--league {
+  height: 26px;
+}
+
+/* ---------- Card ---------- */
+.card {
+  flex: 1;
+  min-height: 0;
+  margin: 13px 12px 13px;
+  display: flex;
+  flex-direction: column;
+  border-radius: 24px;
+  border: 1px solid var(--glass-border);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  overflow: hidden;
+}
+
+.tabs {
+  flex: none;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  height: 48px;
+  margin: 0 12px;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.tab {
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  transition: color 0.2s ease;
+}
+
+.tab.is-active {
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* ---------- Game rows ---------- */
+.games {
+  list-style: none;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
+  padding: 0 12px 8px; /* room under the last game when scrolled to the end */
+}
+
+.games::-webkit-scrollbar {
+  display: none;
+}
+
+/* No divider under whatever ends the list: the last game (Today), the last
+   date group's last game, or that group's header when it's closed */
+.games > .game:last-child,
+.games > .day:last-child .game:last-child,
+.games > .day:last-child > .day-header[aria-expanded="false"] {
+  border-bottom: 0;
+}
+
+/* Two lines per matchup: logos, records and time share a center line that sits
+   in the vertical middle of the row; names and the spread share a baseline just below. */
+.game {
+  display: grid;
+  grid-template-columns: 58px 1fr 72px 1fr 58px;
+  grid-template-rows: 1fr 46px 1fr;
+  grid-template-areas:
+    ".         .         .      .         .        "
+    "away-logo away-stat time   home-stat home-logo"
+    "away-name .         detail .         home-name";
+  align-items: center;
+  height: 86px;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.team-logo {
+  width: 46px;
+  height: 46px;
+  object-fit: contain;
+  justify-self: center;
+}
+
+.team-logo.is-away { grid-area: away-logo; }
+.team-logo.is-home { grid-area: home-logo; }
+.record.is-away,
+.score.is-away { grid-area: away-stat; }
+.record.is-home,
+.score.is-home { grid-area: home-stat; }
+.time { grid-area: time; }
+.detail { grid-area: detail; }
+.team-name.is-away { grid-area: away-name; }
+.team-name.is-home { grid-area: home-name; }
+
+.team-name,
+.detail {
+  align-self: baseline;
+}
+
+/* Centered under the logo; a name wider than the column sits flush with the
+   row's outer edge (where the divider stroke ends) instead of spilling past it. */
+.team-name {
+  display: flex;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.6);
+  white-space: nowrap;
+}
+
+.team-name > span {
+  flex: none;
+  margin: 0 auto;
+}
+
+.team-name.is-home {
+  flex-direction: row-reverse;
+}
+
+.record,
+.time,
+.detail,
+.score {
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.record {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.time {
+  font-family: var(--font-rounded);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  white-space: nowrap;
+}
+
+.detail {
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* Final scores in the Previous tab: large, narrow SF Pro centered in each score column */
+.score {
+  font-size: 40px;
+  font-weight: 600;
+  font-stretch: 60%;
+  font-variant-numeric: proportional-nums;
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+.score.is-loser {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* ---------- Date groups (Previous tab) ---------- */
+.day,
+.day-games {
+  list-style: none;
+}
+
+.day-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 100%;
+  height: 26px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* Same timing and iOS ease-in-out curve as the list animation in app.js */
+.day-header .chevron {
+  transition: transform 0.3s cubic-bezier(0.42, 0, 0.58, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .day-header .chevron {
+    transition: none;
+  }
+}
+
+.day-header[aria-expanded="false"] .chevron {
+  transform: rotate(180deg);
+}
+
+.day-header[aria-expanded="false"] + .day-games {
+  display: none;
+}
+
+.day-header[aria-expanded="false"] {
+  border-bottom: 1px solid var(--hairline);
+}
+
+/* ---------- Game sheet ---------- */
+.game.is-tappable {
+  cursor: pointer;
+}
+
+.game.is-tappable:active {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* Heavy tint: the screen behind stays faintly visible around the sheet */
+.sheet-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 25;
+  background: rgba(0, 0, 0, 0.88);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.35s ease,
+    visibility 0s linear 0.35s;
+}
+
+.sheet-scrim.is-open {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.35s ease;
+}
+
+/* Top edge sits on the "Sports" baseline (104px), just under the NBA letters
+   (97px); a 16px margin on the other sides lets the dimmed screen show around it */
+.sheet {
+  position: absolute;
+  top: var(--sheet-top);
+  right: 16px;
+  bottom: 16px;
+  left: 16px;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 38px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background:
+    radial-gradient(75% 55% at 22% 22%, rgba(29, 72, 160, 0.95) 0%, rgba(29, 72, 160, 0) 100%),
+    linear-gradient(180deg, #2c2c2e 0%, #1a1a1c 100%);
+  transform: translateY(calc(100% + 12px));
+  visibility: hidden;
+  transition:
+    transform 0.45s cubic-bezier(0.32, 0.72, 0, 1),
+    visibility 0s linear 0.45s;
+}
+
+.sheet.is-open {
+  transform: none;
+  visibility: visible;
+  transition: transform 0.45s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* Follows the finger (or mouse) while the sheet is dragged down; no text
+   gets selected along the way */
+.sheet.is-dragging {
+  transition: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.sheet-handle {
+  position: relative;
+  z-index: 3; /* above both pages */
+  flex: none;
+  display: flex;
+  justify-content: center;
+  height: 40px;
+  padding-top: 18px;
+  cursor: grab;
+  touch-action: none;
+}
+
+.sheet-grabber {
+  width: 36px;
+  height: 5px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Round buttons: share (sheet-wide, top right) and back (team page, top left) */
+.sheet-action,
+.sheet-back {
+  position: absolute;
+  top: 30px;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.22);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* 20px from the sheet's edges on every page, so the shared share button
+   never moves when switching between the game and a team */
+.sheet-action {
+  right: 20px;
+}
+
+.sheet-back {
+  left: 20px;
+}
+
+/* A team page opened from the NBA menu has no game to go back to */
+.sheet.is-team-root .sheet-back {
+  display: none;
+}
+
+/* Game date ("Today", "Wednesday, Mar 18") on the dimmed screen, 12px above
+   the sheet's top edge. It may sit over the dimmed Apple Sports title. */
+.sheet-date {
+  position: absolute;
+  top: var(--sheet-top);
+  right: 0;
+  left: 0;
+  z-index: 30;
+  transform: translateY(calc(-100% - 12px));
+  text-align: center;
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.sheet-date.is-open {
+  opacity: 1;
+}
+
+.sheet-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
+  padding: 0 12px 12px;
+}
+
+.sheet-body::-webkit-scrollbar {
+  display: none;
+}
+
+.sheet-league {
+  margin-top: 40px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Logos, names and records on the sides; start time level with the logos */
+.sheet-matchup {
+  display: grid;
+  grid-template-columns: 110px 1fr 110px;
+  align-items: start;
+  margin-top: 24px;
+}
+
+.sheet-team {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.sheet-logo {
+  width: 62px;
+  height: 62px;
+  object-fit: contain;
+}
+
+/* Pulled up into the empty space the logo files have under the artwork. Each
+   logo's empty space differs: --name-pull (app.js, sheetContent) keeps both
+   names on one line, 8px under whichever logo has less empty space below it;
+   the Warriors and Heat are tuned by hand below. */
+.sheet-team-name {
+  margin-top: var(--name-pull, -6px);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.sheet-team[data-team="warriors"] .sheet-team-name {
+  margin-top: -1.8px;
+}
+
+.sheet-team[data-team="heat"] .sheet-team-name {
+  margin-top: -3.8px;
+}
+
+/* 4px between the bottom of the name and the top of the record's digits */
+.sheet-team-record {
+  margin-top: -1px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.sheet-time {
+  justify-self: center;
+  margin-top: 21px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* Finished games: each score sits above its team's logo (big narrow SF Pro,
+   larger than the 62px logo; loser dimmed), and "Final" sits between the two
+   scores, level with their digits */
+.sheet-score {
+  margin-bottom: 4px;
+  font-size: 64px;
+  font-weight: 600;
+  font-stretch: 60%;
+  font-variant-numeric: proportional-nums;
+  line-height: 1;
+}
+
+.sheet-score.is-loser {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.sheet-final {
+  justify-self: center;
+  margin-top: 23px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* Cards: corner radius is concentric with the sheet's (38px − 12px inset) */
+.sheet-card {
+  margin-top: 15px;
+  padding: 3px 12px 9px;
+  border-radius: 26px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.sheet-card + .sheet-card {
+  margin-top: 9px;
+  padding-bottom: 8px; /* room under the Series card's last game */
+}
+
+.sheet-card .day-games {
+  margin-top: 12px;
+}
+
+.sheet-card-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 100%;
+  height: 16px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* ---- Betting odds ---- */
+.odds {
+  width: 100%;
+  margin-top: 4px;
+  border-collapse: collapse;
+  table-layout: fixed;
+  text-align: center;
+}
+
+.odds th {
+  padding-bottom: 9px;
+  font-size: 12px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.odds td {
+  height: 32px;
+  padding: 0;
+  vertical-align: middle;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.22);
+}
+
+.odds td + td {
+  border-left: 1px solid rgba(255, 255, 255, 0.22);
+}
+
+.odds-team {
+  font-size: 15px;
+}
+
+.odds-line,
+.odds-price {
+  display: block;
+}
+
+.odds-line {
+  font-size: 11px;
+  line-height: 13px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.odds-price {
+  font-size: 15px;
+  line-height: 18px;
+}
+
+.odds-source {
+  margin-top: 12px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.odds-source strong {
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* ---- Series ---- */
+/* Same 46px logos as the main list, on a logos' line exactly that tall, so team
+   names start right under them — the same logo-to-name gap as the main list */
+.series-game {
+  grid-template-columns: 52px 1fr 84px 1fr 52px;
+  grid-template-rows: 1fr 46px 1fr;
+  height: 86px;
+}
+
+.series-games > .series-game:last-child {
+  border-bottom: 0;
+}
+
+/* Unplayed games have no scores, so their date and start time can use the
+   score columns too (columns 2–4) */
+.series-day,
+.series-time {
+  grid-column: 2 / 5;
+  justify-self: center;
+  white-space: nowrap;
+}
+
+/* On the logos' line */
+.series-day {
+  grid-row: 2;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* Above the date: the bottom of the top band, nudged down so the visible gap
+   time → date (17px) matches date → spread below it */
+.series-time {
+  grid-row: 1;
+  align-self: end;
+  transform: translateY(2px);
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.series-date {
+  grid-area: time;
+  justify-self: center;
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.sheet-card .day-header {
+  border-bottom: 0;
+}
+
+/* Collapsible lists that keep one game showing when closed: the Series card
+   (its most recent final) and team-page months (their next / latest game) */
+.day-header[aria-expanded="false"] + .keeps-one {
+  display: block;
+}
+
+.day-header[aria-expanded="false"] + .keeps-one > :not(.is-kept) {
+  display: none;
+}
+
+/* No divider under a kept game that ends its card (the Series card, or the
+   team schedule's last month) */
+.day-header[aria-expanded="false"] + .series-games > .is-kept,
+.team-schedule .day:last-child > .day-header[aria-expanded="false"] + .keeps-one > .is-kept {
+  border-bottom: 0;
+}
+
+/* ---------- Sheet pages (game ↔ team), iOS-style push ---------- */
+.sheet-page {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  padding-top: 40px; /* under the grabber */
+  transition:
+    transform 0.45s cubic-bezier(0.32, 0.72, 0, 1),
+    filter 0.45s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.sheet-page--game {
+  background:
+    radial-gradient(75% 55% at 22% 22%, rgba(29, 72, 160, 0.95) 0%, rgba(29, 72, 160, 0) 100%),
+    linear-gradient(180deg, #2c2c2e 0%, #1a1a1c 100%);
+}
+
+/* Fades in over the dimmed game page while the tapped logo flies from the
+   game header to the team page's big logo (the "logo morph", see app.js);
+   back fades it out while the logo flies home. */
+.sheet-page--team {
+  /* Figma fill, top layer first:
+     - radial glow centered on the card's top edge, reaching 195px down (just
+       past the team logo) and 56.5% of the card's width to each side
+     - right-to-left linear: darkens toward the left
+     - top-to-bottom linear: darkens toward the bottom
+     Colors come from the team's theme in app.js (Warriors by default). */
+  --team-glow: 47, 95, 196;
+  --team-shade: 10, 21, 48;
+  --team-top: #1d428a;
+  --team-bottom: #0a1530;
+  background:
+    radial-gradient(56.5% 195px at 50% 0, rgba(var(--team-glow), 0.4) 0%, rgba(var(--team-glow), 0) 100%),
+    linear-gradient(270deg, rgba(var(--team-shade), 0) 0%, rgba(var(--team-shade), 0.6) 100%),
+    linear-gradient(180deg, var(--team-top) 0%, var(--team-bottom) 100%);
+  /* Content scrolls in the area below the back button (30px + 44px), so
+     anything scrolled up disappears at the button's bottom edge */
+  padding-top: 74px;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.3s ease,
+    visibility 0s linear 0.3s;
+}
+
+.sheet.is-team .sheet-page--team {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.3s ease;
+}
+
+.sheet.is-team .sheet-page--game {
+  filter: brightness(0.6);
+}
+
+/* The logo in flight between the game header and the team page */
+.logo-flight {
+  position: absolute;
+  z-index: 2; /* over both pages, under the buttons */
+  object-fit: contain;
+  transform-origin: 0 0;
+  pointer-events: none;
+}
+
+/* Reopening the sheet starts on the game page without replaying the slide */
+.sheet.no-page-anim .sheet-page {
+  transition: none;
+}
+
+.sheet-page-title {
+  position: absolute;
+  top: 30px;
+  right: 76px;
+  left: 76px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  overflow: hidden;
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Team logo in the game sheet's header opens the team page */
+.sheet-team.is-link {
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.sheet-team.is-link:active {
+  opacity: 0.6;
+}
+
+/* ---------- Team page ---------- */
+.team-page-logo {
+  display: block;
+  width: 100px;
+  height: 100px;
+  margin: 7px auto 0; /* 81px from the top of the sheet */
+  object-fit: contain;
+}
+
+/* Pulled up into the logo file's empty space under the artwork: the digits
+   sit 6px below the visible logo (--record-pull, worked out per team in
+   app.js), or 6px (Warriors) / 8px (Heat) as tuned by hand below. */
+.team-page-record {
+  margin-top: var(--record-pull, -10px);
+  text-align: center;
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.sheet-page--team[data-team="warriors"] .team-page-record {
+  margin-top: -9.6px;
+}
+
+.sheet-page--team[data-team="heat"] .team-page-record {
+  margin-top: -9.1px;
+}
+
+/* The cards stay together and stick at the top of the scroll area once the
+   logo and record have scrolled away. The section is exactly as tall as the
+   scroll area, so the page can only scroll by the logo + record. Scrolling
+   over the schedule scrolls its games directly; at the end of the list the
+   scroll carries on to the page (native scroll chaining). The schedule card
+   is only as tall as its content, up to the space left. */
+.team-sticky {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding-top: 11px;
+}
+
+.team-sticky > .team-card {
+  flex: none;
+}
+
+.team-sticky > .team-card:first-child {
+  margin-top: 0;
+}
+
+.team-sticky > .team-schedule {
+  flex: 0 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.team-schedule > .segmented {
+  flex: none;
+}
+
+.team-schedule > .team-games {
+  flex: 0 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.team-schedule > .team-games::-webkit-scrollbar {
+  display: none;
+}
+
+/* Dark cards: black at 48% over the gradient (sampled from the mockup), so
+   they darken with the background toward the bottom and left */
+.team-card {
+  margin-top: 11px;
+  padding: 16px 12px;
+  background: rgba(0, 0, 0, 0.48);
+}
+
+/* Restores the bottom padding that .sheet-card + .sheet-card removes for the
+   game sheet's Series card */
+.team-card + .team-card {
+  margin-top: 8px;
+  padding-bottom: 16px;
+}
+
+.team-games,
+.team-games .day-games {
+  list-style: none;
+}
+
+/* date | opponent logo | two lines of text
+   The logo column is the 46px logo (same as the main list) plus 10px each
+   side, so the logo sits centered between the date and the text */
+.team-game {
+  display: grid;
+  grid-template-columns: minmax(26px, max-content) 66px 1fr;
+  align-items: center;
+  height: 68px;
+  border-bottom: 1px solid var(--hairline);
+}
+
+/* The single top card (next game, or a final score when opened from
+   Previous): no divider, and the card's 16px padding sets its height.
+   Nor does the schedule's last row have a divider. */
+.team-card:not(.team-schedule) .team-game,
+.team-card:not(.team-schedule) .game {
+  height: auto;
+  border-bottom: 0;
+}
+
+/* The final-score row has nothing in its top band; collapse it, then place
+   the row so its logos-and-scores line sits on the card's vertical center
+   (the team names hang below it, with ~12px under them):
+   16 padding + 8 + half the 46px line = half the card's inner height */
+.team-card:not(.team-schedule) .game {
+  grid-template-rows: auto 46px auto;
+  margin: 8px 0 -7px;
+}
+
+.team-schedule .day:last-child .day-games > :last-child {
+  border-bottom: 0;
+}
+
+.tg-date {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.2;
+}
+
+.tg-weekday {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.tg-day {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.tg-logo {
+  justify-self: center;
+  width: 46px;
+  height: 46px;
+  object-fit: contain;
+}
+
+/* Two full-width lines with room between them (the pair can be taller than
+   the date):  opponent ...... time  /  record ...... network · spread */
+.tg-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  line-height: 1.2;
+}
+
+.tg-line {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px; /* minimum space between the left and right text */
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.tg-line > :first-child {
+  flex: none;
+}
+
+.tg-main {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.tg-time {
+  font-family: var(--font-rounded);
+}
+
+/* "vs" / "@" before the opponent */
+.tg-prefix {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.tg-sub {
+  font-size: 12px;
+}
+
+.tg-record {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Where to watch · spread (or "Final"); only the network name gives way,
+   with "…", if the line runs out of room */
+.tg-watch {
+  display: flex;
+  min-width: 0;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* Short network labels fit (widest, "NBCS Bay Area", is 86.5px); anything
+   longer is capped at 90px with "…" so the line never gets cramped */
+.tg-network {
+  min-width: 0;
+  max-width: 90px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Previous Games | Upcoming switch; the thumb slides between the halves */
+.segmented {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  height: 30px;
+  margin-bottom: 2px;
+  padding: 2px;
+  border-radius: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.28);
+}
+
+.segmented-thumb {
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  left: 2px;
+  width: calc(50% - 2px);
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.24);
+  transition: transform 0.3s cubic-bezier(0.42, 0, 0.58, 1);
+}
+
+.segmented[data-active="upcoming"] .segmented-thumb {
+  transform: translateX(100%);
+}
+
+.segment {
+  position: relative;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.75);
+  transition: color 0.3s ease;
+}
+
+.segment[aria-selected="true"] {
+  color: #fff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sheet-page,
+  .sheet-page--team,
+  .sheet.is-team .sheet-page--team,
+  .segmented-thumb {
+    transition: none;
+  }
+}
