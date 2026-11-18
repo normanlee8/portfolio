@@ -28,6 +28,11 @@
     <link rel="preload" href="/assets/fonts/figtree-latin.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="/css/style.css">
     <script src="/js/script.js" defer></script>
+    <!-- Instant pages (Chrome, Edge): a page is prepared in the background once you point at a link to it, so it opens
+         at once when clicked. Other browsers get the same head start from script.js -->
+    <script type="speculationrules">
+        {"prerender": [{"where": {"and": [{"href_matches": "/*"}, {"not": {"href_matches": ["/prototypes/*", "/*.pdf", "/*.png", "/*.webp", "/*.mp4"]}}]}, "eagerness": "moderate"}]}
+    </script>
 </head>
 <body>
     <!-- Header -->

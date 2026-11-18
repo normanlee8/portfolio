@@ -1080,8 +1080,11 @@ h1.work-header {
     transform-origin: bottom left; /* grows out from the cursor's side */
     scale: 0.85;
     opacity: 0;
+    /* hidden once it has faded out, not just see-through: a see-through pill still blurs what's behind it on
+       every frame, which made scrolling past the covers drop frames */
+    visibility: hidden;
     box-shadow: 0 6px 20px var(--shadow-color); /* lifts it off the photo */
-    transition: opacity 0.25s ease, scale 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: opacity 0.25s ease, scale 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), visibility 0s linear 0.25s;
     pointer-events: none;
 }
 
@@ -1094,6 +1097,8 @@ h1.work-header {
     .work-thumbnail:hover .view-project {
         opacity: 1;
         scale: 1;
+        visibility: visible;
+        transition-delay: 0s;
     }
 }
 
@@ -1246,6 +1251,7 @@ a.work-thumbnail:active {
     translate: -50% -50%;
     transform: rotateX(38deg) rotateZ(-24deg);
     transition: scale 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: transform; /* grows on hover without the browser redrawing every tile at the new size */
 }
 
 .cover-wall-col {
@@ -1322,10 +1328,11 @@ a.work-thumbnail:active {
     margin-bottom: 4cqh;
     overflow: hidden;
     border-radius: 0.8cqh;
+    /* one soft shadow, not a stack: the wall holds dozens of tiles, and wide layered shadows made drawing them
+       as the cover scrolled into view drop frames */
     box-shadow:
         0 0 0 0.12cqh var(--tile-edge),
-        0 0.8cqh 2cqh rgb(var(--shadow) / calc(0.08 * var(--s))),
-        0 4cqh 8cqh rgb(var(--shadow) / calc(0.1 * var(--s)));
+        0 1.2cqh 3cqh rgb(var(--shadow) / calc(0.14 * var(--s)));
 }
 
 .work-thumbnail .cover-wall img {
@@ -1464,6 +1471,9 @@ a.work-thumbnail:active {
     border-radius: inherit;
     container-type: size;
     background: var(--cover-bg);
+    /* drawn once into its own layer and kept there, so scrolling moves the finished picture instead of
+       redrawing the phones, their sides, and their shadows */
+    will-change: transform;
 }
 
 :root.dark-theme .cover-screens {

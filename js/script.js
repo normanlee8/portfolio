@@ -283,6 +283,26 @@ document.addEventListener("click", (e) => {
     window.scrollTo({ top: 0 });
 });
 
+// Instant pages, in browsers without speculation rules (Firefox, Safari): pointing at a link to another page
+// here (or touching or tabbing to it) fetches that page into the browser's cache, so by the time it's clicked it
+// comes from memory instead of the network. Chrome and Edge prepare the whole page instead (each page's <head>)
+if (!(HTMLScriptElement.supports && HTMLScriptElement.supports("speculationrules"))) {
+    const warmed = new Set([location.pathname]);
+
+    function warmLink(e) {
+        const link = e.target instanceof Element && e.target.closest("a[href]");
+        if (!link || link.origin !== location.origin || link.hasAttribute("download")) return;
+        const path = link.pathname;
+        if (warmed.has(path) || path.startsWith("/prototypes/") || /\.(pdf|png|jpe?g|webp|svg|mp4)$/i.test(path)) return;
+        warmed.add(path);
+        fetch(path, { credentials: "same-origin", priority: "low" }).catch(() => warmed.delete(path));
+    }
+
+    document.addEventListener("pointerover", warmLink, { passive: true });
+    document.addEventListener("touchstart", warmLink, { passive: true });
+    document.addEventListener("focusin", warmLink);
+}
+
 // Copy Email
 const copyEmailBtn = document.getElementById("copy-email");
 const toast = document.getElementById("toast");
