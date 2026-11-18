@@ -35,6 +35,10 @@
                 document.documentElement.classList.add("dark-theme");
             }
         }
+        // No graphics card found earlier this visit (script.js): skip the glass from the first frame (style.css)
+        try {
+            if (sessionStorage.getItem("gfx") === "low") document.documentElement.classList.add("low-gfx");
+        } catch (e) {}
     </script>
     <link rel="preload" href="/assets/fonts/figtree-latin.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="/css/style.css">

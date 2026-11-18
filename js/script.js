@@ -181,6 +181,96 @@ if (protoDialog && protoLink && typeof protoDialog.showModal === 'function') {
     });
 }
 
+// Graphics check: is there a graphics card doing the drawing? Asked once per visit, once the page is idle, by
+// trying to start WebGL in a mode that refuses to run on the processor alone. Without one, the page switches to a
+// lighter look that draws quickly on the processor (.low-gfx in style.css: solid tints for the glass, the Apple Sports
+// cover's still parts as one flat picture under its live lifting parts, no shadows under the wall's tiles), and later pages start that way (each page's <head>)
+function markLowGraphics() {
+    document.documentElement.classList.add("low-gfx");
+    try {
+        sessionStorage.setItem("gfx", "low");
+    } catch (e) {}
+}
+
+function checkGraphics() {
+    let low = false;
+    try {
+        const canvas = document.createElement("canvas");
+        const gl = canvas.getContext("webgl", { failIfMajorPerformanceCaveat: true }) ||
+            canvas.getContext("experimental-webgl", { failIfMajorPerformanceCaveat: true });
+        low = !gl;
+        if (gl) gl.getExtension("WEBGL_lose_context")?.loseContext();
+    } catch (e) {
+        low = true;
+    }
+    if (low) markLowGraphics();
+    else {
+        try {
+            sessionStorage.setItem("gfx", "ok");
+        } catch (e) {}
+    }
+}
+
+let graphicsSeen = null;
+try {
+    graphicsSeen = sessionStorage.getItem("gfx");
+} catch (e) {}
+
+if (!graphicsSeen) {
+    if ("requestIdleCallback" in window) requestIdleCallback(checkGraphics, { timeout: 2000 });
+    else setTimeout(checkGraphics, 1200);
+}
+
+// Frame check: some browsers pass the check above and still draw slowly (Firefox with hardware acceleration off
+// keeps WebGL). While the page scrolls, the time between frames is measured in batches (40 frames, or 0.6s of
+// scrolling when frames are that slow); if a third or more of a batch ran long (over 30ms, under about 33 frames a
+// second), the page switches to the lighter look for the rest of the visit. After ten smooth batches it stops
+if (graphicsSeen !== "low") {
+    let gaps = [];
+    let lastFrame = 0;
+    let frame = 0;
+    let scrolling = 0; // timer: scrolling counts as stopped 0.7s after the last scroll event (longer than a slow frame)
+    let smoothBatches = 0;
+    let batchTime = 0;
+
+    function timeFrame(now) {
+        if (lastFrame) {
+            gaps.push(now - lastFrame);
+            batchTime += now - lastFrame;
+        }
+        lastFrame = now;
+        if (gaps.length >= 40 || (gaps.length >= 8 && batchTime >= 600)) {
+            const slow = gaps.filter((gap) => gap > 30).length;
+            const isSlow = slow * 3 >= gaps.length;
+            gaps = [];
+            batchTime = 0;
+            if (isSlow) {
+                markLowGraphics();
+                window.removeEventListener("scroll", onScrollFrames);
+                frame = 0;
+                return;
+            }
+            if (++smoothBatches >= 10) {
+                window.removeEventListener("scroll", onScrollFrames);
+                frame = 0;
+                return;
+            }
+        }
+        frame = scrolling ? requestAnimationFrame(timeFrame) : 0;
+    }
+
+    function onScrollFrames() {
+        clearTimeout(scrolling);
+        scrolling = setTimeout(() => {
+            scrolling = 0;
+            lastFrame = 0; // a pause isn't a slow frame
+        }, 700);
+        if (!frame) frame = requestAnimationFrame(timeFrame);
+    }
+
+    window.addEventListener("scroll", onScrollFrames, { passive: true });
+}
+
 // Theme Toggle
 const themeToggleBtn = document.querySelector(".theme-toggle-btn");
 const darkQuery = window.matchMedia("(prefers-color-scheme: dark)");

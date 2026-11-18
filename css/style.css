@@ -274,12 +274,14 @@ body {
 }
 
 /* Header
-   The glass runs on past the top of the page (--header-bleed), out of sight on most screens. Safari on iPhone and
-   iPad draws the page under the status bar and its own toolbar too, above the page's top edge; without this, text
-   scrolling up there showed sharp above a hard-edged header. The extra height sits above the header and is taken
-   back by the negative margin and top, so the header's own 56px stays exactly where it was */
+   On iPhone and iPad the glass runs on past the top of the page (--header-bleed, set below): Safari there draws the
+   page under the status bar and its own toolbar too, above the page's top edge, and without it text scrolling up
+   there showed sharp above a hard-edged header. The extra height sits above the header and is taken back by the
+   negative margin and top, so the header's own 56px stays exactly where it was. Elsewhere nothing is drawn up there,
+   so the glass stays the header's own size: blurring three times the area on every scroll frame was the main cost
+   of scrolling on computers without hardware acceleration */
 .header {
-    --header-bleed: 120px;
+    --header-bleed: 0px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -295,6 +297,49 @@ body {
     -webkit-backdrop-filter: blur(20px) saturate(180%);
     backdrop-filter: blur(20px) saturate(180%);
     view-transition-name: site-header; /* stays put while pages change under it */
+}
+
+/* iPhone and iPad (only their Safari knows -webkit-touch-callout) */
+@supports (-webkit-touch-callout: none) {
+    .header {
+        --header-bleed: 120px;
+    }
+}
+
+/* Without a graphics card (hardware acceleration turned off, or a browser that can't use it), every blur of what's
+   behind a piece of glass is worked out by the processor on every frame, which made scrolling and the popups
+   stutter. There script.js marks the page .low-gfx, and each piece of glass becomes a nearly solid tint of the same
+   color instead, which looks almost the same */
+:root.low-gfx .header,
+:root.low-gfx .view-project,
+:root.low-gfx .proto-close,
+:root.low-gfx .media-controls,
+:root.low-gfx .media-nav,
+:root.low-gfx .proto-dialog::backdrop,
+:root.low-gfx::view-transition-group(site-header) {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+}
+
+:root.low-gfx .header {
+    background-color: color-mix(in srgb, var(--bg-color) 95%, transparent);
+}
+
+:root.low-gfx .view-project {
+    background-color: color-mix(in srgb, var(--bg-card) 94%, transparent);
+}
+
+:root.low-gfx .proto-close,
+:root.low-gfx .media-nav {
+    background-color: rgb(52 54 60 / 0.92);
+}
+
+:root.low-gfx .media-controls {
+    background-color: rgb(0 0 0 / 0.72);
+}
+
+:root.low-gfx .proto-dialog::backdrop {
+    background-color: rgb(5 7 13 / 0.86);
 }
 
 /* Header line: track (::before) and scroll progress (.header-progress, added and scaled by script.js) */
@@ -320,6 +365,8 @@ body {
     transform-origin: left;
     transform: scaleX(0); /* script.js sets the scale as you scroll */
     pointer-events: none;
+    /* on its own layer, so growing it on every scroll frame doesn't repaint the header (its text, icons, and glass) */
+    will-change: transform;
 }
 
 .header.scrolled::before,
@@ -1335,6 +1382,12 @@ a.work-thumbnail:active {
         0 1.2cqh 3cqh rgb(var(--shadow) / calc(0.14 * var(--s)));
 }
 
+/* drawing slowly (no graphics card, script.js): just the hairline edge. A soft shadow under every tile on a turned
+   plane is what made those browsers stutter as the wall scrolled into view */
+:root.low-gfx .cover-wall-tile {
+    box-shadow: 0 0 0 0.12cqh var(--tile-edge);
+}
+
 .work-thumbnail .cover-wall img {
     position: static;
     inset: auto;
@@ -1753,6 +1806,52 @@ a.work-thumbnail:active {
     .work-thumbnail .cover-screens .cover-layer {
         transition: none;
     }
+}
+
+/* For browsers that draw slowly: without a graphics card, the phones, their sides, and their shadows on a turned
+   floor take too long to redraw on every scroll frame. script.js marks the page .low-gfx when that's the case, and
+   the parts that never move become one flat picture (rendered from this cover, in each theme, with empty spots
+   where the lifting parts sit). The floor stays, with its phones invisible, so the list, today's game, and the logo
+   still lift and lean over the picture, and the picture slides with the cursor just as the floor does. The picture
+   is never downloaded otherwise. It's wider than any thumbnail and centered at full height, so each one shows the
+   same part the live cover does */
+/* as specific as the rule that shows every picture in the cover (.work-thumbnail .cover-screens img), or that rule
+   wins and the flat picture shows under the live phones */
+.work-thumbnail .cover-screens .cover-flat {
+    display: none;
+}
+
+:root.low-gfx .cover-screens::before {
+    display: none;
+}
+
+:root.low-gfx .cover-screens .cover-phone {
+    visibility: hidden;
+    box-shadow: none;
+    filter: none;
+}
+
+:root.low-gfx .work-thumbnail .cover-screens .cover-layer {
+    visibility: visible;
+}
+
+:root.low-gfx .work-thumbnail .cover-screens .cover-flat.is-light,
+:root.low-gfx.dark-theme .work-thumbnail .cover-screens .cover-flat.is-dark {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: auto;
+    max-width: none;
+    height: 100%;
+    /* the floor's slide away from the cursor (see .cover-floor) */
+    translate: calc(-50% + var(--px, 0) * -1cqh) calc(var(--py, 0) * -1cqh);
+    transition: translate 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    border-radius: 0;
+}
+
+:root.low-gfx.dark-theme .work-thumbnail .cover-screens .cover-flat.is-light {
+    display: none;
 }
 
 .section-item {
