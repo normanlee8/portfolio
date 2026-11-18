@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Designing and Building my Portfolio from Figma to Code - Norman Lee</title>
+    <meta name="description" content="How I designed this portfolio in Figma and built it in plain HTML, CSS, and JavaScript: quick to load, easy to navigate on any device, and full of small details that make browsing easier.">
+    <!-- Kept out of search until the placeholder sections are filled in; remove this line, and add the page to sitemap.xml, when it's done -->
+    <meta name="robots" content="noindex">
+    <link rel="canonical" href="https://normanmade.com/portfolio">
+    <!-- Link Previews -->
+    <meta property="og:type" content="article">
+    <meta property="og:site_name" content="normanmade.com">
+    <meta property="og:title" content="Designing and Building my Portfolio from Figma to Code">
+    <meta property="og:description" content="How I designed this portfolio in Figma and built it in plain HTML, CSS, and JavaScript: quick to load, easy to navigate on any device, and full of small details that make browsing easier.">
+    <meta property="og:url" content="https://normanmade.com/portfolio">
+    <meta property="og:image" content="https://normanmade.com/images/og-image.png?v=3">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Norman Lee, User Experience Designer. Make life easier. Design with empathy.">
+    <meta name="twitter:card" content="summary_large_image">
+    <!-- Icons -->
+    <link rel="icon" href="/favicon.ico?v=4" sizes="48x48">
+    <link rel="icon" href="/favicon.svg?v=4" type="image/svg+xml">
+    <link rel="icon" href="/icon-192.png?v=4" type="image/png" sizes="192x192">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=3">
+    <!-- Load Theme -->
+    <script>
+        // Arriving through a page transition: skip the load-in fade (style.css)
+        addEventListener("pagereveal", (e) => {
+            if (e.viewTransition) document.documentElement.classList.add("from-transition");
+        });
+        {
+            const savedTheme = localStorage.getItem("theme");
+            const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+            if (savedTheme === "dark" || (!savedTheme && systemPrefersDark)) {
+                document.documentElement.classList.add("dark-theme");
+            }
+        }
+    </script>
+    <link rel="preload" href="/assets/fonts/figtree-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="/js/script.js" defer></script>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header perma-line">
+        <div class="name">
+            <a href="/"><span class="name-chevron" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/></svg></span>NORMANLEE</a>
+        </div>
+        <div class="nav-container">
+            <button class="theme-toggle-btn" aria-label="Change to dark mode" title="Change to dark mode">
+                <!-- Sun Icon -->
+                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M8 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6m0 1a4 4 0 1 0 0-8 4 4 0 0 0 0 8M8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0m0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13m8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5M3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8m10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0m-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0m9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707M4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708"/>
+                </svg>
+                <!-- Sun Icon Fill -->
+                <svg class="sun-icon-fill" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8M8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0m0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13m8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5M3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8m10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0m-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0m9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707M4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708"/>
+                </svg>
+                <!-- Moon Icon -->
+                <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M6 .278a.77.77 0 0 1 .08.858 7.2 7.2 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277q.792-.001 1.533-.16a.79.79 0 0 1 .81.316.73.73 0 0 1-.031.893A8.35 8.35 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.75.75 0 0 1 6 .278M4.858 1.311A7.27 7.27 0 0 0 1.025 7.71c0 4.02 3.279 7.276 7.319 7.276a7.32 7.32 0 0 0 5.205-2.162q-.506.063-1.029.063c-4.61 0-8.343-3.714-8.343-8.29 0-1.167.242-2.278.681-3.286"/>
+                </svg>
+                <!-- Moon Icon Fill -->
+                <svg class="moon-icon-fill" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M6 .278a.77.77 0 0 1 .08.858 7.2 7.2 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277q.792-.001 1.533-.16a.79.79 0 0 1 .81.316.73.73 0 0 1-.031.893A8.35 8.35 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.75.75 0 0 1 6 .278"/>
+                </svg>
+            </button>
+            <button class="hamburger-menu" aria-label="Toggle menu" aria-expanded="false">
+                <span class="hamburger-box" aria-hidden="true">
+                    <span class="bar bar-top"></span>
+                    <span class="bar bar-middle"></span>
+                    <span class="bar bar-bottom"></span>
+                </span>
+            </button>
+        </div>
+        <div class="expanded-menu hidden" id="menu">
+            <a href="/" class="menu-item">
+                <!-- Home outline -->
+                <svg class="icon-outline" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M8.354 1.146a.5.5 0 0 0-.708 0l-6 6A.5.5 0 0 0 1.5 7.5v7a.5.5 0 0 0 .5.5h4.5a.5.5 0 0 0 .5-.5v-4h2v4a.5.5 0 0 0 .5.5H14a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-.146-.354L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293zM2.5 14V7.707l5.5-5.5 5.5 5.5V14H10v-4a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5v4z"/>
+                </svg>
+                <!-- Home fill -->
+                <svg class="icon-fill" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M6.5 14.5v-3.505c0-.245.25-.495.5-.495h2c.25 0 .5.25.5.5v3.5a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-.146-.354L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293L8.354 1.146a.5.5 0 0 0-.708 0l-6 6A.5.5 0 0 0 1.5 7.5v7a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 .5-.5"/>
+                </svg>
+                <span>Home</span>
+            </a>
+
+            <div class="nav-dropdown">
+                <a href="/work" class="menu-item" aria-current="true">
+                    <!-- Briefcase outline -->
+                    <svg class="icon-outline" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M6.5 1A1.5 1.5 0 0 0 5 2.5V3H1.5A1.5 1.5 0 0 0 0 4.5v8A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-8A1.5 1.5 0 0 0 14.5 3H11v-.5A1.5 1.5 0 0 0 9.5 1zm0 1h3a.5.5 0 0 1 .5.5V3H6v-.5a.5.5 0 0 1 .5-.5m1.886 6.914L15 7.151V12.5a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5V7.15l6.614 1.764a1.5 1.5 0 0 0 .772 0M1.5 4h13a.5.5 0 0 1 .5.5v1.616L8.129 7.948a.5.5 0 0 1-.258 0L1 6.116V4.5a.5.5 0 0 1 .5-.5"/>
+                    </svg>
+                    <!-- Briefcase fill -->
+                    <svg class="icon-fill" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M6.5 1A1.5 1.5 0 0 0 5 2.5V3H1.5A1.5 1.5 0 0 0 0 4.5v1.384l7.614 2.03a1.5 1.5 0 0 0 .772 0L16 5.884V4.5A1.5 1.5 0 0 0 14.5 3H11v-.5A1.5 1.5 0 0 0 9.5 1zm0 1h3a.5.5 0 0 1 .5.5V3H6v-.5a.5.5 0 0 1 .5-.5"/>
+                        <path d="M0 12.5A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5V6.85L8.129 8.947a.5.5 0 0 1-.258 0L0 6.85z"/>
+                    </svg>
+                    <span>Work</span>
+                </a>
+                <div class="project-menu">
+                    <div class="project-menu-panel">
+                        <a href="/apple-sports-concept" class="project-menu-item">Bringing Team Schedules and Results to Apple Sports</a>
+                        <a href="/portfolio" class="project-menu-item">Designing and Building my Portfolio from Figma to Code</a>
+                    </div>
+                </div>
+            </div>
+
+            <a href="/about" class="menu-item">
+                <!-- About Icon -->
+                <svg class="icon-outline" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0m4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4m-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10s-3.516.68-4.168 1.332c-.678.678-.83 1.418-.832 1.664z"/>
+                </svg>
+                <!-- About Fill -->
+                <svg class="icon-fill" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
+                </svg>
+                <span>About</span>
+            </a>
+
+        </div>
+    </div>
+
+    <!-- Work -->
+    <!--
+        MEDIA SLOTS: a placeholder is a <div class="shot"> with its shot number.
+        A full phone screen goes in a phone frame, which draws the border and the status bar (1:46, island, signal, Wi-Fi, battery):
+            <div class="phone"><img src="/images/apple-sports/02a-yesterday.webp?v=2" alt="..." width="624" height="1353" loading="lazy"></div>
+            <div class="phone"><video src="..." poster="..." data-autoplay muted loop playsinline preload="none"></video></div>
+        data-autoplay (not autoplay) so it only downloads and plays once it scrolls into view (script.js).
+        The file's own status bar is painted out first, so the frame's is the only one showing.
+        A crop goes in bare: <img class="shot is-actual"> shows it at its real size, <img class="shot is-wide"> fills the width.
+        Phones and crops open in a larger view on click (script.js); recordings also get a small pause/play button.
+    -->
+    <div class="section-work">
+        <div class="work-card" data-fade="0">
+            <div class="work-thumbnail">
+                <div class="cover-wall" aria-hidden="true">
+                    <div class="cover-wall-plane">
+                        <div class="cover-wall-col" style="--w: 44cqh; --time: 74.4s">
+                            <div class="cover-wall-track">
+                                <div class="cover-wall-tile is-desktop"><img class="is-light" src="/images/portfolio/home-desktop-light.webp" alt="" width="2400" height="1350"><img class="is-dark" src="/images/portfolio/home-desktop-dark.webp" alt="" width="2400" height="1350"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-about-skills-light.webp" alt="" width="1000" height="396"><img class="is-dark" src="/images/portfolio/cover-snip-about-skills-dark.webp" alt="" width="1000" height="396"></div>
+                                <div class="cover-wall-tile cover-wall-code is-js"><p class="cover-wall-tab">script.js</p><pre><span><i>195</i><span class="t-kw">function</span> <span class="t-fn">applyTheme</span><span class="t-mute">(</span><span class="t-mute">)</span> <span class="t-mute">{</span></span><span><i>196</i>    <span class="t-kw">const</span> isDark <span class="t-mute">=</span> <span class="t-fn">getPreferredTheme</span><span class="t-mute">(</span><span class="t-mute">)</span> <span class="t-mute">===</span> <span class="t-val">"dark"</span><span class="t-mute">;</span></span><span class="is-hot"><i>197</i>    document<span class="t-mute">.</span>documentElement<span class="t-mute">.</span>classList<span class="t-mute">.</span><span class="t-fn">toggle</span><span class="t-mute">(</span><span class="t-val">"dark-theme"</span><span class="t-mute">,</span> isDark<span class="t-mute">)</span><span class="t-mute">;</span></span><span><i>198</i>    <span class="t-fn">updateButtonAria</span><span class="t-mute">(</span>isDark<span class="t-mute">)</span><span class="t-mute">;</span></span><span><i>199</i><span class="t-mute">}</span></span></pre></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-apple-quotes-light.webp" alt="" width="800" height="344"><img class="is-dark" src="/images/portfolio/cover-snip-apple-quotes-dark.webp" alt="" width="800" height="344"></div>
+                                <div class="cover-wall-tile is-desktop"><img class="is-light" src="/images/portfolio/home-desktop-light.webp" alt="" width="2400" height="1350"><img class="is-dark" src="/images/portfolio/home-desktop-dark.webp" alt="" width="2400" height="1350"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-about-skills-light.webp" alt="" width="1000" height="396"><img class="is-dark" src="/images/portfolio/cover-snip-about-skills-dark.webp" alt="" width="1000" height="396"></div>
+                                <div class="cover-wall-tile cover-wall-code is-js"><p class="cover-wall-tab">script.js</p><pre><span><i>195</i><span class="t-kw">function</span> <span class="t-fn">applyTheme</span><span class="t-mute">(</span><span class="t-mute">)</span> <span class="t-mute">{</span></span><span><i>196</i>    <span class="t-kw">const</span> isDark <span class="t-mute">=</span> <span class="t-fn">getPreferredTheme</span><span class="t-mute">(</span><span class="t-mute">)</span> <span class="t-mute">===</span> <span class="t-val">"dark"</span><span class="t-mute">;</span></span><span class="is-hot"><i>197</i>    document<span class="t-mute">.</span>documentElement<span class="t-mute">.</span>classList<span class="t-mute">.</span><span class="t-fn">toggle</span><span class="t-mute">(</span><span class="t-val">"dark-theme"</span><span class="t-mute">,</span> isDark<span class="t-mute">)</span><span class="t-mute">;</span></span><span><i>198</i>    <span class="t-fn">updateButtonAria</span><span class="t-mute">(</span>isDark<span class="t-mute">)</span><span class="t-mute">;</span></span><span><i>199</i><span class="t-mute">}</span></span></pre></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-apple-quotes-light.webp" alt="" width="800" height="344"><img class="is-dark" src="/images/portfolio/cover-snip-apple-quotes-dark.webp" alt="" width="800" height="344"></div>
+                                <div class="cover-wall-tile is-desktop"><img class="is-light" src="/images/portfolio/home-desktop-light.webp" alt="" width="2400" height="1350"><img class="is-dark" src="/images/portfolio/home-desktop-dark.webp" alt="" width="2400" height="1350"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-about-skills-light.webp" alt="" width="1000" height="396"><img class="is-dark" src="/images/portfolio/cover-snip-about-skills-dark.webp" alt="" width="1000" height="396"></div>
+                                <div class="cover-wall-tile cover-wall-code is-js"><p class="cover-wall-tab">script.js</p><pre><span><i>195</i><span class="t-kw">function</span> <span class="t-fn">applyTheme</span><span class="t-mute">(</span><span class="t-mute">)</span> <span class="t-mute">{</span></span><span><i>196</i>    <span class="t-kw">const</span> isDark <span class="t-mute">=</span> <span class="t-fn">getPreferredTheme</span><span class="t-mute">(</span><span class="t-mute">)</span> <span class="t-mute">===</span> <span class="t-val">"dark"</span><span class="t-mute">;</span></span><span class="is-hot"><i>197</i>    document<span class="t-mute">.</span>documentElement<span class="t-mute">.</span>classList<span class="t-mute">.</span><span class="t-fn">toggle</span><span class="t-mute">(</span><span class="t-val">"dark-theme"</span><span class="t-mute">,</span> isDark<span class="t-mute">)</span><span class="t-mute">;</span></span><span><i>198</i>    <span class="t-fn">updateButtonAria</span><span class="t-mute">(</span>isDark<span class="t-mute">)</span><span class="t-mute">;</span></span><span><i>199</i><span class="t-mute">}</span></span></pre></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-apple-quotes-light.webp" alt="" width="800" height="344"><img class="is-dark" src="/images/portfolio/cover-snip-apple-quotes-dark.webp" alt="" width="800" height="344"></div>
+                                <!-- again, so the loop has no seam -->
+                                <div class="cover-wall-tile is-desktop"><img class="is-light" src="/images/portfolio/home-desktop-light.webp" alt="" width="2400" height="1350"><img class="is-dark" src="/images/portfolio/home-desktop-dark.webp" alt="" width="2400" height="1350"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-about-skills-light.webp" alt="" width="1000" height="396"><img class="is-dark" src="/images/portfolio/cover-snip-about-skills-dark.webp" alt="" width="1000" height="396"></div>
+                                <div class="cover-wall-tile cover-wall-code is-js"><p class="cover-wall-tab">script.js</p><pre><span><i>195</i><span class="t-kw">function</span> <span class="t-fn">applyTheme</span><span class="t-mute">(</span><span class="t-mute">)</span> <span class="t-mute">{</span></span><span><i>196</i>    <span class="t-kw">const</span> isDark <span class="t-mute">=</span> <span class="t-fn">getPreferredTheme</span><span class="t-mute">(</span><span class="t-mute">)</span> <span class="t-mute">===</span> <span class="t-val">"dark"</span><span class="t-mute">;</span></span><span class="is-hot"><i>197</i>    document<span class="t-mute">.</span>documentElement<span class="t-mute">.</span>classList<span class="t-mute">.</span><span class="t-fn">toggle</span><span class="t-mute">(</span><span class="t-val">"dark-theme"</span><span class="t-mute">,</span> isDark<span class="t-mute">)</span><span class="t-mute">;</span></span><span><i>198</i>    <span class="t-fn">updateButtonAria</span><span class="t-mute">(</span>isDark<span class="t-mute">)</span><span class="t-mute">;</span></span><span><i>199</i><span class="t-mute">}</span></span></pre></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-apple-quotes-light.webp" alt="" width="800" height="344"><img class="is-dark" src="/images/portfolio/cover-snip-apple-quotes-dark.webp" alt="" width="800" height="344"></div>
+                                <div class="cover-wall-tile is-desktop"><img class="is-light" src="/images/portfolio/home-desktop-light.webp" alt="" width="2400" height="1350"><img class="is-dark" src="/images/portfolio/home-desktop-dark.webp" alt="" width="2400" height="1350"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-about-skills-light.webp" alt="" width="1000" height="396"><img class="is-dark" src="/images/portfolio/cover-snip-about-skills-dark.webp" alt="" width="1000" height="396"></div>
+                                <div class="cover-wall-tile cover-wall-code is-js"><p class="cover-wall-tab">script.js</p><pre><span><i>195</i><span class="t-kw">function</span> <span class="t-fn">applyTheme</span><span class="t-mute">(</span><span class="t-mute">)</span> <span class="t-mute">{</span></span><span><i>196</i>    <span class="t-kw">const</span> isDark <span class="t-mute">=</span> <span class="t-fn">getPreferredTheme</span><span class="t-mute">(</span><span class="t-mute">)</span> <span class="t-mute">===</span> <span class="t-val">"dark"</span><span class="t-mute">;</span></span><span class="is-hot"><i>197</i>    document<span class="t-mute">.</span>documentElement<span class="t-mute">.</span>classList<span class="t-mute">.</span><span class="t-fn">toggle</span><span class="t-mute">(</span><span class="t-val">"dark-theme"</span><span class="t-mute">,</span> isDark<span class="t-mute">)</span><span class="t-mute">;</span></span><span><i>198</i>    <span class="t-fn">updateButtonAria</span><span class="t-mute">(</span>isDark<span class="t-mute">)</span><span class="t-mute">;</span></span><span><i>199</i><span class="t-mute">}</span></span></pre></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-apple-quotes-light.webp" alt="" width="800" height="344"><img class="is-dark" src="/images/portfolio/cover-snip-apple-quotes-dark.webp" alt="" width="800" height="344"></div>
+                                <div class="cover-wall-tile is-desktop"><img class="is-light" src="/images/portfolio/home-desktop-light.webp" alt="" width="2400" height="1350"><img class="is-dark" src="/images/portfolio/home-desktop-dark.webp" alt="" width="2400" height="1350"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-about-skills-light.webp" alt="" width="1000" height="396"><img class="is-dark" src="/images/portfolio/cover-snip-about-skills-dark.webp" alt="" width="1000" height="396"></div>
+                                <div class="cover-wall-tile cover-wall-code is-js"><p class="cover-wall-tab">script.js</p><pre><span><i>195</i><span class="t-kw">function</span> <span class="t-fn">applyTheme</span><span class="t-mute">(</span><span class="t-mute">)</span> <span class="t-mute">{</span></span><span><i>196</i>    <span class="t-kw">const</span> isDark <span class="t-mute">=</span> <span class="t-fn">getPreferredTheme</span><span class="t-mute">(</span><span class="t-mute">)</span> <span class="t-mute">===</span> <span class="t-val">"dark"</span><span class="t-mute">;</span></span><span class="is-hot"><i>197</i>    document<span class="t-mute">.</span>documentElement<span class="t-mute">.</span>classList<span class="t-mute">.</span><span class="t-fn">toggle</span><span class="t-mute">(</span><span class="t-val">"dark-theme"</span><span class="t-mute">,</span> isDark<span class="t-mute">)</span><span class="t-mute">;</span></span><span><i>198</i>    <span class="t-fn">updateButtonAria</span><span class="t-mute">(</span>isDark<span class="t-mute">)</span><span class="t-mute">;</span></span><span><i>199</i><span class="t-mute">}</span></span></pre></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-apple-quotes-light.webp" alt="" width="800" height="344"><img class="is-dark" src="/images/portfolio/cover-snip-apple-quotes-dark.webp" alt="" width="800" height="344"></div>
+                            </div>
+                        </div>
+                        <div class="cover-wall-col" style="--w: 30cqh; --time: 64s">
+                            <div class="cover-wall-track">
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/home-mobile-light.webp" alt="" width="786" height="1704"><img class="is-dark" src="/images/portfolio/home-mobile-dark.webp" alt="" width="786" height="1704"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-apple-anatomy-light.webp" alt="" width="800" height="344"><img class="is-dark" src="/images/portfolio/cover-snip-apple-anatomy-dark.webp" alt="" width="800" height="344"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-footer-light.webp" alt="" width="1100" height="160"><img class="is-dark" src="/images/portfolio/cover-snip-footer-dark.webp" alt="" width="1100" height="160"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/home-mobile-light.webp" alt="" width="786" height="1704"><img class="is-dark" src="/images/portfolio/home-mobile-dark.webp" alt="" width="786" height="1704"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-apple-anatomy-light.webp" alt="" width="800" height="344"><img class="is-dark" src="/images/portfolio/cover-snip-apple-anatomy-dark.webp" alt="" width="800" height="344"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-footer-light.webp" alt="" width="1100" height="160"><img class="is-dark" src="/images/portfolio/cover-snip-footer-dark.webp" alt="" width="1100" height="160"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/home-mobile-light.webp" alt="" width="786" height="1704"><img class="is-dark" src="/images/portfolio/home-mobile-dark.webp" alt="" width="786" height="1704"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-apple-anatomy-light.webp" alt="" width="800" height="344"><img class="is-dark" src="/images/portfolio/cover-snip-apple-anatomy-dark.webp" alt="" width="800" height="344"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-footer-light.webp" alt="" width="1100" height="160"><img class="is-dark" src="/images/portfolio/cover-snip-footer-dark.webp" alt="" width="1100" height="160"></div>
+                                <!-- again, so the loop has no seam -->
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/home-mobile-light.webp" alt="" width="786" height="1704"><img class="is-dark" src="/images/portfolio/home-mobile-dark.webp" alt="" width="786" height="1704"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-apple-anatomy-light.webp" alt="" width="800" height="344"><img class="is-dark" src="/images/portfolio/cover-snip-apple-anatomy-dark.webp" alt="" width="800" height="344"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-footer-light.webp" alt="" width="1100" height="160"><img class="is-dark" src="/images/portfolio/cover-snip-footer-dark.webp" alt="" width="1100" height="160"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/home-mobile-light.webp" alt="" width="786" height="1704"><img class="is-dark" src="/images/portfolio/home-mobile-dark.webp" alt="" width="786" height="1704"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-apple-anatomy-light.webp" alt="" width="800" height="344"><img class="is-dark" src="/images/portfolio/cover-snip-apple-anatomy-dark.webp" alt="" width="800" height="344"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-footer-light.webp" alt="" width="1100" height="160"><img class="is-dark" src="/images/portfolio/cover-snip-footer-dark.webp" alt="" width="1100" height="160"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/home-mobile-light.webp" alt="" width="786" height="1704"><img class="is-dark" src="/images/portfolio/home-mobile-dark.webp" alt="" width="786" height="1704"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-apple-anatomy-light.webp" alt="" width="800" height="344"><img class="is-dark" src="/images/portfolio/cover-snip-apple-anatomy-dark.webp" alt="" width="800" height="344"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-footer-light.webp" alt="" width="1100" height="160"><img class="is-dark" src="/images/portfolio/cover-snip-footer-dark.webp" alt="" width="1100" height="160"></div>
+                            </div>
+                        </div>
+                        <div class="cover-wall-col" style="--w: 56cqh; --time: 80s">
+                            <div class="cover-wall-track">
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-apple-head-light.webp" alt="" width="1100" height="418"><img class="is-dark" src="/images/portfolio/cover-snip-apple-head-dark.webp" alt="" width="1100" height="418"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-about-tidbits-light.webp" alt="" width="800" height="833"><img class="is-dark" src="/images/portfolio/cover-snip-about-tidbits-dark.webp" alt="" width="800" height="833"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-home-thanks-light.webp" alt="" width="1100" height="189"><img class="is-dark" src="/images/portfolio/cover-snip-home-thanks-dark.webp" alt="" width="1100" height="189"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-apple-head-light.webp" alt="" width="1100" height="418"><img class="is-dark" src="/images/portfolio/cover-snip-apple-head-dark.webp" alt="" width="1100" height="418"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-about-tidbits-light.webp" alt="" width="800" height="833"><img class="is-dark" src="/images/portfolio/cover-snip-about-tidbits-dark.webp" alt="" width="800" height="833"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-home-thanks-light.webp" alt="" width="1100" height="189"><img class="is-dark" src="/images/portfolio/cover-snip-home-thanks-dark.webp" alt="" width="1100" height="189"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-apple-head-light.webp" alt="" width="1100" height="418"><img class="is-dark" src="/images/portfolio/cover-snip-apple-head-dark.webp" alt="" width="1100" height="418"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-about-tidbits-light.webp" alt="" width="800" height="833"><img class="is-dark" src="/images/portfolio/cover-snip-about-tidbits-dark.webp" alt="" width="800" height="833"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-home-thanks-light.webp" alt="" width="1100" height="189"><img class="is-dark" src="/images/portfolio/cover-snip-home-thanks-dark.webp" alt="" width="1100" height="189"></div>
+                                <!-- again, so the loop has no seam -->
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-apple-head-light.webp" alt="" width="1100" height="418"><img class="is-dark" src="/images/portfolio/cover-snip-apple-head-dark.webp" alt="" width="1100" height="418"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-about-tidbits-light.webp" alt="" width="800" height="833"><img class="is-dark" src="/images/portfolio/cover-snip-about-tidbits-dark.webp" alt="" width="800" height="833"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-home-thanks-light.webp" alt="" width="1100" height="189"><img class="is-dark" src="/images/portfolio/cover-snip-home-thanks-dark.webp" alt="" width="1100" height="189"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-apple-head-light.webp" alt="" width="1100" height="418"><img class="is-dark" src="/images/portfolio/cover-snip-apple-head-dark.webp" alt="" width="1100" height="418"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-about-tidbits-light.webp" alt="" width="800" height="833"><img class="is-dark" src="/images/portfolio/cover-snip-about-tidbits-dark.webp" alt="" width="800" height="833"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-home-thanks-light.webp" alt="" width="1100" height="189"><img class="is-dark" src="/images/portfolio/cover-snip-home-thanks-dark.webp" alt="" width="1100" height="189"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-apple-head-light.webp" alt="" width="1100" height="418"><img class="is-dark" src="/images/portfolio/cover-snip-apple-head-dark.webp" alt="" width="1100" height="418"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-about-tidbits-light.webp" alt="" width="800" height="833"><img class="is-dark" src="/images/portfolio/cover-snip-about-tidbits-dark.webp" alt="" width="800" height="833"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-home-thanks-light.webp" alt="" width="1100" height="189"><img class="is-dark" src="/images/portfolio/cover-snip-home-thanks-dark.webp" alt="" width="1100" height="189"></div>
+                            </div>
+                        </div>
+                        <div class="cover-wall-col" style="--w: 40cqh; --time: 74s">
+                            <div class="cover-wall-track">
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-apple-overview-light.webp" alt="" width="1000" height="435"><img class="is-dark" src="/images/portfolio/cover-snip-apple-overview-dark.webp" alt="" width="1000" height="435"></div>
+                                <div class="cover-wall-tile cover-wall-code is-css"><p class="cover-wall-tab">style.css</p><pre><span><i>732</i><span class="t-sel">.hero-text</span> <span class="t-mute">{</span></span><span class="is-hot"><i>733</i>    <span class="t-prop">font-size</span><span class="t-mute">:</span> <span class="t-val">clamp(2.25rem, 10cqi, 6rem)</span><span class="t-mute">;</span></span><span><i>734</i>    <span class="t-prop">line-height</span><span class="t-mute">:</span> <span class="t-val">var(--leading-none)</span><span class="t-mute">;</span></span><span><i>735</i>    <span class="t-prop">letter-spacing</span><span class="t-mute">:</span> <span class="t-val">-0.035em</span><span class="t-mute">;</span></span><span><i>736</i>    <span class="t-prop">white-space</span><span class="t-mute">:</span> <span class="t-val">nowrap</span><span class="t-mute">;</span></span><span><i>737</i><span class="t-mute">}</span></span></pre></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-about-hello-light.webp" alt="" width="1000" height="304"><img class="is-dark" src="/images/portfolio/cover-snip-about-hello-dark.webp" alt="" width="1000" height="304"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/home-tablet-light.webp" alt="" width="2420" height="1668"><img class="is-dark" src="/images/portfolio/home-tablet-dark.webp" alt="" width="2420" height="1668"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-apple-overview-light.webp" alt="" width="1000" height="435"><img class="is-dark" src="/images/portfolio/cover-snip-apple-overview-dark.webp" alt="" width="1000" height="435"></div>
+                                <div class="cover-wall-tile cover-wall-code is-css"><p class="cover-wall-tab">style.css</p><pre><span><i>732</i><span class="t-sel">.hero-text</span> <span class="t-mute">{</span></span><span class="is-hot"><i>733</i>    <span class="t-prop">font-size</span><span class="t-mute">:</span> <span class="t-val">clamp(2.25rem, 10cqi, 6rem)</span><span class="t-mute">;</span></span><span><i>734</i>    <span class="t-prop">line-height</span><span class="t-mute">:</span> <span class="t-val">var(--leading-none)</span><span class="t-mute">;</span></span><span><i>735</i>    <span class="t-prop">letter-spacing</span><span class="t-mute">:</span> <span class="t-val">-0.035em</span><span class="t-mute">;</span></span><span><i>736</i>    <span class="t-prop">white-space</span><span class="t-mute">:</span> <span class="t-val">nowrap</span><span class="t-mute">;</span></span><span><i>737</i><span class="t-mute">}</span></span></pre></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-about-hello-light.webp" alt="" width="1000" height="304"><img class="is-dark" src="/images/portfolio/cover-snip-about-hello-dark.webp" alt="" width="1000" height="304"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/home-tablet-light.webp" alt="" width="2420" height="1668"><img class="is-dark" src="/images/portfolio/home-tablet-dark.webp" alt="" width="2420" height="1668"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-apple-overview-light.webp" alt="" width="1000" height="435"><img class="is-dark" src="/images/portfolio/cover-snip-apple-overview-dark.webp" alt="" width="1000" height="435"></div>
+                                <div class="cover-wall-tile cover-wall-code is-css"><p class="cover-wall-tab">style.css</p><pre><span><i>732</i><span class="t-sel">.hero-text</span> <span class="t-mute">{</span></span><span class="is-hot"><i>733</i>    <span class="t-prop">font-size</span><span class="t-mute">:</span> <span class="t-val">clamp(2.25rem, 10cqi, 6rem)</span><span class="t-mute">;</span></span><span><i>734</i>    <span class="t-prop">line-height</span><span class="t-mute">:</span> <span class="t-val">var(--leading-none)</span><span class="t-mute">;</span></span><span><i>735</i>    <span class="t-prop">letter-spacing</span><span class="t-mute">:</span> <span class="t-val">-0.035em</span><span class="t-mute">;</span></span><span><i>736</i>    <span class="t-prop">white-space</span><span class="t-mute">:</span> <span class="t-val">nowrap</span><span class="t-mute">;</span></span><span><i>737</i><span class="t-mute">}</span></span></pre></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-about-hello-light.webp" alt="" width="1000" height="304"><img class="is-dark" src="/images/portfolio/cover-snip-about-hello-dark.webp" alt="" width="1000" height="304"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/home-tablet-light.webp" alt="" width="2420" height="1668"><img class="is-dark" src="/images/portfolio/home-tablet-dark.webp" alt="" width="2420" height="1668"></div>
+                                <!-- again, so the loop has no seam -->
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-apple-overview-light.webp" alt="" width="1000" height="435"><img class="is-dark" src="/images/portfolio/cover-snip-apple-overview-dark.webp" alt="" width="1000" height="435"></div>
+                                <div class="cover-wall-tile cover-wall-code is-css"><p class="cover-wall-tab">style.css</p><pre><span><i>732</i><span class="t-sel">.hero-text</span> <span class="t-mute">{</span></span><span class="is-hot"><i>733</i>    <span class="t-prop">font-size</span><span class="t-mute">:</span> <span class="t-val">clamp(2.25rem, 10cqi, 6rem)</span><span class="t-mute">;</span></span><span><i>734</i>    <span class="t-prop">line-height</span><span class="t-mute">:</span> <span class="t-val">var(--leading-none)</span><span class="t-mute">;</span></span><span><i>735</i>    <span class="t-prop">letter-spacing</span><span class="t-mute">:</span> <span class="t-val">-0.035em</span><span class="t-mute">;</span></span><span><i>736</i>    <span class="t-prop">white-space</span><span class="t-mute">:</span> <span class="t-val">nowrap</span><span class="t-mute">;</span></span><span><i>737</i><span class="t-mute">}</span></span></pre></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-about-hello-light.webp" alt="" width="1000" height="304"><img class="is-dark" src="/images/portfolio/cover-snip-about-hello-dark.webp" alt="" width="1000" height="304"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/home-tablet-light.webp" alt="" width="2420" height="1668"><img class="is-dark" src="/images/portfolio/home-tablet-dark.webp" alt="" width="2420" height="1668"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-apple-overview-light.webp" alt="" width="1000" height="435"><img class="is-dark" src="/images/portfolio/cover-snip-apple-overview-dark.webp" alt="" width="1000" height="435"></div>
+                                <div class="cover-wall-tile cover-wall-code is-css"><p class="cover-wall-tab">style.css</p><pre><span><i>732</i><span class="t-sel">.hero-text</span> <span class="t-mute">{</span></span><span class="is-hot"><i>733</i>    <span class="t-prop">font-size</span><span class="t-mute">:</span> <span class="t-val">clamp(2.25rem, 10cqi, 6rem)</span><span class="t-mute">;</span></span><span><i>734</i>    <span class="t-prop">line-height</span><span class="t-mute">:</span> <span class="t-val">var(--leading-none)</span><span class="t-mute">;</span></span><span><i>735</i>    <span class="t-prop">letter-spacing</span><span class="t-mute">:</span> <span class="t-val">-0.035em</span><span class="t-mute">;</span></span><span><i>736</i>    <span class="t-prop">white-space</span><span class="t-mute">:</span> <span class="t-val">nowrap</span><span class="t-mute">;</span></span><span><i>737</i><span class="t-mute">}</span></span></pre></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-about-hello-light.webp" alt="" width="1000" height="304"><img class="is-dark" src="/images/portfolio/cover-snip-about-hello-dark.webp" alt="" width="1000" height="304"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/home-tablet-light.webp" alt="" width="2420" height="1668"><img class="is-dark" src="/images/portfolio/home-tablet-dark.webp" alt="" width="2420" height="1668"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-apple-overview-light.webp" alt="" width="1000" height="435"><img class="is-dark" src="/images/portfolio/cover-snip-apple-overview-dark.webp" alt="" width="1000" height="435"></div>
+                                <div class="cover-wall-tile cover-wall-code is-css"><p class="cover-wall-tab">style.css</p><pre><span><i>732</i><span class="t-sel">.hero-text</span> <span class="t-mute">{</span></span><span class="is-hot"><i>733</i>    <span class="t-prop">font-size</span><span class="t-mute">:</span> <span class="t-val">clamp(2.25rem, 10cqi, 6rem)</span><span class="t-mute">;</span></span><span><i>734</i>    <span class="t-prop">line-height</span><span class="t-mute">:</span> <span class="t-val">var(--leading-none)</span><span class="t-mute">;</span></span><span><i>735</i>    <span class="t-prop">letter-spacing</span><span class="t-mute">:</span> <span class="t-val">-0.035em</span><span class="t-mute">;</span></span><span><i>736</i>    <span class="t-prop">white-space</span><span class="t-mute">:</span> <span class="t-val">nowrap</span><span class="t-mute">;</span></span><span><i>737</i><span class="t-mute">}</span></span></pre></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-about-hello-light.webp" alt="" width="1000" height="304"><img class="is-dark" src="/images/portfolio/cover-snip-about-hello-dark.webp" alt="" width="1000" height="304"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/home-tablet-light.webp" alt="" width="2420" height="1668"><img class="is-dark" src="/images/portfolio/home-tablet-dark.webp" alt="" width="2420" height="1668"></div>
+                            </div>
+                        </div>
+                        <div class="cover-wall-col" style="--w: 48cqh; --time: 78.3s">
+                            <div class="cover-wall-track">
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-apple-problem-light.webp" alt="" width="1000" height="330"><img class="is-dark" src="/images/portfolio/cover-snip-apple-problem-dark.webp" alt="" width="1000" height="330"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-about-experience-light.webp" alt="" width="1000" height="630"><img class="is-dark" src="/images/portfolio/cover-snip-about-experience-dark.webp" alt="" width="1000" height="630"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-apple-native-light.webp" alt="" width="1000" height="336"><img class="is-dark" src="/images/portfolio/cover-snip-apple-native-dark.webp" alt="" width="1000" height="336"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-apple-learned-light.webp" alt="" width="1000" height="433"><img class="is-dark" src="/images/portfolio/cover-snip-apple-learned-dark.webp" alt="" width="1000" height="433"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-apple-problem-light.webp" alt="" width="1000" height="330"><img class="is-dark" src="/images/portfolio/cover-snip-apple-problem-dark.webp" alt="" width="1000" height="330"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-about-experience-light.webp" alt="" width="1000" height="630"><img class="is-dark" src="/images/portfolio/cover-snip-about-experience-dark.webp" alt="" width="1000" height="630"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-apple-native-light.webp" alt="" width="1000" height="336"><img class="is-dark" src="/images/portfolio/cover-snip-apple-native-dark.webp" alt="" width="1000" height="336"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-apple-learned-light.webp" alt="" width="1000" height="433"><img class="is-dark" src="/images/portfolio/cover-snip-apple-learned-dark.webp" alt="" width="1000" height="433"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-apple-problem-light.webp" alt="" width="1000" height="330"><img class="is-dark" src="/images/portfolio/cover-snip-apple-problem-dark.webp" alt="" width="1000" height="330"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-about-experience-light.webp" alt="" width="1000" height="630"><img class="is-dark" src="/images/portfolio/cover-snip-about-experience-dark.webp" alt="" width="1000" height="630"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-apple-native-light.webp" alt="" width="1000" height="336"><img class="is-dark" src="/images/portfolio/cover-snip-apple-native-dark.webp" alt="" width="1000" height="336"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-apple-learned-light.webp" alt="" width="1000" height="433"><img class="is-dark" src="/images/portfolio/cover-snip-apple-learned-dark.webp" alt="" width="1000" height="433"></div>
+                                <!-- again, so the loop has no seam -->
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-apple-problem-light.webp" alt="" width="1000" height="330"><img class="is-dark" src="/images/portfolio/cover-snip-apple-problem-dark.webp" alt="" width="1000" height="330"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-about-experience-light.webp" alt="" width="1000" height="630"><img class="is-dark" src="/images/portfolio/cover-snip-about-experience-dark.webp" alt="" width="1000" height="630"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-apple-native-light.webp" alt="" width="1000" height="336"><img class="is-dark" src="/images/portfolio/cover-snip-apple-native-dark.webp" alt="" width="1000" height="336"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-apple-learned-light.webp" alt="" width="1000" height="433"><img class="is-dark" src="/images/portfolio/cover-snip-apple-learned-dark.webp" alt="" width="1000" height="433"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-apple-problem-light.webp" alt="" width="1000" height="330"><img class="is-dark" src="/images/portfolio/cover-snip-apple-problem-dark.webp" alt="" width="1000" height="330"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-about-experience-light.webp" alt="" width="1000" height="630"><img class="is-dark" src="/images/portfolio/cover-snip-about-experience-dark.webp" alt="" width="1000" height="630"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-apple-native-light.webp" alt="" width="1000" height="336"><img class="is-dark" src="/images/portfolio/cover-snip-apple-native-dark.webp" alt="" width="1000" height="336"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-apple-learned-light.webp" alt="" width="1000" height="433"><img class="is-dark" src="/images/portfolio/cover-snip-apple-learned-dark.webp" alt="" width="1000" height="433"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-apple-problem-light.webp" alt="" width="1000" height="330"><img class="is-dark" src="/images/portfolio/cover-snip-apple-problem-dark.webp" alt="" width="1000" height="330"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-about-experience-light.webp" alt="" width="1000" height="630"><img class="is-dark" src="/images/portfolio/cover-snip-about-experience-dark.webp" alt="" width="1000" height="630"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-apple-native-light.webp" alt="" width="1000" height="336"><img class="is-dark" src="/images/portfolio/cover-snip-apple-native-dark.webp" alt="" width="1000" height="336"></div>
+                                <div class="cover-wall-tile"><img class="is-light" src="/images/portfolio/cover-snip-apple-learned-light.webp" alt="" width="1000" height="433"><img class="is-dark" src="/images/portfolio/cover-snip-apple-learned-dark.webp" alt="" width="1000" height="433"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p>2026</p>
+            </div>
+            <h1 class="work-header">Designing and Building my Portfolio from Figma to Code</h1>
+            <div class="tag-container">
+                <span class="pill-tag">VISUAL DESIGN</span>
+                <span class="pill-tag">INTERACTION DESIGN</span>
+                <span class="pill-tag">RESPONSIVE DESIGN</span>
+                <span class="pill-tag">ACCESSIBILITY</span>
+                <span class="pill-tag">FRONT-END DEVELOPMENT</span>
+            </div>
+            <dl class="project-details">
+                <div class="detail-item">
+                    <dt class="detail-label">Role</dt>
+                    <dd class="content-description">Designer · Developer</dd>
+                </div>
+                <div class="detail-item">
+                    <dt class="detail-label">Duration</dt>
+                    <!-- Check the start month: the first commit is Oct 15; the Figma work came before it -->
+                    <dd class="content-description">Oct 2026 - Present</dd>
+                </div>
+                <div class="detail-item">
+                    <dt class="detail-label">Tools</dt>
+                    <dd class="content-description">Figma · VS Code · Claude Code</dd>
+                </div>
+                <div class="detail-item">
+                    <dt class="detail-label">Team</dt>
+                    <dd class="content-description">Solo</dd>
+                </div>
+                <div class="detail-item">
+                    <dt class="detail-label">Deliverables</dt>
+                    <dd class="content-description">Live website · Figma designs</dd>
+                </div>
+            </dl>
+        </div>
+
+        <!-- Overview -->
+        <div class="section-item" data-fade="1">
+            <h2 class="section-header">Overview</h2>
+            <dl class="case-tldr">
+                <div>
+                    <dt>Context</dt>
+                    <dd>A portfolio is often the first thing a recruiter sees, and most only have a minute or two to look.</dd>
+                </div>
+                <div>
+                    <dt>Problem</dt>
+                    <dd>Many portfolio sites I came across lag, load slowly, or put visuals ahead of the work. I wanted one that gets visitors to what matters quickly and still feels like me.</dd>
+                </div>
+                <div>
+                    <dt>Why it matters</dt>
+                    <dd>If a site is slow or hard to get around, a recruiter can leave before seeing the work at all.</dd>
+                </div>
+                <div>
+                    <dt>Solution</dt>
+                    <dd>A site I designed in Figma and built in plain HTML, CSS, and JavaScript: quick to load, easy to navigate on any device, with small details that make browsing easier.</dd>
+                </div>
+                <div>
+                    <dt>Constraint</dt>
+                    <dd>Live by the end of October, with no frameworks, and working on every screen size.</dd>
+                </div>
+            </dl>
+        </div>
+
+        <!-- Audience and goals -->
+        <div class="section-item" data-fade="2">
+            <h2 class="section-header">Who It's For</h2>
+            <p class="case-lede">Recruiters first, then anyone who lands here.</p>
+            <p class="section-content">The site is for recruiters, for me, and for anyone who ends up on it. A recruiter might give a portfolio less than a minute, so every page tries to get them to the essentials fast: who I am, what I've made, and how to reach me.</p>
+            <ul class="case-moments">
+                <li>
+                    <p class="case-moment-label">Works everywhere</p>
+                    <p>Phones, tablets, and computers. I designed every page at three sizes so it reads well on any of them.</p>
+                </li>
+                <li>
+                    <p class="case-moment-label">Feels quick</p>
+                    <p>Pages load and change fast. Many sites I came across lag or load slowly, and I didn't want mine to be one of them.</p>
+                </li>
+                <li>
+                    <p class="case-moment-label">Feels like me</p>
+                    <p>Simple, clean, organized, and empathetic. Plenty of portfolios lead with bold art or code-heavy visuals, but that isn't who I am.</p>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Early concepts -->
+        <div class="section-item" data-fade="3">
+            <h2 class="section-header">Early Concepts</h2>
+            <p class="case-lede">From plain, to playful, and back to clean.</p>
+            <p class="section-content">I started with the simplest version of what I wanted: a streamlined, minimal portfolio that gets straight to the point. The second version is nearly the same; the only change moved the navigation links from the hero into the header.</p>
+            <p class="section-content">It felt too basic, so I experimented with lined paper. Loose-leaf paper is something nearly everyone has used, it works on a light or dark background, and it's academic, organized, and to the point, much like the years of school behind it. I then set the page on my family's wooden table, a fixture in many Asian households, and turned the navigation into sticky-note tabs to make it feel real.</p>
+            <p class="section-content">I dropped it because there was too much going on: the table, the paper on top of it, the different-colored tabs, and lines that made text hard to fit. Lined paper is also much taller than it is wide, so it couldn't simply stretch across a wide screen, which is why the table filled the sides.</p>
+            <p class="section-content">Next, I tried a blue gradient with project cards. It was still simple, but it was clean, and I liked that. Blue is my favorite color, and it conveys trust. The second blue version got darker toward the bottom, like a sky, moved the project cards down, and let the landing page fill the whole screen.</p>
+            <figure class="case-figure">
+                <!-- Early concepts, in order. Each is a 16:9 crop; the larger view shows the whole frame -->
+                <div class="case-stage case-gallery is-landscape">
+                    <figure class="case-shot">
+                        <img class="shot is-actual" src="/images/portfolio/01-polished.webp" alt="A white page with Norman Lee, Product Designer, a paragraph of placeholder text, three buttons, and a list of project cards with round thumbnails" width="1280" height="720" loading="lazy" decoding="async">
+                        <figcaption>Iteration 1: Minimal</figcaption>
+                    </figure>
+                    <figure class="case-shot">
+                        <img class="shot is-actual" src="/images/portfolio/02-design-2.webp" alt="A cream page with the same name, text, and project list, and the navigation links moved into the header" width="1280" height="720" loading="lazy" decoding="async">
+                        <figcaption>Iteration 2: Links in the header</figcaption>
+                    </figure>
+                    <figure class="case-shot">
+                        <img class="shot is-actual" src="/images/portfolio/03-lined-paper.webp" alt="A dark page drawn as lined notebook paper, with the name in a serif font and a red margin line" width="1280" height="720" loading="lazy" decoding="async">
+                        <figcaption>Experiment 1: Lined paper</figcaption>
+                    </figure>
+                    <figure class="case-shot">
+                        <img class="shot is-actual" src="/images/portfolio/04-lined-paper-table.webp" alt="The lined paper page on a wooden table, with colorful sticky-note tabs as the navigation" width="1280" height="720" loading="lazy" decoding="async">
+                        <figcaption>Experiment 2: On the table</figcaption>
+                    </figure>
+                    <figure class="case-shot">
+                        <img class="shot is-actual" src="/images/portfolio/05-blue.webp" alt="A navy blue page with a centered NORMANLEE wordmark, a short intro, and three project cards" width="1280" height="720" loading="lazy" decoding="async">
+                        <figcaption>Iteration 3: Blue</figcaption>
+                    </figure>
+                    <figure class="case-shot">
+                        <img class="shot is-actual" src="/images/portfolio/06-sky-blue.webp" alt="A tall blue page that fades from bright at the top to darker at the bottom, with the intro filling the first screen and project cards below" width="960" height="1440" loading="lazy" decoding="async">
+                        <figcaption>Iteration 4: Sky blue</figcaption>
+                    </figure>
+                </div>
+                <figcaption>The early concepts, in order, with the lined paper experiments in between.</figcaption>
+            </figure>
+        </div>
+
+        <!-- Color and themes -->
+        <div class="section-item">
+            <h2 class="section-header">Easy on the Eyes</h2>
+            <p class="case-lede">A warm off-white and a soft gray, in light and dark.</p>
+            <p class="section-content">In the end I dropped the blue. Not everyone likes blue, or any single color, so I'd rather the site be a little "boring" and neutral and let the work stand out. Everyone should be able to use it comfortably.</p>
+            <p class="section-content">Neither theme is pure white or pure black. Pure white is harsh on the eyes, so the light theme is slightly warm, the way True Tone and Night Shift warm up a screen, without looking yellowed. The dark theme is a gray that's dark enough to make a difference but not so dark that it's hard to look at, since pure black can be harsh too.</p>
+            <p class="section-content">People also have preferences: some like dark mode, some like light, and some like to switch. The site opens in whichever theme the device is set to, and a button in the header switches it.</p>
+            <figure class="case-figure">
+                <div class="case-stage case-gallery is-landscape">
+                    <figure class="case-shot">
+                        <img class="shot is-actual" src="/images/portfolio/home-desktop-light.webp" alt="The home page in the light theme: a warm off-white background with dark text" width="1280" height="720" loading="lazy" decoding="async">
+                        <figcaption>Light</figcaption>
+                    </figure>
+                    <figure class="case-shot">
+                        <img class="shot is-actual" src="/images/portfolio/home-desktop-dark.webp" alt="The home page in the dark theme: a soft charcoal background with light text" width="1280" height="720" loading="lazy" decoding="async">
+                        <figcaption>Dark</figcaption>
+                    </figure>
+                </div>
+                <figcaption>The home page in each theme.</figcaption>
+            </figure>
+        </div>
+
+        <!-- Favicon -->
+        <div class="section-item">
+            <h2 class="section-header">A Small Mark</h2>
+            <p class="case-lede">The icon in the browser tab, after 26 tries.</p>
+            <p class="section-content">The favicon is the small icon in the browser tab and in bookmarks, so it has to read at just a few pixels wide. I tried 26 designs: my initials, NL, in blue; my name spelled out, on one line and stacked; a single bold N, some cropped to fill the whole square; and Ns with layered, stepped shadows, upright and turned at an angle.</p>
+            <figure class="case-figure">
+                <div class="case-stage">
+                    <div class="shot is-wide" role="img" aria-label="Placeholder for shot 17"><span>17 · The 26 favicon designs, in a grid</span></div>
+                </div>
+                <figcaption>Every favicon design I tried, in the order I made them.</figcaption>
+            </figure>
+            <p class="case-placeholder"><span>To come</span>Why I chose the final one, a white N on a blue circle, over the others.</p>
+        </div>
+
+        <!-- Figma to code -->
+        <div class="section-item">
+            <h2 class="section-header">From Figma to Code</h2>
+            <p class="case-lede">Designed at three sizes, then built frame by frame.</p>
+            <p class="section-content">I designed every page at three widths: 393px for phones, 768px for tablets, and 1440px for computers. I laid each frame out with absolute positioning first, which gave me full control to see how every element looked next to the others. Then I rebuilt each one with auto layout, which works much like CSS flexbox, the part of CSS I knew best. That made moving to code almost one to one.</p>
+            <figure class="case-figure">
+                <div class="case-stage case-breakpoints">
+                    <!-- The final home page frames, shown at the same scale so their sizes compare -->
+                    <div class="shot" role="img" aria-label="Placeholder for shot 07"><span>07 · 393px</span></div>
+                    <div class="shot" role="img" aria-label="Placeholder for shot 08"><span>08 · 768px</span></div>
+                    <div class="shot" role="img" aria-label="Placeholder for shot 09"><span>09 · 1440px</span></div>
+                </div>
+                <figcaption>The home page's final Figma frames at 393, 768, and 1440px, shown at the same scale.</figcaption>
+            </figure>
+            <p class="section-content">I built the site in plain HTML, CSS, and JavaScript, with no frameworks: just VS Code and three files. I worked page by page, going through each component in Figma and coding it. I chose to build it myself because that's the pipeline I know, and because building it would teach me HTML, CSS, and JavaScript along the way.</p>
+            <p class="section-content">In code, the breakpoints moved. The desktop layout switched at 1280px instead of 1440px, and a new breakpoint appeared at 1024px, because the gap between the tablet and desktop designs was too big. A layout that looked right at 768px looked odd at 1280px.</p>
+            <figure class="case-figure">
+                <div class="case-stage case-breakpoints">
+                    <!-- The home page as built, at one scale so the sizes compare. Each size comes in both themes, and the one
+                         matching the site's theme shows -->
+                    <img class="shot is-actual for-light" src="/images/portfolio/home-mobile-light.webp" alt="The home page on a phone, in the light theme" width="75" height="162" loading="lazy" decoding="async">
+                    <img class="shot is-actual for-dark" src="/images/portfolio/home-mobile-dark.webp" alt="The home page on a phone, in the dark theme" width="75" height="162" loading="lazy" decoding="async">
+                    <img class="shot is-actual for-light" src="/images/portfolio/home-tablet-light.webp" alt="The home page on a tablet, in the light theme" width="230" height="159" loading="lazy" decoding="async">
+                    <img class="shot is-actual for-dark" src="/images/portfolio/home-tablet-dark.webp" alt="The home page on a tablet, in the dark theme" width="230" height="159" loading="lazy" decoding="async">
+                    <img class="shot is-actual for-light" src="/images/portfolio/home-desktop-light.webp" alt="The home page on a computer, in the light theme" width="328" height="185" loading="lazy" decoding="async">
+                    <img class="shot is-actual for-dark" src="/images/portfolio/home-desktop-dark.webp" alt="The home page on a computer, in the dark theme" width="328" height="185" loading="lazy" decoding="async">
+                </div>
+                <figcaption>The home page as built, on a phone, a tablet, and a computer, shown at the same scale. It follows the site's theme.</figcaption>
+            </figure>
+            <p class="case-tradeoff"><span>In hindsight</span>I didn't plan for those in-between sizes in Figma. Designing for more widths up front would have saved reworking layouts in code.</p>
+            <figure class="case-figure">
+                <div class="case-stage case-gallery is-landscape">
+                    <figure class="case-shot">
+                        <div class="shot" role="img" aria-label="Placeholder for shot 10"><span>10 · The final Work page frame at 1440px</span></div>
+                        <figcaption>Work</figcaption>
+                    </figure>
+                    <figure class="case-shot">
+                        <div class="shot" role="img" aria-label="Placeholder for shot 11"><span>11 · The final project page frame at 1440px</span></div>
+                        <figcaption>Project</figcaption>
+                    </figure>
+                    <figure class="case-shot">
+                        <div class="shot" role="img" aria-label="Placeholder for shot 12"><span>12 · The final About page frame at 1440px</span></div>
+                        <figcaption>About</figcaption>
+                    </figure>
+                </div>
+                <figcaption>The rest of the final frames at 1440px.</figcaption>
+            </figure>
+            <figure class="case-figure">
+                <div class="case-stage case-gallery is-landscape">
+                    <figure class="case-shot">
+                        <div class="shot" role="img" aria-label="Placeholder for shot 13"><span>13 · The home page when I stopped coding by hand</span></div>
+                        <figcaption>Where I stopped coding by hand</figcaption>
+                    </figure>
+                    <figure class="case-shot">
+                        <img class="shot is-actual" src="/images/portfolio/home-desktop-light.webp" alt="The home page today: the NORMANLEE wordmark, the headline Make life easier, and the navigation in the header" width="1280" height="720" loading="lazy" decoding="async">
+                        <figcaption>Today</figcaption>
+                    </figure>
+                </div>
+                <figcaption>The home page when I stopped coding by hand, and today.</figcaption>
+            </figure>
+        </div>
+
+        <!-- Hardest decision: to come -->
+        <div class="section-item">
+            <h2 class="section-header">The Hardest Decision</h2>
+            <p class="case-placeholder"><span>To come</span>The hardest call in designing or building the site, and the options I weighed.</p>
+        </div>
+
+        <!-- Quality-of-life details -->
+        <div class="section-item">
+            <h2 class="section-header">Small Things, Less Effort</h2>
+            <p class="case-lede">Shortcuts that save a click, everywhere on the site.</p>
+            <ul class="case-moments">
+                <li>
+                    <p class="case-moment-label">Home from my name</p>
+                    <p>Hovering my name in the header shows a small arrow, a hint that it leads home.</p>
+                </li>
+                <li>
+                    <p class="case-moment-label">Projects from the menu</p>
+                    <p>Hovering Work opens a list of projects, so visitors can go straight to one without stopping at the Work page.</p>
+                </li>
+                <li>
+                    <p class="case-moment-label">Previous and next</p>
+                    <p>The end of each project links to the next one, so there's no trip back to the Work page.</p>
+                </li>
+                <li>
+                    <p class="case-moment-label">On this page</p>
+                    <p>A list of sections jumps anywhere in a case study and shows where you are: at the side on wide screens, in the bottom bar on smaller ones.</p>
+                </li>
+                <li>
+                    <p class="case-moment-label">Return to top</p>
+                    <p>One click back to the top of a long page.</p>
+                </li>
+                <li>
+                    <p class="case-moment-label">Theme toggle</p>
+                    <p>Light or dark, starting from the device's own setting.</p>
+                </li>
+            </ul>
+            <p class="section-content">Around those are small touches that are easy to miss: pages fade in, a line under the header fills as you scroll, the location arrow on the home page, the bouncing arrow that invites a scroll, and "User Experience Designer" fading away as the page moves. None of them get in the way, and together they make the site feel looked after.</p>
+        </div>
+
+        <!-- Building with Claude Code -->
+        <div class="section-item">
+            <h2 class="section-header">Building with Claude Code</h2>
+            <p class="case-lede">I designed it; Claude Code helped me build it faster.</p>
+            <p class="section-content">I coded the first version by hand: the navigation, dark mode, the page fade-in, the scroll progress, the breakpoints, and the Work menu. As the site grew, so did the complexity. Some of it would have taken months to learn, and I had a deadline, so I switched to Claude Code to put changes in place faster.</p>
+            <p class="section-content">I'm a designer, not a design engineer, with enough front-end knowledge to take a design live. I made the design decisions and reviewed every change before keeping it. Claude Code suggested some ideas, mostly small stylistic tweaks, but about 90% of the site is my own ideas.</p>
+            <p class="section-content">I also said no often. I turned down two redesigns of the Work page, several takes on the header's glass blur, and a theme switch that spread out from the button in a circle.</p>
+            <p class="case-placeholder"><span>To come</span>Specific examples of how I worked with Claude Code: what I asked for, what it suggested, and what I changed or rejected.</p>
+        </div>
+
+        <!-- Testing: to come -->
+        <div class="section-item">
+            <h2 class="section-header">Testing and Feedback</h2>
+            <p class="section-content">I tested the site with design friends and with people outside design, since each group notices different things.</p>
+            <p class="case-placeholder"><span>To come</span>What they said, and what I changed because of it.</p>
+        </div>
+
+        <!-- Next steps -->
+        <div class="section-item">
+            <h2 class="section-header">Next Steps</h2>
+            <p class="case-lede">More case studies, and steady refinement.</p>
+            <p class="section-content">The site only recently went live, so there's nothing to measure yet. Next, I'll add case studies as I finish them, starting with a refresh of the San Francisco Public Library website, and keep making small improvements as I think of them.</p>
+        </div>
+
+        <!-- Reflection -->
+        <div class="section-item">
+            <h2 class="section-header">What I Learned</h2>
+            <p class="case-lede">Plan for every screen size from the start, not just three.</p>
+            <p class="section-content">A simple, neutral site can still feel personal. The personality lives in the small details, not in the colors.</p>
+        </div>
+    </div>
+
+    <!-- Previous / Next Project (order matches the Work page; wraps around) -->
+    <nav class="project-pager" aria-label="More projects" data-fade="7">
+        <a href="/apple-sports-concept" class="pager-link pager-prev">
+            <span class="pager-label"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"><path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/></svg>Previous</span>
+            <span class="pager-title">Bringing Team Schedules and Results to Apple Sports</span>
+        </a>
+    </nav>
+
+    <!-- Footer -->
+    <div class="section-footer" data-fade="7">
+        <div class="footer-thanks">
+            <p>Thanks for stopping by!</p>
+        </div>
+        <div class="footer-details">
+            <div class="footer-nav-links">
+                <a href="/Norman-Lee-Resume.pdf" class="resume nav-content" target="_blank" rel="noopener">
+                    <!-- File outline -->
+                    <svg class="icon-outline" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M5.5 7a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1zM5 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5"/>
+                        <path d="M9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.5zm0 1v2A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1z"/>
+                    </svg>
+                    <!-- File fill -->
+                    <svg class="icon-fill" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.5zM5.5 7a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1zM5 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5"/>
+                    </svg>
+                    <p>Resume</p>
+                </a>
+
+                <a href="https://www.linkedin.com/in/normanlee8" class="linkedin nav-content" target="_blank" rel="noopener noreferrer">
+                    <!-- LinkedIn outline -->
+                    <svg class="icon-outline" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="-143 145 512 512">
+                        <path d="M329,145h-432c-22.1,0-40,17.9-40,40v432c0,22.1,17.9,40,40,40h432c22.1,0,40-17.9,40-40V185C369,162.9,351.1,145,329,145z M339,617c0,5.5-4.5,10-10,10h-432c-5.5,0-10-4.5-10-10V185c0-5.5,4.5-10,10-10h432c5.5,0,10,4.5,10,10V617z"/>
+                        <rect x="-8.5" y="348.4" width="49.9" height="159.7"/>
+                        <path d="M177.7,346.9c-28.6,0-46.5,15.6-49.8,26.6v-25.1H71.8c0.7,13.3,0,159.7,0,159.7h56.1v-86.3c0-4.9-0.2-9.7,1.2-13.1 c3.8-9.6,12.1-19.6,27-19.6c19.5,0,28.3,14.8,28.3,36.4v82.6H241v-88.8C241,369.9,213.2,346.9,177.7,346.9z"/>
+                        <path d="M15.4,273c-18.4,0-30.5,11.9-30.5,27.7c0,15.5,11.7,27.7,29.8,27.7h0.4c18.8,0,30.5-12.3,30.4-27.7 C45.1,284.9,33.8,273,15.4,273z"/>
+                    </svg>
+                    <!-- LinkedIn fill -->
+                    <svg class="icon-fill" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="-143 145 512 512">
+                        <path d="M329,145h-432c-22.1,0-40,17.9-40,40v432c0,22.1,17.9,40,40,40h432c22.1,0,40-17.9,40-40V185C369,162.9,351.1,145,329,145z M41.4,508.1H-8.5V348.4h49.9V508.1z M15.1,328.4h-0.4c-18.1,0-29.8-12.2-29.8-27.7c0-15.8,12.1-27.7,30.5-27.7 c18.4,0,29.7,11.9,30.1,27.7C45.6,316.1,33.9,328.4,15.1,328.4z M241,508.1h-56.6v-82.6c0-21.6-8.8-36.4-28.3-36.4 c-14.9,0-23.2,10-27,19.6c-1.4,3.4-1.2,8.2-1.2,13.1v86.3H71.8c0,0,0.7-146.4,0-159.7h56.1v25.1c3.3-11,21.2-26.6,49.8-26.6 c35.5,0,63.3,23,63.3,72.4V508.1z"/>
+                    </svg>
+                    <p>LinkedIn</p>
+                </a>
+            </div>
+            <div class="footer-right">
+                <div class="email-location">
+                    <button type="button" id="copy-email" class="email nav-content" title="Click to copy">
+                        <!-- Envelope outline -->
+                        <svg class="icon-outline" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1zm13 2.383-4.708 2.825L15 11.105zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741M1 11.105l4.708-2.897L1 5.383z"/>
+                        </svg>
+                        <!-- Envelope open fill -->
+                        <svg class="icon-fill" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M8.941.435a2 2 0 0 0-1.882 0l-6 3.2A2 2 0 0 0 0 5.4v.314l6.709 3.932L8 8.928l1.291.718L16 5.714V5.4a2 2 0 0 0-1.059-1.765zM16 6.873l-5.693 3.337L16 13.372v-6.5Zm-.059 7.611L8 10.072.059 14.484A2 2 0 0 0 2 16h12a2 2 0 0 0 1.941-1.516M0 13.373l5.693-3.163L0 6.873z"/>
+                        </svg>
+                        <p>normanlee2002@gmail.com</p>
+                    </button>
+
+                    <div class="location nav-content">
+                        <p>San Francisco, CA</p>
+                    </div>
+
+                    <div class="location local-time nav-content" hidden>
+                        <p><span id="local-time"></span> PT</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-name">
+            <div class="bigname">
+                <a href="/">
+                    <p>NORMANLEE</p>
+                </a>
+            </div>
+            <div class="made-by">
+                <p>Made by</p>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2026 NORMAN LEE</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sections list and return-to-top (1280px+) -->
+    <aside class="page-toc" aria-label="On this page">
+        <p class="toc-title">On this page</p>
+        <ul class="toc-list"></ul>
+    </aside>
+    <button type="button" class="toc-top" aria-label="Return to top">
+        <span class="toc-top-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                <path fill-rule="evenodd" d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708z"/>
+            </svg>
+        </span>
+        <span class="toc-top-label">Return to Top</span>
+    </button>
+
+    <!-- Page Navigation -->
+    <nav class="page-nav" aria-label="Page">
+        <a href="/work" class="page-nav-back" aria-label="Go back">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
+            </svg>
+        </a>
+        <div class="page-nav-sections">
+            <!-- Filled by script.js -->
+            <div class="section-menu hidden" id="section-menu">
+                <div class="section-menu-inner">
+                    <p class="section-menu-title">On this page</p>
+                    <ul class="section-list"></ul>
+                </div>
+            </div>
+            <button type="button" class="section-toggle" aria-expanded="false" aria-controls="section-menu">
+                <span class="progress-ring" aria-hidden="true">
+                    <svg viewBox="0 0 36 36">
+                        <circle class="progress-track" cx="18" cy="18" r="15.9155"/>
+                        <circle class="progress-fill" cx="18" cy="18" r="15.9155"/>
+                    </svg>
+                    <span class="progress-percent">0%</span>
+                </span>
+                <span class="section-label">Scroll Down</span>
+                <svg class="section-chevron" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708z"/>
+                </svg>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Copy-email toast -->
+    <div class="toast" id="toast" role="status" aria-live="polite">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+        </svg>
+        <div class="toast-text">
+            <p class="toast-title">Email copied</p>
+            <p class="toast-message">normanlee2002@gmail.com has been copied to your clipboard</p>
+        </div>
+    </div>
+</body>
+</html>

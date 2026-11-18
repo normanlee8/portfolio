@@ -206,6 +206,8 @@ function updateButtonAria(isDark) {
 
 applyTheme();
 
+let themeSwitch = 0; // the latest switch; a quick second click cuts the first one short
+
 themeToggleBtn.addEventListener("click", () => {
     const isDarkNow = !document.documentElement.classList.contains("dark-theme");
 
@@ -223,8 +225,11 @@ themeToggleBtn.addEventListener("click", () => {
         applyTheme();
         return;
     }
+    const thisSwitch = ++themeSwitch;
     page.classList.add("theme-switching");
-    document.startViewTransition(applyTheme).finished.catch(() => {}).then(() => page.classList.remove("theme-switching"));
+    document.startViewTransition(applyTheme).finished.catch(() => {}).then(() => {
+        if (thisSwitch === themeSwitch) page.classList.remove("theme-switching");
+    });
 });
 
 // Re-check when a page is shown, including from Back/Forward
@@ -454,6 +459,65 @@ document.querySelectorAll(".work-thumbnail .cover-screens").forEach((cover) => {
         px = 0;
         py = 0;
         if (!frame) frame = requestAnimationFrame(lean);
+    });
+});
+
+// The portfolio cover's wall of sections: pointing at it (or at its slice on the Work page, or tabbing to its
+// project) eases the columns up to speed, and leaving eases them to a stop where they are, so the motion never
+// starts or stops with a jolt. Each column's own speed and direction come from style.css; this only scales them.
+// With reduced motion on, the wall holds still (style.css)
+const WALL_SPEED_UP = 1000; // ms from still to full speed
+const WALL_SLOW_DOWN = 700; // ms from full speed to still
+
+document.querySelectorAll(".work-thumbnail .cover-wall").forEach((wall) => {
+    if (reduceMotion.matches) return;
+    const zone = wall.closest(".work-grid .work-card") || wall.closest(".work-thumbnail");
+    const card = wall.closest(".work-card");
+    let runs = [];
+    let level = 0; // 0 = still, 1 = full speed
+    let target = 0;
+    let frame = 0;
+    let lastTime = 0;
+
+    // the columns' animations, taken over from the stylesheet: running, but at no speed until pointed at
+    function takeOver() {
+        runs = wall.getAnimations({ subtree: true });
+        runs.forEach((run) => {
+            run.playbackRate = 0;
+            run.play();
+        });
+    }
+
+    // ease in and out: slow at both ends of the change, so speed builds and fades smoothly
+    const ease = (t) => t * t * (3 - 2 * t);
+
+    function step(now) {
+        const dt = lastTime ? now - lastTime : 16;
+        lastTime = now;
+        const span = target > level ? WALL_SPEED_UP : WALL_SLOW_DOWN;
+        level = target > level ? Math.min(target, level + dt / span) : Math.max(target, level - dt / span);
+        const rate = ease(level);
+        runs.forEach((run) => (run.playbackRate = rate));
+        frame = level === target ? 0 : requestAnimationFrame(step);
+    }
+
+    function go(to) {
+        if (!runs.length) takeOver();
+        target = to;
+        if (!frame) {
+            lastTime = 0;
+            frame = requestAnimationFrame(step);
+        }
+    }
+
+    takeOver();
+    zone.addEventListener("pointerenter", (e) => {
+        if (e.pointerType === "mouse") go(1);
+    });
+    zone.addEventListener("pointerleave", () => go(0));
+    card.addEventListener("focusin", () => go(1));
+    card.addEventListener("focusout", () => {
+        if (!card.matches(":hover")) go(0);
     });
 });
 
@@ -937,8 +1001,10 @@ if (zoomables.length && typeof HTMLDialogElement === "function") {
         return Promise.all(moves.map((m) => m.finished)).catch(() => {});
     }
 
-    // The items shown alongside this one (same card), for Left / Right
-    const groupOf = (item) => [...zoomables].filter((z) => z.closest(".case-stage") === item.closest(".case-stage"));
+    // The items shown alongside this one (same card), for Left / Right. A picture hidden for the other theme
+    // isn't one of them
+    const groupOf = (item) =>
+        [...zoomables].filter((z) => z.closest(".case-stage") === item.closest(".case-stage") && z.getClientRects().length > 0);
 
     // Shows the open item's place in its group, e.g. "2 of 5", and only offers the directions that go somewhere
     function labelView() {

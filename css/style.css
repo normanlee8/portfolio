@@ -273,15 +273,21 @@ body {
     }
 }
 
-/* Header */
+/* Header
+   The glass runs on past the top of the page (--header-bleed), out of sight on most screens. Safari on iPhone and
+   iPad draws the page under the status bar and its own toolbar too, above the page's top edge; without this, text
+   scrolling up there showed sharp above a hard-edged header. The extra height sits above the header and is taken
+   back by the negative margin and top, so the header's own 56px stays exactly where it was */
 .header {
+    --header-bleed: 120px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 var(--space-md);
-    height: var(--header-height);
+    padding: var(--header-bleed) var(--space-md) 0;
+    height: calc(var(--header-height) + var(--header-bleed));
+    margin-top: calc(-1 * var(--header-bleed));
     position: sticky;
-    top: 0;
+    top: calc(-1 * var(--header-bleed));
     z-index: 100;
     /* glass: a light tint over a deep blur, with the colors behind it turned up so they glow through
        instead of going gray */
@@ -1148,17 +1154,286 @@ a.work-thumbnail:active {
     animation: none;
 }
 
+/* The header's glass during any transition. A transition plays on pictures of the page, and the header's picture
+   is taken on its own, with nothing behind it to blur, so the header's layer blurs the fading page under it
+   instead. Without this, the text under the header shows through its tint until the transition ends */
+::view-transition-group(site-header) {
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    backdrop-filter: blur(20px) saturate(180%);
+}
+
 /* Switching themes: the whole page eases from one theme to the other (script.js starts it).
-   The header and cover join the page for this one, so everything fades together */
-:root.theme-switching .header,
+   The cover joins the page for this one; the header keeps its own layer, so its glass stays on (above) */
 :root.theme-switching .work-thumbnail {
     view-transition-name: none;
 }
 
-:root.theme-switching::view-transition-old(root),
-:root.theme-switching::view-transition-new(root) {
+:root.theme-switching::view-transition-old(*),
+:root.theme-switching::view-transition-new(*) {
     animation-duration: 0.45s;
     animation-timing-function: ease-in-out;
+}
+
+/* ===== Portfolio cover: the site, as a scrolling wall of its sections =====
+   Sections of the three pages (and real lines of this stylesheet and of script.js) as tiles of different sizes,
+   in columns on a plane tipped back and turned. Pointed at, each column scrolls at its own speed, the next one the
+   other way, and
+   never ends: its tiles repeat, and moving it by exactly half its length lands it where it began.
+   Light or dark with the site, pictures included. With reduced motion on, the wall holds still. Sized in cqh
+   (thumbnail height), so it keeps its size when a Work slice widens on hover */
+.cover-wall {
+    --canvas: #DCDFE0;
+    --tile-edge: rgb(0 0 0 / 0.06);
+    --panel: #FFFFFF;
+    --panel-bar: #F0EFEC;
+    --panel-text: #2A2A28;
+    --panel-muted: #9A978F;
+    --panel-line: rgb(13 153 255 / 0.12);
+    --accent: #0D99FF;
+    --code-sel: #A626A4;
+    --code-kw: #A626A4;
+    --code-fn: #0F6CBD;
+    --code-prop: #0F6CBD;
+    --code-val: #B4461A;
+    --shadow: 43 42 39;
+    --s: 1;
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    overflow: hidden;
+    border-radius: inherit;
+    container-type: size;
+    background: radial-gradient(80% 90% at 50% 40%, #E9EBEB, var(--canvas));
+}
+
+:root.dark-theme .cover-wall {
+    --canvas: #1A1A19;
+    --tile-edge: rgb(255 255 255 / 0.08);
+    --panel: #2C2C2A;
+    --panel-bar: #242422;
+    --panel-text: #ECEAE5;
+    --panel-muted: #85827B;
+    --panel-line: rgb(13 153 255 / 0.22);
+    --code-sel: #D7A6FF;
+    --code-kw: #D7A6FF;
+    --code-fn: #7CC4FF;
+    --code-prop: #7CC4FF;
+    --code-val: #FFB283;
+    --shadow: 0 0 0;
+    --s: 1.8;
+    background: radial-gradient(80% 90% at 50% 40%, #262624, var(--canvas));
+}
+
+/* no photo here, so the year needs no shade behind it; on the light version it reads dark */
+.work-thumbnail:has(.cover-wall)::before {
+    content: none;
+}
+
+:root:not(.dark-theme) .work-thumbnail:has(.cover-wall) {
+    color: var(--text-primary);
+}
+
+/* the plane: the columns side by side, tipped back and turned around its middle. The columns run on past its top
+   and bottom; what shows is the stretch around the middle, which every column covers at every moment */
+.cover-wall-plane {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: flex;
+    align-items: flex-start;
+    gap: 4cqh;
+    height: 280cqh;
+    translate: -50% -50%;
+    transform: rotateX(38deg) rotateZ(-24deg);
+    transition: scale 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cover-wall-col {
+    flex: none;
+    width: var(--w);
+}
+
+/* the column's tiles, repeated; it slides by half its length and starts again. Each column has its own speed
+   (--time, set on it): the middle one goes up, the two beside it go down, and the outer two stay put.
+   It holds still until the cover is pointed at (or its slice on the Work page, or its project is tabbed to):
+   script.js then eases it up to speed, and eases it to a stop where it is when the pointer leaves */
+.cover-wall-track {
+    display: flex;
+    flex-direction: column;
+    animation: cover-wall-down var(--time) linear infinite paused;
+}
+
+.cover-wall-col:nth-child(3) .cover-wall-track {
+    animation-name: cover-wall-up;
+}
+
+.cover-wall-col:first-child .cover-wall-track,
+.cover-wall-col:last-child .cover-wall-track {
+    animation: none;
+}
+
+/* pointed at, the wall also grows a little, toward the viewer */
+.work-card:focus-within .cover-wall-plane {
+    scale: 1.06;
+}
+
+@media (hover: hover) {
+    .work-thumbnail:hover .cover-wall-plane,
+    .work-grid .work-card:hover .cover-wall-plane {
+        scale: 1.06;
+    }
+}
+
+@keyframes cover-wall-up {
+    from {
+        transform: translateY(0);
+    }
+
+    to {
+        transform: translateY(-50%);
+    }
+}
+
+@keyframes cover-wall-down {
+    from {
+        transform: translateY(-50%);
+    }
+
+    to {
+        transform: translateY(0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .cover-wall-track {
+        animation: none;
+        transform: translateY(-12%);
+    }
+
+    .cover-wall-plane {
+        transition: none;
+    }
+}
+
+/* a tile: a section of a page or an editor, with a hairline edge and a soft shadow. The space after it (a margin,
+   not a gap) keeps the two sets exactly the same length */
+.cover-wall-tile {
+    flex: none;
+    margin-bottom: 4cqh;
+    overflow: hidden;
+    border-radius: 0.8cqh;
+    box-shadow:
+        0 0 0 0.12cqh var(--tile-edge),
+        0 0.8cqh 2cqh rgb(var(--shadow) / calc(0.08 * var(--s))),
+        0 4cqh 8cqh rgb(var(--shadow) / calc(0.1 * var(--s)));
+}
+
+.work-thumbnail .cover-wall img {
+    position: static;
+    inset: auto;
+    z-index: auto;
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: fill;
+    border-radius: 0;
+}
+
+/* the home page, whole, on a computer, a phone, and a tablet */
+.cover-wall-tile.is-desktop img {
+    aspect-ratio: 16 / 9;
+}
+
+/* the pictures in the site's current theme */
+.work-thumbnail .cover-wall .is-dark,
+:root.dark-theme .work-thumbnail .cover-wall .is-light {
+    display: none;
+}
+
+:root.dark-theme .work-thumbnail .cover-wall .is-dark {
+    display: block;
+}
+
+/* an editor tile: the file's tab, then its lines, numbered as in the file */
+.cover-wall-code {
+    background-color: var(--panel);
+    color: var(--panel-text);
+}
+
+.cover-wall-tab {
+    display: flex;
+    align-items: center;
+    gap: 0.8cqh;
+    padding: 1cqh 1.6cqh;
+    background-color: var(--panel-bar);
+    font-size: 1.35cqh;
+    font-weight: var(--weight-medium);
+    line-height: 1.2;
+}
+
+/* the file's color dot: blue for CSS, yellow for JavaScript */
+.cover-wall-tab::before {
+    content: "";
+    width: 0.9cqh;
+    height: 0.9cqh;
+    border-radius: 50%;
+    background-color: var(--accent);
+}
+
+.cover-wall-code.is-js .cover-wall-tab::before {
+    background-color: #E8B931;
+}
+
+.cover-wall-code pre {
+    margin: 0;
+    padding: 1.2cqh 0 1.4cqh;
+    overflow: hidden;
+    font-family: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 1.25cqh;
+    line-height: 1.8;
+    white-space: pre;
+}
+
+.cover-wall-code pre > span {
+    display: block;
+}
+
+.cover-wall-code pre > .is-hot {
+    background-color: var(--panel-line);
+}
+
+/* the line number */
+.cover-wall-code pre i {
+    display: inline-block;
+    width: 3.2em;
+    padding-right: 1.2em;
+    color: var(--panel-muted);
+    font-style: normal;
+    text-align: right;
+}
+
+.cover-wall-code .t-sel {
+    color: var(--code-sel);
+}
+
+.cover-wall-code .t-kw {
+    color: var(--code-kw);
+}
+
+.cover-wall-code .t-fn {
+    color: var(--code-fn);
+}
+
+.cover-wall-code .t-prop {
+    color: var(--code-prop);
+}
+
+.cover-wall-code .t-val {
+    color: var(--code-val);
+}
+
+.cover-wall-code .t-mute {
+    color: var(--panel-muted);
 }
 
 /* ===== Apple Sports cover: a team page, taken apart =====
@@ -2403,6 +2678,80 @@ img.shot {
     }
 }
 
+/* wide screenshots (whole pages, design frames): always two per row, with an odd last one centered, so each stays
+   large enough to read. Each shows a 16:9 window from the top; the larger view shows the whole image */
+@container (min-width: 34rem) {
+    .case-stage.case-gallery.is-landscape {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .case-gallery.is-landscape > .case-shot:last-child:nth-child(odd) {
+        grid-column: 2 / span 2;
+    }
+
+    .case-gallery.is-landscape > .case-shot:nth-child(4):nth-last-child(2) {
+        grid-column: span 2;
+    }
+}
+
+.case-gallery.is-landscape .case-shot .shot {
+    aspect-ratio: 16 / 9;
+}
+
+/* the same page at several widths, side by side at one scale; they shrink together on narrow screens */
+.case-stage.case-breakpoints {
+    align-items: flex-end;
+}
+
+/* placeholders until the frames are in: each the size and shape its frame will be (393, 768, and 1440px wide,
+   one screen tall, at one scale) */
+.case-breakpoints div.shot {
+    flex: 0 1 auto;
+    max-width: 100%;
+    border-radius: 8px;
+}
+
+.case-breakpoints div.shot:nth-child(1) {
+    width: 94px;
+    aspect-ratio: 94 / 204;
+}
+
+.case-breakpoints div.shot:nth-child(2) {
+    width: 184px;
+    aspect-ratio: 184 / 246;
+}
+
+.case-breakpoints div.shot:nth-child(3) {
+    width: 346px;
+    aspect-ratio: 346 / 216;
+}
+
+/* a figure that follows the site's theme: each picture comes in both, and only the matching one shows */
+:root.dark-theme .shot.for-light,
+:root:not(.dark-theme) .shot.for-dark {
+    display: none;
+}
+
+/* a section still to be written: a dashed box, so it can't be mistaken for finished copy */
+.case-placeholder {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    padding: var(--space-md);
+    border: 1.5px dashed color-mix(in srgb, var(--line-color) 45%, transparent);
+    border-radius: 10px;
+    font-size: var(--text-base);
+    color: var(--text-secondary);
+}
+
+.case-placeholder > span {
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--accent-color);
+}
+
 .case-shot {
     display: flex;
     flex-direction: column;
@@ -2484,6 +2833,11 @@ div.shot {
 div.shot.is-wide {
     aspect-ratio: 16 / 9;
     border-radius: 6px;
+}
+
+/* in a gallery of screenshots it takes the screenshot's shape and corners */
+.case-shot div.shot {
+    border-radius: 8px;
 }
 
 /* the label's breathing room sits on an inner span, so the placeholder itself stays padding-free */
@@ -2608,6 +2962,7 @@ div.shot > span {
 }
 
 .pager-next {
+    grid-column: -2 / -1; /* the right-hand column, even when there's no previous project beside it */
     justify-self: end;
     align-items: flex-end;
     text-align: right;
@@ -4007,6 +4362,7 @@ body:has(.page-nav) .toast {
 
     /* the lines belong to the cards so they fade in with them */
     .work-grid {
+        --slices: 3; /* how many projects share the row; the sizes below divide by it */
         container-type: inline-size; /* for cqi units */
         display: flex;
         flex-direction: row;
@@ -4015,6 +4371,10 @@ body:has(.page-nav) .toast {
         margin: 0 var(--space-md);
         /* fill the screen below the heading */
         min-height: calc(100svh - var(--header-height) - var(--text-2xl) * 1.15 - 2 * var(--space-lg) - 1px);
+    }
+
+    .work-grid:not(:has(> .work-card:nth-child(3))) {
+        --slices: 2;
     }
 
     /* A slice: the cover, then the details. Pointing at one (or tabbing into it) opens it up: it widens while
@@ -4039,7 +4399,7 @@ body:has(.page-nav) .toast {
 
     /* text keeps the width of a narrowed slice, so it never reflows as slices open and close */
     .work-grid .work-card > * {
-        --slice-content: calc(100cqi / (2 + var(--open)) - 2 * var(--space-md) - 1px);
+        --slice-content: calc(100cqi / (var(--slices) - 1 + var(--open)) - 2 * var(--space-md) - 1px);
         width: var(--slice-content);
         flex-shrink: 0;
         transition: opacity 0.4s ease;
@@ -4048,7 +4408,7 @@ body:has(.page-nav) .toast {
     /* the cover runs the slice's full width at a fixed height, so it widens as its slice opens */
     .work-grid .work-card > .work-thumbnail {
         width: auto;
-        height: calc((100cqi / 3 - 2 * var(--space-md)) * 9 / 16);
+        height: calc((100cqi / var(--slices) - 2 * var(--space-md)) * 9 / 16);
         aspect-ratio: auto;
         transition: opacity 0.4s ease, transform 0.4s ease, scale 0.2s ease;
     }
