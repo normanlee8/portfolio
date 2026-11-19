@@ -336,10 +336,8 @@ function updateButtonAria(isDark) {
 
 applyTheme();
 
-let themeSwitch = 0; // the latest switch; a quick second click cuts the first one short
-
-// The covers' pictures in the other theme only download when needed, so pointing at the switch fetches them, and
-// switching waits (briefly) until they're ready to draw: the page changes theme whole, never with a blank cover
+// The covers' pictures in the other theme only download when needed, so pointing at (or pressing) the switch fetches
+// and decodes them ahead of the click, and the switch itself never waits for them
 function picturesForTheme(theme) {
     const imgs = [];
     document.querySelectorAll(".work-thumbnail :is(.cover-screens, .cover-wall)").forEach((cover) => {
@@ -356,14 +354,15 @@ function picturesForTheme(theme) {
 }
 
 const otherTheme = () => (pageTheme() === "dark" ? "light" : "dark");
-themeToggleBtn.addEventListener("pointerenter", () => picturesForTheme(otherTheme()));
-themeToggleBtn.addEventListener("focus", () => picturesForTheme(otherTheme()));
+const warmOtherTheme = () => readyPictures(picturesForTheme(otherTheme()));
+themeToggleBtn.addEventListener("pointerenter", warmOtherTheme);
+themeToggleBtn.addEventListener("pointerdown", warmOtherTheme); // touch screens: no hover, but a head start
+themeToggleBtn.addEventListener("focus", warmOtherTheme);
 
-themeToggleBtn.addEventListener("click", async () => {
+// The theme changes on the click, all at once. The hover color transitions are held off for that one change
+// (style.css), so nothing eases into the new colors behind the rest of the page
+themeToggleBtn.addEventListener("click", () => {
     const isDarkNow = !document.documentElement.classList.contains("dark-theme");
-    const thisSwitch = ++themeSwitch;
-    await readyPictures(picturesForTheme(isDarkNow ? "dark" : "light"), 400);
-    if (thisSwitch !== themeSwitch) return; // clicked again meanwhile: that click takes over
 
     // Matching the system clears the saved choice
     if (isDarkNow === darkQuery.matches) {
@@ -372,18 +371,11 @@ themeToggleBtn.addEventListener("click", async () => {
         localStorage.setItem("theme", isDarkNow ? "dark" : "light");
     }
 
-    // The page eases from one theme to the other (style.css).
-    // Without view transitions, or with reduced motion on, it just switches
     const page = document.documentElement;
-    // (and where drawing is slow: blending two pictures of the whole page on every frame would stutter)
-    if (!document.startViewTransition || reduceMotion.matches || page.classList.contains("low-gfx")) {
-        applyTheme();
-        return;
-    }
-    page.classList.add("theme-switching");
-    document.startViewTransition(applyTheme).finished.catch(() => {}).then(() => {
-        if (thisSwitch === themeSwitch) page.classList.remove("theme-switching");
-    });
+    page.classList.add("theme-instant");
+    applyTheme();
+    getComputedStyle(page).color; // the new colors land now, with no transitions running
+    page.classList.remove("theme-instant");
 });
 
 // Re-check when a page is shown, including from Back/Forward

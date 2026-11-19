@@ -719,6 +719,21 @@ body {
     display: block;
 }
 
+/* pressed: the icon gives a little, so the click registers before the page changes */
+.theme-toggle-btn svg {
+    transition: scale 0.12s ease;
+}
+
+.theme-toggle-btn:active svg {
+    scale: 0.88;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .theme-toggle-btn:active svg {
+        scale: none;
+    }
+}
+
 /* filled icon on hover (mouse only; a tap would leave it filled) */
 @media (hover: hover) {
     .theme-toggle-btn:hover .moon-icon {
@@ -1210,13 +1225,13 @@ a.work-thumbnail:active {
 }
 
 /* ===== Switching themes =====
-   The whole page eases from one theme to the other (script.js starts it, except where drawing is slow). Moving between
-   pages has no transition of its own: the next page simply fades in (Page Fade In, above), which costs far less than
-   a transition, which has to take and blend pictures of both pages */
-:root.theme-switching::view-transition-old(*),
-:root.theme-switching::view-transition-new(*) {
-    animation-duration: 0.45s;
-    animation-timing-function: ease-in-out;
+   Instant: the whole page changes on the click (script.js). For that one change, color transitions are held off, so
+   links and buttons don't ease into the new colors after everything else has switched. The theme button itself keeps
+   its press feedback */
+:root.theme-instant *:not(.theme-toggle-btn *),
+:root.theme-instant *::before,
+:root.theme-instant *::after {
+    transition: none !important;
 }
 
 /* ===== Portfolio cover: the site, as a scrolling wall of its sections =====
