@@ -703,6 +703,47 @@ window.addEventListener("load", () => {
     else setTimeout(prefetchLiveCovers, 1500);
 });
 
+// The Apple Sports cover's phones: each one's flat side as a picture (style.css, "The side as a picture"). The same
+// slices the stylesheet stacks as shadows under the phone, in the same order and places, drawn into one picture per
+// theme and phone, so a scroll past the live cover draws one picture instead of 27 shadows per phone.
+// They're pictures in the cover like any other, so the cover waits for them before it comes to life (bringToLife)
+// and the other theme's are ready before the theme switches (picturesForTheme)
+const PHONE = { w: 66, bezel: 1.3, radius: 66 * 0.168, rim: 0.3 }; // cqh, as in style.css (.cover-phone)
+// each slice's offset (cqh) and color, top to bottom: the stylesheet's box-shadow list after the rim
+const SIDE_SLICES = [
+    [0.19, 0.27, "a"], [0.37, 0.53, "mix"],
+    ...[[0.56, 0.80], [0.75, 1.06], [0.93, 1.33], [1.12, 1.60], [1.30, 1.86], [1.49, 2.13], [1.68, 2.39], [1.86, 2.66],
+        [2.05, 2.93], [2.24, 3.19], [2.42, 3.46], [2.61, 3.73], [2.79, 3.99], [2.98, 4.26], [3.17, 4.52], [3.35, 4.79],
+        [3.54, 5.06], [3.73, 5.32], [3.91, 5.59], [4.10, 5.85], [4.29, 6.12], [4.47, 6.39], [4.66, 6.65]].map(([x, y]) => [x, y, "b"]),
+    [4.84, 6.92, "c"], [5.03, 7.18, "c"],
+];
+
+function drawPhoneSides(cover) {
+    const style = getComputedStyle(cover);
+    const last = SIDE_SLICES[SIDE_SLICES.length - 1];
+    const width = PHONE.w + 2 * PHONE.rim + last[0];
+    cover.querySelectorAll(".cover-phone").forEach((phone) => {
+        const shot = phone.querySelector("img");
+        // the phone's height: its bezel above and below the screenshot, which fills its width
+        const height = 2 * PHONE.bezel + (PHONE.w - 2 * PHONE.bezel) * shot.getAttribute("height") / shot.getAttribute("width");
+        ["light", "dark"].forEach((theme) => {
+            const color = (name) => style.getPropertyValue(`--cover-side-${name}-${theme}`).trim();
+            const fills = { a: color("a"), b: color("b"), c: color("c"), mix: `color-mix(in srgb, ${color("a")} 45%, ${color("b")})` };
+            // from the phone's top left, less the rim (the stylesheet places the picture there); the last slice is
+            // at the bottom and the first on top, as the shadows stack
+            const slices = SIDE_SLICES.map(([x, y, c]) => `<use href="#s" x="${x}" y="${y}" style="fill:${fills[c]}"/>`).reverse().join("");
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${(height + 2 * PHONE.rim + last[1]).toFixed(5)}" preserveAspectRatio="none">` +
+                `<defs><rect id="s" width="${PHONE.w + 2 * PHONE.rim}" height="${(height + 2 * PHONE.rim).toFixed(5)}" rx="${(PHONE.radius + PHONE.rim).toFixed(5)}"/></defs>${slices}</svg>`;
+            const img = document.createElement("img");
+            img.className = `cover-side is-${theme}`;
+            img.alt = "";
+            img.src = `data:image/svg+xml,${encodeURIComponent(svg)}`;
+            phone.prepend(img);
+        });
+        phone.classList.add("has-side");
+    });
+}
+
 // The Apple Sports cover leans with the cursor: the floor slides a little away from it and the lifted parts slide
 // the other way, higher parts further, so the screen seems to have depth. The lean eases toward the cursor here,
 // frame by frame, and is written straight onto those pieces, each on its own layer (style.css): following the cursor
@@ -712,6 +753,7 @@ const LEAN_EASE = 0.1; // share of the remaining distance covered per frame (at 
 const LIFT_SETTLE = 1000; // ms for the lifted parts to settle back down (style.css: 0.8s, after up to 0.1s)
 
 document.querySelectorAll(".work-thumbnail .cover-screens").forEach((cover) => {
+    drawPhoneSides(cover);
     const thumb = cover.closest(".work-thumbnail");
     const zone = coverZone(cover);
     const card = cover.closest(".work-card") || thumb;

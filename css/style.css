@@ -1510,9 +1510,17 @@ a.work-thumbnail:active {
     --cover-shadow: 43 42 39;
     --cover-shadow-strength: 0.7;
     --cover-edge: #C9C7C2;   /* titanium: the rim around the glass */
-    --cover-side-a: #E3E1DC; /* the side's bright top line */
-    --cover-side-b: #9C9A95; /* the side */
-    --cover-side-c: #6E6C68; /* its bottom line */
+    /* the side's bright top line (a), the side (b) and its bottom line (c), in each theme. Both are set here, so
+       script.js can draw the sides' pictures for both themes ahead (switching themes never waits for one) */
+    --cover-side-a-light: #E3E1DC;
+    --cover-side-b-light: #9C9A95;
+    --cover-side-c-light: #6E6C68;
+    --cover-side-a-dark: #A8A6A1;
+    --cover-side-b-dark: #5F5E5A;
+    --cover-side-c-dark: #3A3937;
+    --cover-side-a: var(--cover-side-a-light);
+    --cover-side-b: var(--cover-side-b-light);
+    --cover-side-c: var(--cover-side-c-light);
     position: absolute;
     inset: 0;
     z-index: -2;
@@ -1530,9 +1538,9 @@ a.work-thumbnail:active {
     --cover-shadow: 0 0 0;
     --cover-shadow-strength: 1;
     --cover-edge: #8A8985;
-    --cover-side-a: #A8A6A1;
-    --cover-side-b: #5F5E5A;
-    --cover-side-c: #3A3937;
+    --cover-side-a: var(--cover-side-a-dark);
+    --cover-side-b: var(--cover-side-b-dark);
+    --cover-side-c: var(--cover-side-c-dark);
 }
 
 /* a pool of blue light on the floor under the middle phone */
@@ -1614,6 +1622,56 @@ a.work-thumbnail:active {
         5.03cqh 7.18cqh 0 0.3cqh var(--cover-side-c),
         8.98cqh 7.59cqh 5cqh rgb(var(--cover-shadow) / calc(0.4 * var(--s))),
         22.39cqh 18.03cqh 14cqh rgb(var(--cover-shadow) / calc(0.4 * var(--s)));
+}
+
+/* The side as a picture: script.js draws the same slices as above, in the same order and places, into one picture
+   per theme (.cover-side) and marks the phone has-side. Firefox can't keep its drawing of the tilted phones as the
+   page scrolls, so with the cover live under the pointer it drew all of those shadows again on every frame of a
+   scroll and fell about a third of the frames behind; a picture is drawn in one step.
+   The picture sits under the phone (on its own, isolated, so each phone's parts stay together), the soft shadows on
+   the floor stay below it, and the titanium rim and the black body are drawn over it exactly as the phone drew them
+   (::after: the phone's own box, background and rim) */
+.cover-phone.has-side {
+    isolation: isolate;
+    background: none;
+    box-shadow:
+        8.98cqh 7.59cqh 5cqh rgb(var(--cover-shadow) / calc(0.4 * var(--s))),
+        22.39cqh 18.03cqh 14cqh rgb(var(--cover-shadow) / calc(0.4 * var(--s)));
+}
+
+.cover-phone.has-side::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    border-radius: inherit;
+    background-color: #0B0B0C;
+    box-shadow: 0 0 0 0.3cqh var(--cover-edge);
+    pointer-events: none;
+}
+
+/* from the phone's top left, less the rim, to past the last slice (5.03cqh across, 7.18cqh down) */
+.work-thumbnail .cover-screens img.cover-side {
+    position: absolute;
+    z-index: -1;
+    inset: auto;
+    left: -0.3cqh;
+    top: -0.3cqh;
+    width: 71.63cqh;
+    height: calc(100% + 7.78cqh);
+    max-width: none;
+    border-radius: 0;
+    pointer-events: none;
+}
+
+/* the picture in the site's current theme */
+.work-thumbnail .cover-screens img.cover-side.is-dark,
+:root.dark-theme .work-thumbnail .cover-screens img.cover-side.is-light {
+    display: none;
+}
+
+:root.dark-theme .work-thumbnail .cover-screens img.cover-side.is-dark {
+    display: block;
 }
 
 /* the phones on either side sit further along the floor, so the row steps */
