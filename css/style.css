@@ -311,7 +311,6 @@ body {
    stutter. There script.js marks the page .low-gfx, and each piece of glass becomes a nearly solid tint of the same
    color instead, which looks almost the same */
 :root.low-gfx .header,
-:root.low-gfx .view-project,
 :root.low-gfx .proto-close,
 :root.low-gfx .media-controls,
 :root.low-gfx .media-nav,
@@ -323,10 +322,6 @@ body {
 
 :root.low-gfx .header {
     background-color: color-mix(in srgb, var(--bg-color) 95%, transparent);
-}
-
-:root.low-gfx .view-project {
-    background-color: color-mix(in srgb, var(--bg-card) 94%, transparent);
 }
 
 :root.low-gfx .proto-close,
@@ -827,6 +822,11 @@ body {
     will-change: transform;
 }
 
+/* once scrolled away (script.js), it stops: a bounce nobody can see still costs work on every frame */
+.scroll-down.is-gone .scroll-down-bounce {
+    animation-play-state: paused;
+}
+
 @keyframes arrow-bounce {
     0%, 100% {
         transform: translateY(0);
@@ -1115,10 +1115,10 @@ h1.work-header {
     gap: var(--space-xs);
     padding: var(--space-xs) var(--space-sm);
     border-radius: 9999px;
-    background-color: color-mix(in srgb, var(--bg-card) 55%, transparent);
+    /* a nearly solid tint, not frosted glass: a blur here would be worked out again on every frame as the pill
+       follows the cursor, the biggest cost of moving over a cover */
+    background-color: color-mix(in srgb, var(--bg-card) 90%, transparent);
     border: 1px solid color-mix(in srgb, var(--border-card) 60%, transparent);
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
     color: var(--text-primary);
     font-size: var(--text-2xs);
     font-weight: var(--weight-medium);
@@ -1133,6 +1133,7 @@ h1.work-header {
     box-shadow: 0 6px 20px var(--shadow-color); /* lifts it off the photo */
     transition: opacity 0.25s ease, scale 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), visibility 0s linear 0.25s;
     pointer-events: none;
+    will-change: transform; /* its own layer, so following the cursor redraws nothing */
 }
 
 .view-project svg {
@@ -1571,10 +1572,11 @@ a.work-thumbnail:active {
     display: flex;
     align-items: flex-start;
     gap: 16cqh;
-    /* --px / --py: where the cursor is over the cover, -1 to 1 (script.js). The floor slides a little away from it */
-    translate: calc(-50% + var(--px, 0) * -1cqh) calc(-50% + 8cqh + var(--py, 0) * -1cqh);
-    transition: translate 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    /* at rest; leaning with the cursor, script.js slides it a little away from the cursor (set here directly, eased
+       in the script, so following the cursor only moves this finished layer instead of redrawing the phones) */
+    translate: -50% calc(-50% + 8cqh);
     transform: scaleY(0.6157) rotate(35deg);
+    will-change: transform;
 }
 
 /* phone: black bezel, titanium rim, a flat side made of stacked slices, then its shadow on the floor */
@@ -1715,7 +1717,7 @@ a.work-thumbnail:active {
 }
 
 /* A part of the middle screen, lifted off it by --lift. Each is a slab with a thin lit rim and two slices
-   of thickness, and throws its shadow straight back down onto the empty spot it came from.
+   of thickness, and throws its shadow straight back down onto the empty spot it came from (.cover-shade, below).
    Placed by fractions of the screen (measured from the screenshot) */
 .work-thumbnail .cover-screens .cover-layer {
     --screen-h: calc(var(--screen-w) * 2556 / 1179);
@@ -1730,18 +1732,100 @@ a.work-thumbnail:active {
        translate lifts the part straight up off the screen (and settles it back), slowly and one part after another;
        transform leans it toward the cursor, more for higher parts, so the screen seems to have real depth */
     translate: calc(var(--lift) * -0.932) calc(var(--lift) * -1.331);
-    transform: translate(
-        calc((var(--px, 0) * 0.819 + var(--py, 0) * 0.932) * var(--depth)),
-        calc((var(--px, 0) * -0.574 + var(--py, 0) * 1.331) * var(--depth))
-    );
+    /* the lean, set by script.js (eased there): each part on its own layer, so leaning just moves it */
+    transform: none;
+    will-change: transform;
     box-shadow:
         0.28cqh 0.40cqh 0 rgb(120 150 215 / 0.55),
-        0.56cqh 0.80cqh 0 rgb(40 60 110 / 0.75),
-        calc(var(--lift) * 0.932) calc(var(--lift) * 1.331) calc(0.45 * var(--lift)) rgb(0 0 0 / 0.6);
-    transition:
-        translate 0.8s cubic-bezier(0.22, 1, 0.36, 1) var(--wait, 0s),
-        box-shadow 0.8s cubic-bezier(0.22, 1, 0.36, 1) var(--wait, 0s),
-        transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+        0.56cqh 0.80cqh 0 rgb(40 60 110 / 0.75);
+    transition: translate 0.8s cubic-bezier(0.22, 1, 0.36, 1) var(--wait, 0s);
+}
+
+/* The shadow each lifted part throws onto the spot it came from: soft at rest, softer when the part rises higher.
+   It's drawn once at each softness (::before at rest, ::after lifted), each on its own layer, and the two cross-fade
+   as the part rises, so the lift redraws nothing. (A shadow animated directly is redrawn on every frame, which made
+   the lift stutter on slower graphics.) Softness: half the old shadow's blur radius, 0.45 x the lift, since a
+   filter blur takes the spread, not the radius */
+.work-thumbnail .cover-screens .cover-shade {
+    --screen-h: calc(var(--screen-w) * 2556 / 1179);
+    position: absolute;
+    left: calc(var(--bezel) + var(--screen-w) * var(--at-x));
+    top: calc(var(--bezel) + var(--screen-h) * var(--at-y));
+    width: calc(var(--screen-w) * var(--at-w));
+    aspect-ratio: var(--ratio);
+    border-radius: calc(var(--screen-w) * 0.0407);
+    pointer-events: none;
+}
+
+.work-thumbnail .cover-screens .cover-shade::before,
+.work-thumbnail .cover-screens .cover-shade::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background-color: rgb(0 0 0 / 0.6);
+    will-change: opacity;
+    transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1) var(--wait, 0s);
+}
+
+.work-thumbnail .cover-screens .cover-shade::before {
+    filter: blur(var(--rest-blur));
+}
+
+.work-thumbnail .cover-screens .cover-shade::after {
+    filter: blur(var(--up-blur));
+    opacity: 0;
+}
+
+.cover-shade.is-list {
+    --at-x: 0.0611;
+    --at-y: 0.4284;
+    --at-w: 0.8779;
+    --ratio: 562 / 774;
+    --rest-blur: 0.675cqh; /* lift 3cqh */
+    --up-blur: 1.575cqh;   /* lift 7cqh */
+}
+
+.cover-shade.is-today {
+    --at-x: 0.0611;
+    --at-y: 0.3392;
+    --at-w: 0.8779;
+    --ratio: 562 / 111;
+    --rest-blur: 1.6875cqh; /* lift 7.5cqh */
+    --up-blur: 3.375cqh;    /* lift 15cqh */
+    --wait: 0.05s;
+}
+
+.work-thumbnail .cover-screens .cover-shade.is-logo {
+    --at-x: 0.3647;
+    --at-y: 0.1745;
+    --at-w: 0.268;
+    --ratio: 1;
+    --rest-blur: 4.05cqh;  /* lift 18cqh */
+    --up-blur: 6.525cqh;   /* lift 29cqh */
+    --wait: 0.1s;
+    border-radius: 50%;
+}
+
+/* lifted higher (pointed at, or tabbed to): the softer shadow takes over */
+.work-card:focus-within .cover-shade::before {
+    opacity: 0;
+}
+
+.work-card:focus-within .cover-shade::after {
+    opacity: 1;
+}
+
+@media (hover: hover) {
+    .work-thumbnail:hover .cover-shade::before,
+    .work-grid .work-card:hover .cover-shade::before {
+        opacity: 0;
+    }
+
+    .work-thumbnail:hover .cover-shade::after,
+    .work-grid .work-card:hover .cover-shade::after {
+        opacity: 1;
+    }
 }
 
 .cover-layer.is-list {
@@ -1803,7 +1887,9 @@ a.work-thumbnail:active {
 
 @media (prefers-reduced-motion: reduce) {
     .cover-floor,
-    .work-thumbnail .cover-screens .cover-layer {
+    .work-thumbnail .cover-screens .cover-layer,
+    .work-thumbnail .cover-screens .cover-shade::before,
+    .work-thumbnail .cover-screens .cover-shade::after {
         transition: none;
     }
 }
@@ -1831,7 +1917,8 @@ a.work-thumbnail:active {
     filter: none;
 }
 
-:root.low-gfx .work-thumbnail .cover-screens .cover-layer {
+:root.low-gfx .work-thumbnail .cover-screens .cover-layer,
+:root.low-gfx .work-thumbnail .cover-screens .cover-shade {
     visibility: visible;
 }
 
@@ -1844,9 +1931,9 @@ a.work-thumbnail:active {
     width: auto;
     max-width: none;
     height: 100%;
-    /* the floor's slide away from the cursor (see .cover-floor) */
-    translate: calc(-50% + var(--px, 0) * -1cqh) calc(var(--py, 0) * -1cqh);
-    transition: translate 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    /* slides with the floor as the cover leans (script.js) */
+    translate: -50% 0;
+    will-change: transform;
     border-radius: 0;
 }
 

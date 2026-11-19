@@ -104,8 +104,9 @@ if (heroTitle) {
             heroTitle.style.opacity = 1 - progress;
             header.classList.toggle('scrolled', progress === 1);
             scrollDownArrow.style.opacity = arrowOpacity;
-            // invisible arrow can't be clicked
+            // invisible arrow can't be clicked, and stops bouncing (style.css)
             scrollDown.style.visibility = arrowOpacity === 0 ? 'hidden' : '';
+            scrollDown.classList.toggle('is-gone', arrowOpacity === 0);
         };
     });
 }
@@ -543,32 +544,70 @@ document.querySelectorAll(".work-thumbnail .view-project").forEach((pill) => {
     });
 });
 
-// The Apple Sports cover leans with the cursor: --px / --py say where the cursor is over it (-1 to 1),
-// and style.css slides the floor a little one way and the lifted parts further the other
+// The Apple Sports cover leans with the cursor: the floor (and its flat picture) slides a little away from it and
+// the lifted parts slide the other way, higher parts further, so the screen seems to have depth. The lean eases
+// toward the cursor here, frame by frame, and is written straight onto those pieces, each on its own layer
+// (style.css): following the cursor then only moves finished layers, with nothing redrawn
+const LEAN_EASE = 0.1; // share of the remaining distance covered per frame (at 60fps): about half a second to settle
+
 document.querySelectorAll(".work-thumbnail .cover-screens").forEach((cover) => {
     const thumb = cover.closest(".work-thumbnail");
+    const floor = cover.querySelector(".cover-floor");
+    const flats = cover.querySelectorAll(".cover-flat");
+    const parts = [...cover.querySelectorAll(".cover-layer")].map((el) => ({
+        el,
+        depth: getComputedStyle(el).getPropertyValue("--depth").trim() || "1cqh",
+    }));
+    const target = { x: 0, y: 0 };
+    const current = { x: 0, y: 0 };
     let frame = 0;
-    let px = 0;
-    let py = 0;
+    let lastTime = 0;
 
-    function lean() {
-        frame = 0;
-        cover.style.setProperty("--px", px.toFixed(3));
-        cover.style.setProperty("--py", py.toFixed(3));
+    function place() {
+        const { x, y } = current;
+        if (floor) floor.style.translate = `calc(-50% + ${(-x).toFixed(3)}cqh) calc(-50% + 8cqh + ${(-y).toFixed(3)}cqh)`;
+        flats.forEach((flat) => (flat.style.translate = `calc(-50% + ${(-x).toFixed(3)}cqh) ${(-y).toFixed(3)}cqh`));
+        parts.forEach(({ el, depth }) => {
+            const dx = (x * 0.819 + y * 0.932).toFixed(3);
+            const dy = (x * -0.574 + y * 1.331).toFixed(3);
+            el.style.transform = `translate(calc(${dx} * ${depth}), calc(${dy} * ${depth}))`;
+        });
+    }
+
+    function step(time) {
+        const dt = lastTime ? Math.min(time - lastTime, 50) : 16.7;
+        lastTime = time;
+        const k = 1 - Math.pow(1 - LEAN_EASE, dt / 16.7); // same feel at any frame rate
+        current.x += (target.x - current.x) * k;
+        current.y += (target.y - current.y) * k;
+        const settled = Math.abs(target.x - current.x) < 0.002 && Math.abs(target.y - current.y) < 0.002;
+        if (settled) {
+            current.x = target.x;
+            current.y = target.y;
+        }
+        place();
+        frame = settled ? 0 : requestAnimationFrame(step);
+    }
+
+    function go() {
+        if (!frame) {
+            lastTime = 0;
+            frame = requestAnimationFrame(step);
+        }
     }
 
     thumb.addEventListener("pointermove", (e) => {
         if (e.pointerType !== "mouse" || reduceMotion.matches) return;
         const rect = thumb.getBoundingClientRect();
-        px = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-        py = ((e.clientY - rect.top) / rect.height) * 2 - 1;
-        if (!frame) frame = requestAnimationFrame(lean);
+        target.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+        target.y = ((e.clientY - rect.top) / rect.height) * 2 - 1;
+        go();
     });
 
     thumb.addEventListener("pointerleave", () => {
-        px = 0;
-        py = 0;
-        if (!frame) frame = requestAnimationFrame(lean);
+        target.x = 0;
+        target.y = 0;
+        go();
     });
 });
 
