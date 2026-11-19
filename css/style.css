@@ -1225,9 +1225,17 @@ a.work-thumbnail:active {
 }
 
 /* ===== Switching themes =====
-   Instant: the whole page changes on the click (script.js). For that one change, color transitions are held off, so
-   links and buttons don't ease into the new colors after everything else has switched. The theme button itself keeps
-   its press feedback */
+   A quick, subtle cross-fade from one theme to the other, starting on the click (script.js; instant where drawing is
+   slow or motion is reduced). It's the only view transition on the site, so it's set on the page as a whole */
+::view-transition-group(root),
+::view-transition-old(root),
+::view-transition-new(root) {
+    animation-duration: 0.2s;
+    animation-timing-function: ease-out;
+}
+
+/* The change under the fade is instant: for that one change, color transitions are held off, so links and buttons don't
+   ease into the new colors after everything else has switched. The theme button itself keeps its press feedback */
 :root.theme-instant *:not(.theme-toggle-btn *),
 :root.theme-instant *::before,
 :root.theme-instant *::after {
@@ -3028,6 +3036,24 @@ img.shot {
 .case-breakpoints div.shot:nth-child(3) {
     width: 346px;
     aspect-ratio: 346 / 216;
+}
+
+/* icons (the favicon designs): shown as they are, with no frame or shadow, since each has its own shape (squares,
+   circles, a diamond). As many to a row as fit at 4rem or more, in order; the final one on its own, a little larger */
+.case-stage.case-icons {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(4rem, 1fr));
+    gap: var(--space-md);
+}
+
+.case-icons > img {
+    width: 100%;
+    height: auto;
+}
+
+.case-stage.case-icons.is-final {
+    grid-template-columns: minmax(0, 6rem);
+    justify-content: center;
 }
 
 /* a figure that follows the site's theme: each picture comes in both, and only the matching one shows */

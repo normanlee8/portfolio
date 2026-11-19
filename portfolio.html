@@ -4,15 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Designing and Building my Portfolio from Figma to Code - Norman Lee</title>
-    <meta name="description" content="How I designed this portfolio in Figma and built it in plain HTML, CSS, and JavaScript: quick to load, easy to navigate on any device, and full of small details that make browsing easier.">
+    <meta name="description" content="How I designed and built this portfolio for recruiters who may only have a minute, and kept its moving project covers while making the site load quickly and scroll smoothly.">
     <!-- Kept out of search until the placeholder sections are filled in; remove this line, and add the page to sitemap.xml, when it's done -->
-    <meta name="robots" content="noindex">
     <link rel="canonical" href="https://normanmade.com/portfolio">
     <!-- Link Previews -->
     <meta property="og:type" content="article">
     <meta property="og:site_name" content="normanmade.com">
     <meta property="og:title" content="Designing and Building my Portfolio from Figma to Code">
-    <meta property="og:description" content="How I designed this portfolio in Figma and built it in plain HTML, CSS, and JavaScript: quick to load, easy to navigate on any device, and full of small details that make browsing easier.">
+    <meta property="og:description" content="How I designed and built this portfolio for recruiters who may only have a minute, and kept its moving project covers while making the site load quickly and scroll smoothly.">
     <meta property="og:url" content="https://normanmade.com/portfolio">
     <meta property="og:image" content="https://normanmade.com/images/og-image.png?v=3">
     <meta property="og:image:width" content="1200">
@@ -290,6 +289,7 @@
                 <span class="pill-tag">RESPONSIVE DESIGN</span>
                 <span class="pill-tag">ACCESSIBILITY</span>
                 <span class="pill-tag">FRONT-END DEVELOPMENT</span>
+                <span class="pill-tag">PERFORMANCE</span>
             </div>
             <dl class="project-details">
                 <div class="detail-item">
@@ -321,24 +321,24 @@
             <h2 class="section-header">Overview</h2>
             <dl class="case-tldr">
                 <div>
-                    <dt>Context</dt>
-                    <dd>A portfolio is often the first thing a recruiter sees, and most only have a minute or two to look.</dd>
+                    <dt>Users</dt>
+                    <dd>Recruiters first, then me, then anyone who lands here. A recruiter might give a portfolio a minute or less, on a phone or a work laptop.</dd>
                 </div>
                 <div>
-                    <dt>Problem</dt>
-                    <dd>Many portfolio sites I came across lag, load slowly, or put visuals ahead of the work. I wanted one that gets visitors to what matters quickly and still feels like me.</dd>
+                    <dt>Challenge</dt>
+                    <dd>I wanted project covers that move and react, because they make the site feel like mine. But effects like those can make a site load slowly or stutter, especially on an older or locked-down work computer, and someone with a minute shouldn't spend it waiting.</dd>
                 </div>
                 <div>
-                    <dt>Why it matters</dt>
-                    <dd>If a site is slow or hard to get around, a recruiter can leave before seeing the work at all.</dd>
+                    <dt>Goal</dt>
+                    <dd>Get visitors to the information they need as quickly as possible, on any device, while keeping the small details that make the site feel like me.</dd>
                 </div>
                 <div>
                     <dt>Solution</dt>
-                    <dd>A site I designed in Figma and built in plain HTML, CSS, and JavaScript: quick to load, easy to navigate on any device, with small details that make browsing easier.</dd>
+                    <dd>A site I designed in Figma and built in plain HTML, CSS, and JavaScript, then measured and adjusted until scrolling stayed smooth, including on a computer without graphics acceleration.</dd>
                 </div>
                 <div>
-                    <dt>Constraint</dt>
-                    <dd>Live by the end of October, with no frameworks, and working on every screen size.</dd>
+                    <dt>Constraints</dt>
+                    <dd>Live by the end of October, so I could focus on the projects that go in it. No frameworks. Viewable on every device: phones, tablets, and computers.</dd>
                 </div>
             </dl>
         </div>
@@ -346,32 +346,86 @@
         <!-- Audience and goals -->
         <div class="section-item" data-fade>
             <h2 class="section-header">Who It's For</h2>
-            <p class="case-lede">Recruiters first, then anyone who lands here.</p>
-            <p class="section-content">The site is for recruiters, for me, and for anyone who ends up on it. A recruiter might give a portfolio less than a minute, so every page tries to get them to the essentials fast: who I am, what I've made, and how to reach me.</p>
+            <p class="case-lede">Recruiters, me, and anyone who ends up here.</p>
+            <p class="section-content">With recruiters in mind, the idea behind every page is to get the viewer to the necessary information as quickly as possible: who I am, what I've made, and how to reach me. I balanced that with small touches I find cool, like the page fade-in and the line under the header that fills as you scroll, the kind of details that can go unnoticed.</p>
             <ul class="case-moments">
                 <li>
                     <p class="case-moment-label">Works everywhere</p>
-                    <p>Phones, tablets, and computers. I designed every page at three sizes so it reads well on any of them.</p>
+                    <p>Phones, tablets, and computers. I designed every page at three sizes so it's viewable no matter what.</p>
                 </li>
                 <li>
                     <p class="case-moment-label">Feels quick</p>
-                    <p>Pages load and change fast. Many sites I came across lag or load slowly, and I didn't want mine to be one of them.</p>
+                    <p>Pages load and switch quickly, and scrolling stays smooth, including on slower computers.</p>
                 </li>
                 <li>
                     <p class="case-moment-label">Feels like me</p>
-                    <p>Simple, clean, organized, and empathetic. Plenty of portfolios lead with bold art or code-heavy visuals, but that isn't who I am.</p>
+                    <p>Simple, clean, organized, and empathetic. Over-the-top visuals aren't who I am; I like the little things instead, like the location arrow, the bouncing arrow on the landing page, and "User Experience Designer" fading away as you scroll.</p>
                 </li>
             </ul>
         </div>
 
-        <!-- Early concepts -->
+        <!-- Decision: the covers -->
         <div class="section-item" data-fade>
+            <h2 class="section-header">Keeping the Moving Covers</h2>
+            <p class="case-lede">The most fun part of the site was also the slowest.</p>
+            <p class="section-content">The project covers are the most personal part of the home page. The portfolio cover is a tilted wall of the site's own sections that starts scrolling when pointed at, and the Apple Sports cover lifts parts of a phone screen off the page. Each is made of many pieces, and on a computer without graphics acceleration every piece was redrawn on every frame of scrolling, so the page stuttered right where the work starts.</p>
+            <p class="section-content">I didn't want to lose them, so I changed when they're live. At rest, each cover is now a single picture of itself, rendered from the live cover so the two look the same. The live cover only switches on when someone points at or tabs to the project, and its images load ahead of time so the switch is hard to notice.</p>
+            <dl class="case-specs">
+                <div>
+                    <dt>Images</dt>
+                    <dd>About 540 KB in 23 files before; about 170 KB in two now, on a typical screen.</dd>
+                </div>
+                <div>
+                    <dt>Scrolling</dt>
+                    <dd>Without graphics acceleration, 11 to 15% of frames were dropped past the covers before; under 1% now.</dd>
+                </div>
+            </dl>
+            <p class="case-tradeoff"><span>Trade-off</span>Swapping the covers for plain screenshots would have been fast with no extra work. Keeping them costs more upkeep: the pictures have to be rendered again whenever a cover changes, so the site includes a small script that renders every size and theme in one step.</p>
+        </div>
+
+        <!-- Decision: motion -->
+        <div class="section-item">
+            <h2 class="section-header">Motion Where It Counts</h2>
+            <p class="case-lede">Keeping the motion that adds something, and trimming what slowed the site down.</p>
+            <p class="section-content">Moving between pages, the site used to slide the Apple Sports cover across the screen into the next page. It looked nice the first time, but on every page change it made the site feel slower, so pages now fade in, in a third of a second. A fade that sharpened out of a blur looked softer, but blurring the whole screen on every frame cost 10 to 30 dropped frames on each page load, even with a graphics card, right when a visitor starts to scroll. It's a plain fade.</p>
+            <p class="section-content">The home page is the one exception. Its parts still rise in one after another, because it's the first impression, but faster than before: done in 1.5 seconds instead of 2.6. The theme switch went the same way: instant felt abrupt and a slow cross-fade felt unresponsive, so it fades in a fifth of a second.</p>
+            <div class="case-in-out">
+                <div>
+                    <p class="case-in-out-label">Kept</p>
+                    <ul>
+                        <li>The home page's entrance, quicker</li>
+                        <li>A short fade between pages</li>
+                        <li>Covers that come alive when pointed at</li>
+                    </ul>
+                </div>
+                <div>
+                    <p class="case-in-out-label">Cut</p>
+                    <ul>
+                        <li>The cover flying between pages</li>
+                        <li>The blur in the page fade</li>
+                        <li>Waiting on images before switching themes</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Decision: slower computers -->
+        <div class="section-item">
+            <h2 class="section-header">Designing for Slower Computers</h2>
+            <p class="case-lede">Testing on a slow setup, not just my own computer.</p>
+            <p class="section-content">I tested the site with graphics acceleration turned off, as a stand-in for an older or locked-down work laptop, on the idea that if it holds up there, faster computers will be fine. Without graphics acceleration, the browser draws everything on the processor, and effects like the header's frosted glass are worked out again on every frame of scrolling. On those computers the site switches to a lighter look: the glass becomes a nearly solid tint of the same color, which looks almost the same. It remembers the choice, so later visits start that way from the first frame.</p>
+            <p class="section-content">Measuring also turned up work that wasn't visible at all. On the case study pages, a few style rules and the reading-progress counter made the browser restyle the whole page on nearly every frame of scrolling. Rewriting them cut that work from 482 ms to 14 ms over the same scroll, with nothing changing on screen.</p>
+            <p class="case-tradeoff"><span>Trade-off</span>A few effects look slightly different on slow computers, so they stay smooth. I'd rather a recruiter sees a nearly solid header than a stuttering one.</p>
+        </div>
+
+        <!-- Early concepts -->
+        <div class="section-item">
             <h2 class="section-header">Early Concepts</h2>
-            <p class="case-lede">From plain, to playful, and back to clean.</p>
-            <p class="section-content">I started with the simplest version of what I wanted: a streamlined, minimal portfolio that gets straight to the point. The second version is nearly the same; the only change moved the navigation links from the hero into the header.</p>
-            <p class="section-content">It felt too basic, so I experimented with lined paper. Loose-leaf paper is something nearly everyone has used, it works on a light or dark background, and it's academic, organized, and to the point, much like the years of school behind it. I then set the page on my family's wooden table, a fixture in many Asian households, and turned the navigation into sticky-note tabs to make it feel real.</p>
-            <p class="section-content">I dropped it because there was too much going on: the table, the paper on top of it, the different-colored tabs, and lines that made text hard to fit. Lined paper is also much taller than it is wide, so it couldn't simply stretch across a wide screen, which is why the table filled the sides.</p>
-            <p class="section-content">Next, I tried a blue gradient with project cards. It was still simple, but it was clean, and I liked that. Blue is my favorite color, and it conveys trust. The second blue version got darker toward the bottom, like a sky, moved the project cards down, and let the landing page fill the whole screen.</p>
+            <p class="case-lede">From a first sketch, to an experiment, and back to clean.</p>
+            <p class="section-content">I knew from the start that I wanted a streamlined, minimal portfolio that gets straight to the point. My first two designs were that first sketch, and they're nearly the same: the only change moved the navigation links from the hero into the header.</p>
+            <p class="section-content">It felt too basic, so I experimented with lined paper. Loose-leaf paper works on a light or a dark background, and I already knew I wanted a theme toggle. It's something nearly everyone has used, it looked unique, and it's academic, organized, and to the point, much like the years of school I spent with it. For the next version, I set the page on my family's wooden table, which has been in our home for as long as I can remember and is a fixture in many Asian households. To add a little realism, the navigation links became sticky-note tabs, the way they'd mark pages in real life.</p>
+            <p class="section-content">I didn't go with it. There was too much going on: the table, the paper on top of it, the different-colored tabs, and lines that made text hard to fit. It also felt too gimmicky. Lined paper is much taller than it is wide, so stretching it across a wide screen didn't look right, which is why the table filled the sides.</p>
+            <p class="section-content">Next, I tried a blue gradient with project cards to see how it would look, and I liked it. It was still basic, but it was clean, which is something I really like. Blue is my favorite color, and it conveys trust. The second blue version used a gradient that's brighter at the top and darker at the bottom, like a sky, moved the project cards down, and let the landing page fill the whole screen. From there, a few more rounds led to the final designs.</p>
             <figure class="case-figure">
                 <!-- Early concepts, in order. Each is a 16:9 crop; the larger view shows the whole frame -->
                 <div class="case-stage case-gallery is-landscape">
@@ -408,9 +462,9 @@
         <div class="section-item">
             <h2 class="section-header">Easy on the Eyes</h2>
             <p class="case-lede">A warm off-white and a soft gray, in light and dark.</p>
-            <p class="section-content">In the end I dropped the blue. Not everyone likes blue, or any single color, so I'd rather the site be a little "boring" and neutral and let the work stand out. Everyone should be able to use it comfortably.</p>
-            <p class="section-content">Neither theme is pure white or pure black. Pure white is harsh on the eyes, so the light theme is slightly warm, the way True Tone and Night Shift warm up a screen, without looking yellowed. The dark theme is a gray that's dark enough to make a difference but not so dark that it's hard to look at, since pure black can be harsh too.</p>
-            <p class="section-content">People also have preferences: some like dark mode, some like light, and some like to switch. The site opens in whichever theme the device is set to, and a button in the header switches it.</p>
+            <p class="section-content">In the end I dropped the blue, because it isn't neutral. Not everyone likes blue, or green, or any single color, so I'd rather the site be a little "boring" and inoffensive, in off-white and gray, and let the work stand out. I care about accessibility: everyone should be able to use the site comfortably.</p>
+            <p class="section-content">People also have preferences. I know plenty of people who prefer dark mode, plenty who prefer light, and some who like to switch, so the site has both. It opens in whichever theme the device is set to, and a button in the header switches it.</p>
+            <p class="section-content">Neither theme is pure white or pure black. Pure white is harsh on the eyes, and True Tone and Night Shift warm a screen slightly to reduce eye strain, so the light theme is slightly warm too, without going so far that it looks yellowed. The dark theme is a gray I chose by eye: not so light that it barely makes a difference, and not so dark that it's hard to look at, since pure black can be harsh too.</p>
             <figure class="case-figure">
                 <div class="case-stage case-gallery is-landscape">
                     <figure class="case-shot">
@@ -426,16 +480,56 @@
             </figure>
         </div>
 
+        <!-- Words -->
+        <div class="section-item">
+            <h2 class="section-header">Choosing the Words</h2>
+            <p class="case-lede">A clearer title, and a shorter headline.</p>
+            <p class="section-content">I changed my title from Product Designer to User Experience Designer. "Product designer" felt vague, and I had nothing yet to back up the "product" part. What I care about most is making people's lives easier. Nice interactions, interfaces, and visuals matter to me too, but the user's experience comes first.</p>
+            <p class="section-content">For the headline, I chose "Make life easier." over "Designing paths of least resistance." They say nearly the same thing, but "Make life easier." is punchier and to the point, while "paths of least resistance" can be confusing.</p>
+        </div>
+
         <!-- Favicon -->
         <div class="section-item">
             <h2 class="section-header">A Small Mark</h2>
             <p class="case-lede">The icon in the browser tab, after 26 tries.</p>
             <p class="section-content">The favicon is the small icon in the browser tab and in bookmarks, so it has to read at just a few pixels wide. I tried 26 designs: my initials, NL, in blue; my name spelled out, on one line and stacked; a single bold N, some cropped to fill the whole square; and Ns with layered, stepped shadows, upright and turned at an angle.</p>
             <figure class="case-figure">
-                <div class="case-stage">
-                    <div class="shot is-wide" role="img" aria-label="Placeholder for shot 17"><span>17 · The 26 favicon designs, in a grid</span></div>
+                <!-- The designs in the order I made them; described once for screen readers, so each icon has empty alt text -->
+                <div class="case-stage case-icons" role="img" aria-label="The 26 favicon designs in a grid: NL initials in blue; NORMAN, NORMANLEE, and NORMAN LEE spelled out on one line and stacked; single bold Ns in white and black, some cropped to fill the square or a circle; Ns with layered, stepped shadows; and Ns turned at an angle">
+                    <img src="/images/portfolio/favicon-01.webp" alt="" width="256" height="256" loading="lazy" decoding="async">
+                    <img src="/images/portfolio/favicon-02.webp" alt="" width="256" height="256" loading="lazy" decoding="async">
+                    <img src="/images/portfolio/favicon-03.webp" alt="" width="256" height="256" loading="lazy" decoding="async">
+                    <img src="/images/portfolio/favicon-04.webp" alt="" width="256" height="256" loading="lazy" decoding="async">
+                    <img src="/images/portfolio/favicon-05.webp" alt="" width="256" height="256" loading="lazy" decoding="async">
+                    <img src="/images/portfolio/favicon-06.webp" alt="" width="256" height="256" loading="lazy" decoding="async">
+                    <img src="/images/portfolio/favicon-07.webp" alt="" width="256" height="256" loading="lazy" decoding="async">
+                    <img src="/images/portfolio/favicon-08.webp" alt="" width="256" height="256" loading="lazy" decoding="async">
+                    <img src="/images/portfolio/favicon-09.webp" alt="" width="256" height="256" loading="lazy" decoding="async">
+                    <img src="/images/portfolio/favicon-10.webp" alt="" width="256" height="256" loading="lazy" decoding="async">
+                    <img src="/images/portfolio/favicon-11.webp" alt="" width="256" height="256" loading="lazy" decoding="async">
+                    <img src="/images/portfolio/favicon-12.webp" alt="" width="256" height="256" loading="lazy" decoding="async">
+                    <img src="/images/portfolio/favicon-13.webp" alt="" width="256" height="256" loading="lazy" decoding="async">
+                    <img src="/images/portfolio/favicon-14.webp" alt="" width="256" height="256" loading="lazy" decoding="async">
+                    <img src="/images/portfolio/favicon-15.webp" alt="" width="256" height="256" loading="lazy" decoding="async">
+                    <img src="/images/portfolio/favicon-16.webp" alt="" width="256" height="256" loading="lazy" decoding="async">
+                    <img src="/images/portfolio/favicon-17.webp" alt="" width="256" height="256" loading="lazy" decoding="async">
+                    <img src="/images/portfolio/favicon-18.webp" alt="" width="256" height="256" loading="lazy" decoding="async">
+                    <img src="/images/portfolio/favicon-19.webp" alt="" width="256" height="256" loading="lazy" decoding="async">
+                    <img src="/images/portfolio/favicon-20.webp" alt="" width="256" height="256" loading="lazy" decoding="async">
+                    <img src="/images/portfolio/favicon-21.webp" alt="" width="256" height="256" loading="lazy" decoding="async">
+                    <img src="/images/portfolio/favicon-22.webp" alt="" width="256" height="256" loading="lazy" decoding="async">
+                    <img src="/images/portfolio/favicon-23.webp" alt="" width="256" height="256" loading="lazy" decoding="async">
+                    <img src="/images/portfolio/favicon-24.webp" alt="" width="256" height="256" loading="lazy" decoding="async">
+                    <img src="/images/portfolio/favicon-25.webp" alt="" width="256" height="256" loading="lazy" decoding="async">
+                    <img src="/images/portfolio/favicon-26.webp" alt="" width="256" height="256" loading="lazy" decoding="async">
                 </div>
                 <figcaption>Every favicon design I tried, in the order I made them.</figcaption>
+            </figure>
+            <figure class="case-figure">
+                <div class="case-stage case-icons is-final">
+                    <img src="/favicon.svg" alt="The final favicon: a white N on a blue circle" width="256" height="256" loading="lazy" decoding="async">
+                </div>
+                <figcaption>The final favicon.</figcaption>
             </figure>
             <p class="case-placeholder"><span>To come</span>Why I chose the final one, a white N on a blue circle, over the others.</p>
         </div>
@@ -443,19 +537,10 @@
         <!-- Figma to code -->
         <div class="section-item">
             <h2 class="section-header">From Figma to Code</h2>
-            <p class="case-lede">Designed at three sizes, then built frame by frame.</p>
-            <p class="section-content">I designed every page at three widths: 393px for phones, 768px for tablets, and 1440px for computers. I laid each frame out with absolute positioning first, which gave me full control to see how every element looked next to the others. Then I rebuilt each one with auto layout, which works much like CSS flexbox, the part of CSS I knew best. That made moving to code almost one to one.</p>
-            <figure class="case-figure">
-                <div class="case-stage case-breakpoints">
-                    <!-- The final home page frames, shown at the same scale so their sizes compare -->
-                    <div class="shot" role="img" aria-label="Placeholder for shot 07"><span>07 · 393px</span></div>
-                    <div class="shot" role="img" aria-label="Placeholder for shot 08"><span>08 · 768px</span></div>
-                    <div class="shot" role="img" aria-label="Placeholder for shot 09"><span>09 · 1440px</span></div>
-                </div>
-                <figcaption>The home page's final Figma frames at 393, 768, and 1440px, shown at the same scale.</figcaption>
-            </figure>
-            <p class="section-content">I built the site in plain HTML, CSS, and JavaScript, with no frameworks: just VS Code and three files. I worked page by page, going through each component in Figma and coding it. I chose to build it myself because that's the pipeline I know, and because building it would teach me HTML, CSS, and JavaScript along the way.</p>
-            <p class="section-content">In code, the breakpoints moved. The desktop layout switched at 1280px instead of 1440px, and a new breakpoint appeared at 1024px, because the gap between the tablet and desktop designs was too big. A layout that looked right at 768px looked odd at 1280px.</p>
+            <p class="case-lede">Designed at three sizes, then built component by component.</p>
+            <p class="section-content">I designed every page at three widths: 393px for phones, 768px for tablets, and 1440px for computers. I laid each frame out with absolute positioning first, which gave me full control to see how every element looked next to the others. Then I rebuilt each one with auto layout, which works much like CSS flexbox, the part of CSS I knew best, so I could turn the designs into code almost one to one.</p>
+            <p class="section-content">I built the site myself instead of using Framer, Webflow, or Squarespace because the Figma-to-HTML, CSS, and JavaScript pipeline is the one I know, so there was almost no learning curve, and building it would teach me more along the way. I opened VS Code with three files, one each for HTML, CSS, and JavaScript, and worked page by page, going through each component in Figma and coding it. I skipped frameworks like Tailwind: they're another thing to learn, and plain HTML, CSS, and JavaScript was the fastest way for me to get it running.</p>
+            <p class="section-content">In code, the breakpoints moved. The desktop layout switched at 1280px instead of 1440px, and a new breakpoint appeared at 1024px, because the gap between the tablet and desktop designs was too big. A layout that looked right at 768px looked odd at 1280px, where a different design fit better.</p>
             <figure class="case-figure">
                 <div class="case-stage case-breakpoints">
                     <!-- The home page as built, at one scale so the sizes compare. Each size comes in both themes, and the one
@@ -469,37 +554,7 @@
                 </div>
                 <figcaption>The home page as built, on a phone, a tablet, and a computer, shown at the same scale. It follows the site's theme.</figcaption>
             </figure>
-            <p class="case-tradeoff"><span>In hindsight</span>I didn't plan for those in-between sizes in Figma. Designing for more widths up front would have saved reworking layouts in code.</p>
-            <figure class="case-figure">
-                <div class="case-stage case-gallery is-landscape">
-                    <figure class="case-shot">
-                        <div class="shot" role="img" aria-label="Placeholder for shot 10"><span>10 · The final Work page frame at 1440px</span></div>
-                        <figcaption>Work</figcaption>
-                    </figure>
-                    <figure class="case-shot">
-                        <div class="shot" role="img" aria-label="Placeholder for shot 11"><span>11 · The final project page frame at 1440px</span></div>
-                        <figcaption>Project</figcaption>
-                    </figure>
-                    <figure class="case-shot">
-                        <div class="shot" role="img" aria-label="Placeholder for shot 12"><span>12 · The final About page frame at 1440px</span></div>
-                        <figcaption>About</figcaption>
-                    </figure>
-                </div>
-                <figcaption>The rest of the final frames at 1440px.</figcaption>
-            </figure>
-            <figure class="case-figure">
-                <div class="case-stage case-gallery is-landscape">
-                    <figure class="case-shot">
-                        <div class="shot" role="img" aria-label="Placeholder for shot 13"><span>13 · The home page when I stopped coding by hand</span></div>
-                        <figcaption>Where I stopped coding by hand</figcaption>
-                    </figure>
-                    <figure class="case-shot">
-                        <img class="shot is-actual" src="/images/portfolio/home-desktop-light.webp" alt="The home page today: the NORMANLEE wordmark, the headline Make life easier, and the navigation in the header" width="1280" height="720" loading="lazy" decoding="async">
-                        <figcaption>Today</figcaption>
-                    </figure>
-                </div>
-                <figcaption>The home page when I stopped coding by hand, and today.</figcaption>
-            </figure>
+            <p class="case-tradeoff"><span>In hindsight</span>I didn't have the foresight to plan for those in-between sizes in Figma, and it's the part of my process I'd most like to improve. Designing for more widths up front would have saved reworking layouts in code.</p>
         </div>
 
         <!-- Hardest decision: to come -->
@@ -511,7 +566,7 @@
         <!-- Quality-of-life details -->
         <div class="section-item">
             <h2 class="section-header">Small Things, Less Effort</h2>
-            <p class="case-lede">Shortcuts that save a click, everywhere on the site.</p>
+            <p class="case-lede">The details I'm proudest of: shortcuts that make the visitor's life easier.</p>
             <ul class="case-moments">
                 <li>
                     <p class="case-moment-label">Home from my name</p>
@@ -538,15 +593,15 @@
                     <p>Light or dark, starting from the device's own setting.</p>
                 </li>
             </ul>
-            <p class="section-content">Around those are small touches that are easy to miss: pages fade in, a line under the header fills as you scroll, the location arrow on the home page, the bouncing arrow that invites a scroll, and "User Experience Designer" fading away as the page moves. None of them get in the way, and together they make the site feel looked after.</p>
+            <p class="section-content">It's all about making the visitor's life easier, and I kept every one of these while keeping the site looking clean.</p>
         </div>
 
         <!-- Building with Claude Code -->
         <div class="section-item">
             <h2 class="section-header">Building with Claude Code</h2>
             <p class="case-lede">I designed it; Claude Code helped me build it faster.</p>
-            <p class="section-content">I coded the first version by hand: the navigation, dark mode, the page fade-in, the scroll progress, the breakpoints, and the Work menu. As the site grew, so did the complexity. Some of it would have taken months to learn, and I had a deadline, so I switched to Claude Code to put changes in place faster.</p>
-            <p class="section-content">I'm a designer, not a design engineer, with enough front-end knowledge to take a design live. I made the design decisions and reviewed every change before keeping it. Claude Code suggested some ideas, mostly small stylistic tweaks, but about 90% of the site is my own ideas.</p>
+            <p class="section-content">I coded the first version by hand. As the site grew, so did the complexity, and some of it would have taken months or even years to learn properly, with a deadline to have the site live. I switched to Claude Code to put changes in place much faster.</p>
+            <p class="section-content">I'm positioning myself as a designer, not a design engineer or a full-stack developer: a designer with enough front-end knowledge to get a site up and running. I made the design decisions, and Claude Code wrote the code faster. I reviewed every change it made, and nothing went in without my supervision. Claude Code did suggest ideas, mostly small stylistic tweaks, but about 90% of the site is my own ideas. The performance work above was done the same way: Claude Code measured the site and proposed changes, and I decided what to keep.</p>
             <p class="section-content">I also said no often. I turned down two redesigns of the Work page, several takes on the header's glass blur, and a theme switch that spread out from the button in a circle.</p>
             <p class="case-placeholder"><span>To come</span>Specific examples of how I worked with Claude Code: what I asked for, what it suggested, and what I changed or rejected.</p>
         </div>
@@ -554,7 +609,7 @@
         <!-- Testing: to come -->
         <div class="section-item">
             <h2 class="section-header">Testing and Feedback</h2>
-            <p class="section-content">I tested the site with design friends and with people outside design, since each group notices different things.</p>
+            <p class="section-content">I tested the site with fellow designers and with people outside design, since different perspectives bring different, useful feedback.</p>
             <p class="case-placeholder"><span>To come</span>What they said, and what I changed because of it.</p>
         </div>
 
@@ -562,7 +617,7 @@
         <div class="section-item">
             <h2 class="section-header">Next Steps</h2>
             <p class="case-lede">More case studies, and steady refinement.</p>
-            <p class="section-content">The site only recently went live, so there's nothing to measure yet. Next, I'll add case studies as I finish them, starting with a refresh of the San Francisco Public Library website, and keep making small improvements as I think of them.</p>
+            <p class="section-content">There's nothing to measure yet: the site only went live recently, Google only recently started showing it, and I haven't applied anywhere with it. Next, I'll add case studies as I finish them, starting with a refresh of the San Francisco Public Library website, and keep adding the small improvements I think of along the way.</p>
         </div>
 
         <!-- Reflection -->

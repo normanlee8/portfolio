@@ -359,10 +359,14 @@ themeToggleBtn.addEventListener("pointerenter", warmOtherTheme);
 themeToggleBtn.addEventListener("pointerdown", warmOtherTheme); // touch screens: no hover, but a head start
 themeToggleBtn.addEventListener("focus", warmOtherTheme);
 
-// The theme changes on the click, all at once. The hover color transitions are held off for that one change
-// (style.css), so nothing eases into the new colors behind the rest of the page
+// The theme changes on the click: the page cross-fades to it in a fifth of a second, starting at once (style.css).
+// Inside the fade the change itself is instant: the hover color transitions are held off for it, so nothing eases into
+// the new colors behind the rest of the page. Without view transitions, with reduced motion on, or where drawing is
+// slow (blending two pictures of the whole page on every frame would stutter), it just switches
 themeToggleBtn.addEventListener("click", () => {
-    const isDarkNow = !document.documentElement.classList.contains("dark-theme");
+    // from the saved choice, not the page's current look: a second click during a fade (before the first change has
+    // landed on the page) still flips it back
+    const isDarkNow = getPreferredTheme() !== "dark";
 
     // Matching the system clears the saved choice
     if (isDarkNow === darkQuery.matches) {
@@ -372,10 +376,15 @@ themeToggleBtn.addEventListener("click", () => {
     }
 
     const page = document.documentElement;
-    page.classList.add("theme-instant");
-    applyTheme();
-    getComputedStyle(page).color; // the new colors land now, with no transitions running
-    page.classList.remove("theme-instant");
+    function switchNow() {
+        page.classList.add("theme-instant");
+        applyTheme();
+        getComputedStyle(page).color; // the new colors land now, with no transitions running
+        page.classList.remove("theme-instant");
+    }
+
+    if (!document.startViewTransition || reduceMotion.matches || page.classList.contains("low-gfx")) switchNow();
+    else document.startViewTransition(switchNow).ready.catch(() => {}); // a quicker second click cuts this fade short
 });
 
 // Re-check when a page is shown, including from Back/Forward
