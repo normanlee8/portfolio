@@ -24,16 +24,11 @@
     <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=3">
     <!-- Load Theme -->
     <script>
-        // Arriving through a page transition, or from another page of this site: no load-in fade, the page is simply
-        // there, the way the one before it was (style.css). The fade is for arriving at the site
-        addEventListener("pagereveal", (e) => {
-            if (e.viewTransition) document.documentElement.classList.add("from-transition");
-        });
-        try {
-            if (document.referrer && new URL(document.referrer).origin === location.origin) {
-                document.documentElement.classList.add("from-transition");
-            }
-        } catch (e) {}
+        // Prepared in the background (speculation rules, below): the fade-in waits until the page is shown (style.css)
+        if (document.prerendering) {
+            document.documentElement.classList.add("prerendering");
+            document.addEventListener("prerenderingchange", () => document.documentElement.classList.remove("prerendering"), { once: true });
+        }
         {
             const savedTheme = localStorage.getItem("theme");
             const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -41,10 +36,19 @@
                 document.documentElement.classList.add("dark-theme");
             }
         }
-        // Drawing without a graphics card, as found by script.js on an earlier page or visit: the lighter look from the
-        // first frame (style.css)
+        // Drawing without a graphics card: the lighter look from the first frame (style.css). Found once, on the very
+        // first visit, by trying to start WebGL in a mode that refuses to run on the processor alone, then remembered;
+        // script.js checks again once a visit, and also watches for drawing that's slow despite a graphics card
         try {
-            if (/^(low|slow)$/.test(localStorage.getItem("gfx"))) document.documentElement.classList.add("low-gfx");
+            let gfx = localStorage.getItem("gfx");
+            if (!gfx) {
+                const gl = document.createElement("canvas").getContext("webgl", { failIfMajorPerformanceCaveat: true });
+                gfx = gl ? "ok" : "low";
+                if (gl) gl.getExtension("WEBGL_lose_context")?.loseContext();
+                localStorage.setItem("gfx", gfx);
+                sessionStorage.setItem("gfx-checked", "1");
+            }
+            if (gfx === "low" || gfx === "slow") document.documentElement.classList.add("low-gfx");
         } catch (e) {}
     </script>
     <link rel="preload" href="/assets/fonts/figtree-latin.woff2" as="font" type="font/woff2" crossorigin>
@@ -142,7 +146,7 @@
 
     <!-- About -->
     <div class="about-intro">
-        <div class="section-photo" data-fade="0">
+        <div class="section-photo" data-fade>
             <!-- Phones: the cats are ears above the photo; 768px: they trail below it; 1280px: they fill the space beside the bio -->
             <div class="photo-cluster">
                 <div class="photo photo-me slot-1">
@@ -157,7 +161,7 @@
             </div>
         </div>
 
-        <div class="about-me" data-fade="1">
+        <div class="about-me" data-fade>
             <h1 class="greeting">Hello, I'm Norman!</h1>
             <p class="section-content">I'm a UX designer based in San Francisco. I graduated from UC San Diego in December of 2024 with a degree in Cognitive Science, specializing in Design and Interaction, and a minor in Computer Science.</p>
             <p class="section-content">I want to make things that are clear, easy to use, and make sense to the people who rely on them. I believe a design can work well and look good at the same time.</p>
@@ -172,7 +176,7 @@
     </div>
 
     <div class="section-resume">
-        <div class="resume-item" data-fade="2">
+        <div class="resume-item" data-fade>
             <h2 class="resume-header">Education</h2>
             <div class="resume-content">
                 <h3 class="content-label">University of California, San Diego</h3>
@@ -184,7 +188,7 @@
             </div>
         </div>
         
-        <div class="resume-item" data-fade="3">
+        <div class="resume-item" data-fade>
             <h2 class="resume-header">Experience</h2>
             <div class="resume-content">
                 <h3 class="content-label"><span class="keep-together">AI Training Fellow</span> <span class="keep-together"><span class="label-at">@</span> Handshake AI</span></h3>
@@ -210,7 +214,7 @@
             </div>
         </div>
 
-        <div class="resume-item" data-fade="4">
+        <div class="resume-item" data-fade>
             <h2 class="resume-header">Skills</h2>
             <div class="resume-content">
                 <h3 class="content-label">Design</h3>
@@ -273,7 +277,7 @@
                 </ul>
             </div>
         </div>
-        <div class="resume-item" data-fade="5">
+        <div class="resume-item" data-fade>
             <h2 class="resume-header">Tidbits</h2>
             <!-- Laid out like the other sections: a label on the left, the grid in the content column -->
             <div class="resume-content resume-last">
@@ -352,7 +356,7 @@
     </div>
 
     <!-- Footer -->
-    <div class="section-footer" data-fade="6">
+    <div class="section-footer" data-fade>
         <div class="footer-thanks">
             <p>Thanks for stopping by!</p>
         </div>
@@ -426,7 +430,7 @@
     </div>
 
     <!-- Sections list and return-to-top (1280px+) -->
-    <aside class="page-toc" aria-label="On this page">
+    <aside class="page-toc" aria-label="On this page" data-fade>
         <p class="toc-title">On this page</p>
         <ul class="toc-list"></ul>
     </aside>
@@ -440,7 +444,7 @@
     </button>
 
     <!-- Page Navigation -->
-    <nav class="page-nav" aria-label="Page">
+    <nav class="page-nav" aria-label="Page" data-fade>
         <a href="/" class="page-nav-back" aria-label="Go back">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
                 <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>

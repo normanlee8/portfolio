@@ -243,29 +243,49 @@ body {
     font-weight: var(--weight-regular);
 }
 
-/* Page Fade In */
+/* Page Fade In: every page but the home page (below), whether arriving at the site or moving between its pages, comes
+   in quickly and all at once, in a third of a second, while the header stays put. Only what's on the first screen takes part (script.js).
+   Just opacity: fading in out of a blur looked softer, but blurring the whole first screen on every frame of the fade
+   cost 10 to 30 dropped frames on every page load, even with a graphics card, right when the visitor starts to scroll */
 @keyframes page-fade-in {
     from {
         opacity: 0;
-        transform: translateY(24px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
     }
 }
 
 [data-fade] {
-    animation: page-fade-in 1.4s cubic-bezier(0.33, 1, 0.68, 1) backwards;
+    animation: page-fade-in 0.333s cubic-bezier(0.42, 0, 0.58, 1);
 }
 
-[data-fade="1"] { animation-delay: 0.25s; }
-[data-fade="2"] { animation-delay: 0.5s; }
-[data-fade="3"] { animation-delay: 0.75s; }
-[data-fade="4"] { animation-delay: 1s; }
-[data-fade="5"] { animation-delay: 1.25s; }
-[data-fade="6"] { animation-delay: 1.5s; }
-[data-fade="7"] { animation-delay: 1.75s; }
+/* The home page comes in piece by piece instead: each part rises a little as it fades up, one after another
+   (data-fade="0" to "7" give the order). Opacity and a move only, which the browser animates without redrawing
+   anything. Until its turn, a part stays hidden (backwards) */
+@keyframes page-rise-in {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+}
+
+[data-fade]:not([data-fade=""]) {
+    animation-name: page-rise-in;
+    animation-duration: 0.8s;
+    animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1);
+    animation-fill-mode: backwards;
+}
+
+[data-fade="1"] { animation-delay: 0.14s; }
+[data-fade="2"] { animation-delay: 0.28s; }
+[data-fade="3"] { animation-delay: 0.42s; }
+[data-fade="4"] { animation-delay: 0.56s; }
+[data-fade="5"] { animation-delay: 0.7s; }
+[data-fade="6"] { animation-delay: 0.84s; }
+[data-fade="7"] { animation-delay: 0.98s; }
+
+/* a page prepared in the background (each page's <head>) holds its fade until it's shown */
+:root.prerendering [data-fade] {
+    animation-play-state: paused;
+}
 
 @media (prefers-reduced-motion: reduce) {
     [data-fade] {
@@ -296,7 +316,6 @@ body {
     background-color: var(--header-bg);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
     backdrop-filter: blur(20px) saturate(180%);
-    view-transition-name: site-header; /* stays put while pages change under it */
 }
 
 /* iPhone and iPad (only their Safari knows -webkit-touch-callout) */
@@ -314,8 +333,7 @@ body {
 :root.low-gfx .proto-close,
 :root.low-gfx .media-controls,
 :root.low-gfx .media-nav,
-:root.low-gfx .proto-dialog::backdrop,
-:root.low-gfx::view-transition-group(site-header) {
+:root.low-gfx .proto-dialog::backdrop {
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
 }
@@ -802,8 +820,8 @@ body {
     display: inline-block; /* so each word can move */
 }
 
-.hero-word:nth-child(2) { animation-delay: 0.68s; }
-.hero-word:nth-child(3) { animation-delay: 0.86s; }
+.hero-word:nth-child(2) { animation-delay: 0.38s; }
+.hero-word:nth-child(3) { animation-delay: 0.48s; }
 
 /* the line under it: a comfortable measure, balanced so its lines come out even */
 .hero-description {
@@ -1197,49 +1215,10 @@ a.work-thumbnail:active {
     }
 }
 
-/* ===== Page transitions =====
-   Going from one page to the next cross-fades instead of blinking, and the Apple Sports cover grows from a
-   thumbnail into the case study's header (and back). Browsers without view transitions just load the page */
-@media (prefers-reduced-motion: no-preference) {
-    @view-transition {
-        navigation: auto;
-    }
-}
-
-::view-transition-old(root),
-::view-transition-new(root) {
-    animation-duration: 0.3s;
-}
-
-.work-thumbnail:has(.cover-screens) {
-    view-transition-name: cover-apple-sports;
-}
-
-::view-transition-group(cover-apple-sports) {
-    animation-duration: 0.55s;
-    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-/* a page reached through a transition skips its load-in fade: the transition is the entrance
-   (the class is set in each page's <head>) */
-:root.from-transition [data-fade] {
-    animation: none;
-}
-
-/* The header's glass during any transition. A transition plays on pictures of the page, and the header's picture
-   is taken on its own, with nothing behind it to blur, so the header's layer blurs the fading page under it
-   instead. Without this, the text under the header shows through its tint until the transition ends */
-::view-transition-group(site-header) {
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
-    backdrop-filter: blur(20px) saturate(180%);
-}
-
-/* Switching themes: the whole page eases from one theme to the other (script.js starts it).
-   The cover joins the page for this one; the header keeps its own layer, so its glass stays on (above) */
-:root.theme-switching .work-thumbnail {
-    view-transition-name: none;
-}
-
+/* ===== Switching themes =====
+   The whole page eases from one theme to the other (script.js starts it, except where drawing is slow). Moving between
+   pages has no transition of its own: the next page simply fades in (Page Fade In, above), which costs far less than
+   a transition, which has to take and blend pictures of both pages */
 :root.theme-switching::view-transition-old(*),
 :root.theme-switching::view-transition-new(*) {
     animation-duration: 0.45s;
@@ -2499,6 +2478,13 @@ html:has(.proto-dialog[open]) {
     --phone-edge: #48484A;
 }
 
+/* a phone playing a recording sits above the phones beside it (script.js marks it). The browser always draws a video
+   on its own layer, and whatever is drawn after it and overlaps it (the soft shadows of the next phones) would need
+   its own layer too, all put together again on every frame: slow without a graphics card */
+.phone.is-recording {
+    z-index: 1;
+}
+
 /* the screen */
 .phone > img,
 .phone > video {
@@ -3467,9 +3453,11 @@ body:has(.page-nav) .toast {
     background-color: var(--bg-thumbnail);
 }
 
+/* (the closed pill is just its toggle, so pointing at the pill is pointing at the toggle; written without :hover inside
+   :has(), which would restyle the whole page whenever the element under the pointer changes, as it does while scrolling) */
 @media (hover: hover) {
     .page-nav-back:hover,
-    .page-nav-sections:has(.section-toggle[aria-expanded="false"]:hover) {
+    .page-nav-sections:hover:has(> .section-toggle[aria-expanded="false"]) {
         background-color: var(--bg-thumbnail);
     }
 }
@@ -4673,8 +4661,11 @@ body:has(.page-nav) .toast {
         background-color: var(--bg-color);
     }
 
-    /* the other two step back */
-    .work-grid:has(.work-card:focus-within) .work-card:not(:focus-within) > * {
+    /* the other two step back. (The grid holds only the slices, edge to edge, so "the grid is focused within / hovered"
+       is "one of its slices is". Written that way, not with :has(), because a :has() around :hover makes the browser
+       restyle the whole page whenever the element under the pointer changes, which it does on every frame of a
+       scroll) */
+    .work-grid:focus-within .work-card:not(:focus-within) > * {
         opacity: 0.7;
     }
 
@@ -4693,12 +4684,12 @@ body:has(.page-nav) .toast {
             background-color: var(--bg-color);
         }
 
-        .work-grid:has(.work-card:hover) .work-card:not(:hover) > * {
+        .work-grid:hover .work-card:not(:hover) > * {
             opacity: 0.7;
         }
 
         /* the slice under the pointer wins over one that only has keyboard focus */
-        .work-grid:has(.work-card:hover) .work-card:hover > * {
+        .work-grid:hover .work-card:hover > * {
             opacity: 1;
         }
     }

@@ -13,16 +13,11 @@
     <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=3">
     <!-- Load Theme -->
     <script>
-        // Arriving through a page transition, or from another page of this site: no load-in fade, the page is simply
-        // there, the way the one before it was (style.css). The fade is for arriving at the site
-        addEventListener("pagereveal", (e) => {
-            if (e.viewTransition) document.documentElement.classList.add("from-transition");
-        });
-        try {
-            if (document.referrer && new URL(document.referrer).origin === location.origin) {
-                document.documentElement.classList.add("from-transition");
-            }
-        } catch (e) {}
+        // Prepared in the background (speculation rules, below): the fade-in waits until the page is shown (style.css)
+        if (document.prerendering) {
+            document.documentElement.classList.add("prerendering");
+            document.addEventListener("prerenderingchange", () => document.documentElement.classList.remove("prerendering"), { once: true });
+        }
         {
             const savedTheme = localStorage.getItem("theme");
             const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -30,10 +25,19 @@
                 document.documentElement.classList.add("dark-theme");
             }
         }
-        // Drawing without a graphics card, as found by script.js on an earlier page or visit: the lighter look from the
-        // first frame (style.css)
+        // Drawing without a graphics card: the lighter look from the first frame (style.css). Found once, on the very
+        // first visit, by trying to start WebGL in a mode that refuses to run on the processor alone, then remembered;
+        // script.js checks again once a visit, and also watches for drawing that's slow despite a graphics card
         try {
-            if (/^(low|slow)$/.test(localStorage.getItem("gfx"))) document.documentElement.classList.add("low-gfx");
+            let gfx = localStorage.getItem("gfx");
+            if (!gfx) {
+                const gl = document.createElement("canvas").getContext("webgl", { failIfMajorPerformanceCaveat: true });
+                gfx = gl ? "ok" : "low";
+                if (gl) gl.getExtension("WEBGL_lose_context")?.loseContext();
+                localStorage.setItem("gfx", gfx);
+                sessionStorage.setItem("gfx-checked", "1");
+            }
+            if (gfx === "low" || gfx === "slow") document.documentElement.classList.add("low-gfx");
         } catch (e) {}
     </script>
     <link rel="preload" href="/assets/fonts/figtree-latin.woff2" as="font" type="font/woff2" crossorigin>

@@ -24,16 +24,11 @@
     <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=3">
     <!-- Load Theme -->
     <script>
-        // Arriving through a page transition, or from another page of this site: no load-in fade, the page is simply
-        // there, the way the one before it was (style.css). The fade is for arriving at the site
-        addEventListener("pagereveal", (e) => {
-            if (e.viewTransition) document.documentElement.classList.add("from-transition");
-        });
-        try {
-            if (document.referrer && new URL(document.referrer).origin === location.origin) {
-                document.documentElement.classList.add("from-transition");
-            }
-        } catch (e) {}
+        // Prepared in the background (speculation rules, below): the fade-in waits until the page is shown (style.css)
+        if (document.prerendering) {
+            document.documentElement.classList.add("prerendering");
+            document.addEventListener("prerenderingchange", () => document.documentElement.classList.remove("prerendering"), { once: true });
+        }
         {
             const savedTheme = localStorage.getItem("theme");
             const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -41,10 +36,19 @@
                 document.documentElement.classList.add("dark-theme");
             }
         }
-        // Drawing without a graphics card, as found by script.js on an earlier page or visit: the lighter look from the
-        // first frame (style.css)
+        // Drawing without a graphics card: the lighter look from the first frame (style.css). Found once, on the very
+        // first visit, by trying to start WebGL in a mode that refuses to run on the processor alone, then remembered;
+        // script.js checks again once a visit, and also watches for drawing that's slow despite a graphics card
         try {
-            if (/^(low|slow)$/.test(localStorage.getItem("gfx"))) document.documentElement.classList.add("low-gfx");
+            let gfx = localStorage.getItem("gfx");
+            if (!gfx) {
+                const gl = document.createElement("canvas").getContext("webgl", { failIfMajorPerformanceCaveat: true });
+                gfx = gl ? "ok" : "low";
+                if (gl) gl.getExtension("WEBGL_lose_context")?.loseContext();
+                localStorage.setItem("gfx", gfx);
+                sessionStorage.setItem("gfx-checked", "1");
+            }
+            if (gfx === "low" || gfx === "slow") document.documentElement.classList.add("low-gfx");
         } catch (e) {}
     </script>
     <link rel="preload" href="/assets/fonts/figtree-latin.woff2" as="font" type="font/woff2" crossorigin>
@@ -152,7 +156,7 @@
         Phones and crops open in a larger view on click (script.js); recordings also get a small pause/play button.
     -->
     <div class="section-work">
-        <div class="work-card" data-fade="0">
+        <div class="work-card" data-fade>
             <div class="work-thumbnail">
                 <div class="cover-screens" aria-hidden="true">
                     <!-- the cover at rest, as one picture of itself; the live cover below is built only when pointed at (style.css) -->
@@ -207,7 +211,7 @@
         </div>
 
         <!-- Overview -->
-        <div class="section-item" data-fade="1">
+        <div class="section-item" data-fade>
             <h2 class="section-header">Overview</h2>
             <dl class="case-tldr">
                 <div>
@@ -255,7 +259,7 @@
         </div>
 
         <!-- Background: how the app works today, for readers who haven't used it -->
-        <div class="section-item" data-fade="2">
+        <div class="section-item" data-fade>
             <h2 class="section-header">How Fans Use <span class="keep-together">Apple Sports</span></h2>
             <p class="case-lede">Built for checking scores at a glance.</p>
             <p class="section-content">Apple Sports users pick their favorite teams, like the Warriors or 49ers, and favorite leagues, like the NBA or NFL.</p>
@@ -265,7 +269,7 @@
         </div>
 
         <!-- Problem -->
-        <div class="section-item" data-fade="3">
+        <div class="section-item" data-fade>
             <h2 class="section-header">The Problem</h2>
             <p class="case-lede">There's no place to see one team's schedule or recent results.</p>
             <p class="section-content">Favoriting a team is the closest thing, but it falls short in three ways:</p>
@@ -322,7 +326,7 @@
         </div>
 
         <!-- Solution -->
-        <div class="section-item" data-fade="4">
+        <div class="section-item" data-fade>
             <h2 class="section-header">The Solution</h2>
             <p class="case-lede">Give every team its own page, with its recent results and upcoming schedule.</p>
             <p class="section-content">While brainstorming, I looked at how ESPN, Yahoo Sports, Google Search, CBS Sports, and theScore show a team's schedule and results. All five have team pages, and tapping a team's logo opens its page. All but Google Search group their games by month.</p>
@@ -609,7 +613,7 @@
     </div>
 
     <!-- Previous / Next Project (order matches the Work page; wraps around) -->
-    <nav class="project-pager" aria-label="More projects" data-fade="7">
+    <nav class="project-pager" aria-label="More projects" data-fade>
         <a href="/portfolio" class="pager-link pager-next">
             <span class="pager-label">Next<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"><path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8"/></svg></span>
             <span class="pager-title">Designing and Building my Portfolio from Figma to Code</span>
@@ -617,7 +621,7 @@
     </nav>
 
     <!-- Footer -->
-    <div class="section-footer" data-fade="7">
+    <div class="section-footer" data-fade>
         <div class="footer-thanks">
             <p>Thanks for stopping by!</p>
         </div>
@@ -691,7 +695,7 @@
     </div>
 
     <!-- Sections list and return-to-top (1280px+) -->
-    <aside class="page-toc" aria-label="On this page">
+    <aside class="page-toc" aria-label="On this page" data-fade>
         <p class="toc-title">On this page</p>
         <ul class="toc-list"></ul>
     </aside>
@@ -705,7 +709,7 @@
     </button>
 
     <!-- Page Navigation -->
-    <nav class="page-nav" aria-label="Page">
+    <nav class="page-nav" aria-label="Page" data-fade>
         <a href="/work" class="page-nav-back" aria-label="Go back">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
                 <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>

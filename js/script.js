@@ -1,53 +1,42 @@
-// Page Fade In: only the first screen fades in. Runs last, once the layout is final
+// Changes an element's text by editing its text node rather than replacing it. Replacing it (textContent) counts as
+// removing and adding a node, and after any such change the stylesheet's :has() rules make the browser restyle the
+// whole page: for text that changes as the page scrolls or a video plays, that was most of the work of every frame
+function setText(el, text) {
+    const node = el.firstChild;
+    if (node && node.nodeType === Node.TEXT_NODE && !node.nextSibling) {
+        if (node.data !== text) node.data = text;
+    } else if (el.textContent !== text) {
+        el.textContent = text;
+    }
+}
+
+// Page Fade In (style.css): only what's on the first screen fades in; anything that starts below it is shown as is,
+// so nothing off screen is animated. Measured from the top of the page (where a refresh restores a scrolled page,
+// what's in view there was below the first screen, so it's simply shown). Run last, once the layout is final
 function pageTop(el) {
     let top = 0;
-    for (; el; el = el.offsetParent) top += el.offsetTop; // ignores the fade's slide offset
+    for (; el; el = el.offsetParent) top += el.offsetTop;
     return top;
 }
 
-// Blocks with their own text or background fade as one piece
-function canSplitFade(el) {
-    if (!el.children.length) return false;
-    if (getComputedStyle(el).backgroundColor !== "rgba(0, 0, 0, 0)") return false;
-    return ![...el.childNodes].some((node) => node.nodeType === Node.TEXT_NODE && node.textContent.trim());
-}
-
-function limitFadeToFirstScreen(el, screenBottom, leeway) {
-    const top = pageTop(el);
-    if (top >= screenBottom) {
-        el.removeAttribute("data-fade");
-        return;
-    }
-    if (top + el.offsetHeight <= screenBottom + leeway || !canSplitFade(el)) return;
-
-    // Crosses the fold: fade its children instead
-    const step = el.getAttribute("data-fade");
-    el.removeAttribute("data-fade");
-    for (const child of el.children) {
-        child.setAttribute("data-fade", step);
-        limitFadeToFirstScreen(child, screenBottom, leeway);
-    }
-}
-
 function setUpPageFade() {
-    const screenBottom = window.innerHeight; // the page's top screen, not the restored scroll position
-    const leeway = window.innerHeight * 0.1; // up to 10% past the fold still fades whole
+    const screenBottom = window.innerHeight;
     document.querySelectorAll("[data-fade]").forEach((el) => {
-        if (el.hasAttribute("data-fade")) limitFadeToFirstScreen(el, screenBottom, leeway);
+        if (pageTop(el) >= screenBottom) el.removeAttribute("data-fade");
     });
 
-    // Opened (or restored by a refresh) away from the top: show everything at once instead of waiting
-    function skipFadeIfScrolled() {
+    // The home page's parts come in one after another: scrolled half a screen down before they all have, the rest
+    // show at once instead of waiting their turn
+    if (!document.querySelector('[data-fade]:not([data-fade=""])')) return;
+    function showRest() {
         if (window.scrollY < window.innerHeight / 2) return;
-        document.getAnimations().forEach((a) => {
-            if (a.animationName === "page-fade-in") a.finish();
+        window.removeEventListener("scroll", showRest);
+        document.getAnimations().forEach((run) => {
+            if (run.animationName === "page-rise-in") run.finish();
         });
     }
-
-    skipFadeIfScrolled();
-    window.addEventListener("scroll", skipFadeIfScrolled, { passive: true });
-    window.addEventListener("load", skipFadeIfScrolled);
-    setTimeout(() => window.removeEventListener("scroll", skipFadeIfScrolled), 4000); // the fade is over by then
+    window.addEventListener("scroll", showRest, { passive: true });
+    setTimeout(() => window.removeEventListener("scroll", showRest), 2000); // it's all in by then
 }
 
 // Scroll effects: everything that follows the scroll updates together, once per frame.
@@ -361,7 +350,8 @@ themeToggleBtn.addEventListener("click", async () => {
     // The page eases from one theme to the other (style.css).
     // Without view transitions, or with reduced motion on, it just switches
     const page = document.documentElement;
-    if (!document.startViewTransition || reduceMotion.matches) {
+    // (and where drawing is slow: blending two pictures of the whole page on every frame would stutter)
+    if (!document.startViewTransition || reduceMotion.matches || page.classList.contains("low-gfx")) {
         applyTheme();
         return;
     }
@@ -477,7 +467,7 @@ if (localTime) {
     });
 
     function updateLocalTime() {
-        localTime.textContent = ptFormat.format(new Date());
+        setText(localTime, ptFormat.format(new Date()));
         localTime.closest(".local-time").hidden = false;
     }
 
@@ -1148,10 +1138,18 @@ if (pageNav) {
     const tocStop = document.querySelector(".project-pager") || document.querySelector(".section-footer");
 
     const sectionNames = sectionHeaders.map((h) => h.textContent.trim());
-    const shown = { ring: null, label: null, current: null, tocShown: null, tocCovered: null }; // what the page shows now
+    const shown = { ring: null, percent: null, label: null, current: null, tocShown: null, tocCovered: null }; // what the page shows now
+
+    // The bottom pill (ring, percentage, label) is hidden on wide screens, where the side list takes its place
+    // (style.css): there it's left alone, and it catches up when the window narrows
+    const pillHidden = window.matchMedia("(min-width: 1280px)");
+    pillHidden.addEventListener("change", () => {
+        shown.ring = shown.percent = shown.label = null;
+        requestScrollEffects();
+    });
 
     addScrollEffect(({ y, height, progress }) => {
-        const ring = (progress * 100).toFixed(1);
+        const pill = !pillHidden.matches;
         const percent = Math.round(progress * 100);
         const atEnd = percent === 100; // matches the ring reading 100%
 
@@ -1174,15 +1172,20 @@ if (pageNav) {
         const tocShown = y > height;
         const tocCovered = tocStop.getBoundingClientRect().top < tocTop.getBoundingClientRect().bottom;
 
-        const next = { ring, label, current, tocShown, tocCovered };
+        const next = {
+            ring: pill ? (progress * 100).toFixed(1) : shown.ring,
+            percent: pill ? percent : shown.percent,
+            label: pill ? label : shown.label,
+            current,
+            tocShown,
+            tocCovered,
+        };
         if (Object.keys(next).every((key) => next[key] === shown[key])) return null;
 
         return () => {
-            if (ring !== shown.ring) {
-                progressPercent.textContent = `${percent}%`;
-                progressFill.style.strokeDasharray = `${ring} 100`;
-            }
-            if (label !== shown.label) sectionLabel.textContent = label;
+            if (next.ring !== shown.ring) progressFill.style.strokeDasharray = `${next.ring} 100`;
+            if (next.percent !== shown.percent) setText(progressPercent, `${next.percent}%`);
+            if (next.label !== shown.label) setText(sectionLabel, next.label);
             if (current !== shown.current) {
                 [sectionItems, tocItems].forEach((items) => items.forEach((btn, i) => {
                     if (i === current) btn.setAttribute("aria-current", "true");
@@ -1263,7 +1266,7 @@ function addMediaControls(video) {
         const time = `${formatTime(video.currentTime)}|${formatTime(duration)}`;
         if (time !== shownTime) {
             shownTime = time;
-            now.textContent = formatTime(video.currentTime);
+            setText(now, formatTime(video.currentTime));
             seek.setAttribute("aria-valuetext", `${formatTime(video.currentTime)} of ${formatTime(duration)}`);
         }
     }
@@ -1274,7 +1277,7 @@ function addMediaControls(video) {
     }
 
     function showDuration() {
-        total.textContent = ` / ${formatTime(video.duration)}`;
+        setText(total, ` / ${formatTime(video.duration)}`);
         sync();
     }
 
@@ -1338,6 +1341,10 @@ const recordingWatcher = "IntersectionObserver" in window && new IntersectionObs
 }, { rootMargin: "200px 0px" });
 
 recordings.forEach((video) => {
+    // its phone is drawn above its neighbours: a recording is always drawn on its own (as a layer), and anything drawn
+    // after it that overlaps it, such as the soft shadows of the phones beside it, would then need layers of its own
+    // too, which are slow to put together on every frame without a graphics card (style.css)
+    video.parentElement.classList.add("is-recording");
     if (reduceMotion.matches) {
         delete video.dataset.autoplay;
         userPaused.add(video);
@@ -1417,7 +1424,7 @@ if (zoomables.length && typeof HTMLDialogElement === "function") {
         const place = inSet ? `${index + 1} of ${group.length}` : "";
         mediaDialog.setAttribute("aria-label", inSet ? `Larger view, ${place}` : "Larger view");
         mediaDialog.classList.toggle("has-nav", inSet);
-        mediaCount.textContent = place;
+        setText(mediaCount, place);
         prevBtn.disabled = index <= 0;
         nextBtn.disabled = index >= group.length - 1;
     }
