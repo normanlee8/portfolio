@@ -24,10 +24,16 @@
     <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=3">
     <!-- Load Theme -->
     <script>
-        // Arriving through a page transition: skip the load-in fade (style.css)
+        // Arriving through a page transition, or from another page of this site: no load-in fade, the page is simply
+        // there, the way the one before it was (style.css). The fade is for arriving at the site
         addEventListener("pagereveal", (e) => {
             if (e.viewTransition) document.documentElement.classList.add("from-transition");
         });
+        try {
+            if (document.referrer && new URL(document.referrer).origin === location.origin) {
+                document.documentElement.classList.add("from-transition");
+            }
+        } catch (e) {}
         {
             const savedTheme = localStorage.getItem("theme");
             const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -35,18 +41,21 @@
                 document.documentElement.classList.add("dark-theme");
             }
         }
-        // No graphics card found earlier this visit (script.js): skip the glass from the first frame (style.css)
+        // Drawing without a graphics card, as found by script.js on an earlier page or visit: the lighter look from the
+        // first frame (style.css)
         try {
-            if (sessionStorage.getItem("gfx") === "low") document.documentElement.classList.add("low-gfx");
+            if (/^(low|slow)$/.test(localStorage.getItem("gfx"))) document.documentElement.classList.add("low-gfx");
         } catch (e) {}
     </script>
     <link rel="preload" href="/assets/fonts/figtree-latin.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="/css/style.css">
     <script src="/js/script.js" defer></script>
-    <!-- Instant pages (Chrome, Edge): a page is prepared in the background once you point at a link to it, so it opens
-         at once when clicked. Other browsers get the same head start from script.js -->
+    <!-- Instant pages (Chrome, Edge): the site's other pages are fetched as soon as this one loads (a few KB each), and a
+         page is prepared whole in the background once you point at a link to it, so it opens at once when clicked, on
+         touch screens too. Other browsers get a head start from script.js -->
     <script type="speculationrules">
-        {"prerender": [{"where": {"and": [{"href_matches": "/*"}, {"not": {"href_matches": ["/prototypes/*", "/*.pdf", "/*.png", "/*.webp", "/*.mp4"]}}]}, "eagerness": "moderate"}]}
+        {"prefetch": [{"where": {"and": [{"href_matches": "/*"}, {"not": {"href_matches": ["/prototypes/*", "/*.pdf", "/*.png", "/*.webp", "/*.mp4"]}}]}, "eagerness": "immediate"}],
+         "prerender": [{"where": {"and": [{"href_matches": "/*"}, {"not": {"href_matches": ["/prototypes/*", "/*.pdf", "/*.png", "/*.webp", "/*.mp4"]}}]}, "eagerness": "moderate"}]}
     </script>
 </head>
 <body>
@@ -146,8 +155,8 @@
         <div class="work-card" data-fade="0">
             <div class="work-thumbnail">
                 <div class="cover-screens" aria-hidden="true">
-                    <!-- the parts of the cover that never move, as one flat picture, used when the browser draws slowly (style.css) -->
-                    <img class="cover-flat is-light" src="/images/apple-sports/cover-flat-light.webp" alt="" width="2138" height="972" loading="lazy"><img class="cover-flat is-dark" src="/images/apple-sports/cover-flat-dark.webp" alt="" width="2138" height="972" loading="lazy">
+                    <!-- the cover at rest, as one picture of itself; the live cover below is built only when pointed at (style.css) -->
+                    <img class="cover-poster is-light" src="/images/apple-sports/cover-poster-light-960.webp" srcset="/images/apple-sports/cover-poster-light-640.webp 1280w, /images/apple-sports/cover-poster-light-960.webp 1920w, /images/apple-sports/cover-poster-light-1320.webp 2640w" sizes="(max-width: 767px) calc(146vw - 47px), (max-width: 1023px) calc(146vw - 78px), min(88vw, 1290px)" alt="" width="2640" height="1320" loading="lazy" fetchpriority="high"><img class="cover-poster is-dark" src="/images/apple-sports/cover-poster-dark-960.webp" srcset="/images/apple-sports/cover-poster-dark-640.webp 1280w, /images/apple-sports/cover-poster-dark-960.webp 1920w, /images/apple-sports/cover-poster-dark-1320.webp 2640w" sizes="(max-width: 767px) calc(146vw - 47px), (max-width: 1023px) calc(146vw - 78px), min(88vw, 1290px)" alt="" width="2640" height="1320" loading="lazy" fetchpriority="high">
                     <div class="cover-floor">
                         <span class="cover-phone"><img src="/images/apple-sports/cover-heat.webp?v=3" alt="" width="560" height="1214"><i class="cover-key"></i><i class="cover-key is-flush"></i><i class="cover-port"></i></span>
                         <span class="cover-phone">

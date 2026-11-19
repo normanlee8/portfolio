@@ -61,11 +61,16 @@ function addScrollEffect(effect) {
     scrollEffects.push(effect);
 }
 
+// The page's length is measured only when it may have changed (a resize, or the page growing), not on every scroll
+// frame: measuring right after the effects' last changes would make the browser lay the page out again each frame
+let pageLength = null;
+
 function runScrollEffects() {
     scrollFrame = 0;
     const y = Math.max(window.scrollY, 0); // iOS can overscroll above the top
     const height = window.innerHeight;
-    const scrollable = document.documentElement.scrollHeight - height;
+    if (pageLength === null) pageLength = document.documentElement.scrollHeight;
+    const scrollable = pageLength - height;
     const view = { y, height, progress: scrollable > 0 ? Math.min(y / scrollable, 1) : 0 };
     const changes = scrollEffects.map((effect) => effect(view));
     changes.forEach((change) => change && change());
@@ -75,10 +80,16 @@ function requestScrollEffects() {
     if (!scrollFrame) scrollFrame = requestAnimationFrame(runScrollEffects);
 }
 
+function remeasureScrollEffects() {
+    pageLength = null;
+    requestScrollEffects();
+}
+
 window.addEventListener('scroll', requestScrollEffects, { passive: true });
-window.addEventListener('resize', requestScrollEffects);
+window.addEventListener('resize', remeasureScrollEffects);
 // the page can also grow without a scroll or resize (images, fonts, the side list), which moves the progress
-if ('ResizeObserver' in window) new ResizeObserver(requestScrollEffects).observe(document.body);
+if ('ResizeObserver' in window) new ResizeObserver(remeasureScrollEffects).observe(document.body);
+else window.addEventListener('scroll', () => (pageLength = null), { passive: true });
 
 // Title Fade + Header Stroke
 const heroTitle = document.querySelector('.title');
@@ -112,21 +123,24 @@ if (heroTitle) {
 }
 
 // Scroll Progress: the line under the header fills as you read. It's its own element, scaled, so moving it
-// restyles nothing else in the header and needs no layout
+// restyles nothing else in the header and needs no layout. Where the browser can tie an animation to the scroll
+// (style.css), it fills by itself, off the page's main thread; elsewhere it's set here, once per frame
 const headerProgress = document.createElement('span');
 headerProgress.className = 'header-progress';
 headerProgress.setAttribute('aria-hidden', 'true');
 header.append(headerProgress);
 let lastScrollProgress = null;
 
-addScrollEffect(({ progress }) => {
-    const scale = progress.toFixed(4);
-    if (scale === lastScrollProgress) return null;
-    lastScrollProgress = scale;
-    return () => {
-        headerProgress.style.transform = `scaleX(${scale})`;
-    };
-});
+if (!(window.CSS && CSS.supports('animation-timeline: scroll()'))) {
+    addScrollEffect(({ progress }) => {
+        const scale = progress.toFixed(4);
+        if (scale === lastScrollProgress) return null;
+        lastScrollProgress = scale;
+        return () => {
+            headerProgress.style.transform = `scaleX(${scale})`;
+        };
+    });
+}
 
 // Work Dropdown: never runs past the header's right edge; long titles wrap instead
 const projectMenu = document.querySelector('.project-menu');
@@ -182,15 +196,20 @@ if (protoDialog && protoLink && typeof protoDialog.showModal === 'function') {
     });
 }
 
-// Graphics check: is there a graphics card doing the drawing? Asked once per visit, once the page is idle, by
+// Graphics check: is there a graphics card doing the drawing? Asked once per visit (once the page is idle) by
 // trying to start WebGL in a mode that refuses to run on the processor alone. Without one, the page switches to a
-// lighter look that draws quickly on the processor (.low-gfx in style.css: solid tints for the glass, the Apple Sports
-// cover's still parts as one flat picture under its live lifting parts, no shadows under the wall's tiles), and later pages start that way (each page's <head>)
-function markLowGraphics() {
-    document.documentElement.classList.add("low-gfx");
+// lighter look that draws quickly on the processor (.low-gfx in style.css: solid tints in place of the frosted glass).
+// The answer is remembered, so later pages and later visits start in the right look from the first frame (each page's
+// <head>); asking again each visit catches hardware acceleration being turned on or off since
+function rememberGraphics(answer) {
     try {
-        sessionStorage.setItem("gfx", "low");
+        localStorage.setItem("gfx", answer);
     } catch (e) {}
+}
+
+function markLowGraphics(answer) {
+    document.documentElement.classList.add("low-gfx");
+    rememberGraphics(answer);
 }
 
 function checkGraphics() {
@@ -204,20 +223,26 @@ function checkGraphics() {
     } catch (e) {
         low = true;
     }
-    if (low) markLowGraphics();
-    else {
-        try {
-            sessionStorage.setItem("gfx", "ok");
-        } catch (e) {}
+    try {
+        sessionStorage.setItem("gfx-checked", "1");
+    } catch (e) {}
+    if (low) markLowGraphics("low");
+    else if (graphicsSeen !== "slow") {
+        // a graphics card after all (turned back on): the full look again. One found too slow by the frame check below
+        // stays that way
+        document.documentElement.classList.remove("low-gfx");
+        rememberGraphics("ok");
     }
 }
 
 let graphicsSeen = null;
+let graphicsChecked = false;
 try {
-    graphicsSeen = sessionStorage.getItem("gfx");
+    graphicsSeen = localStorage.getItem("gfx");
+    graphicsChecked = !!sessionStorage.getItem("gfx-checked");
 } catch (e) {}
 
-if (!graphicsSeen) {
+if (!graphicsChecked) {
     if ("requestIdleCallback" in window) requestIdleCallback(checkGraphics, { timeout: 2000 });
     else setTimeout(checkGraphics, 1200);
 }
@@ -225,8 +250,8 @@ if (!graphicsSeen) {
 // Frame check: some browsers pass the check above and still draw slowly (Firefox with hardware acceleration off
 // keeps WebGL). While the page scrolls, the time between frames is measured in batches (40 frames, or 0.6s of
 // scrolling when frames are that slow); if a third or more of a batch ran long (over 30ms, under about 33 frames a
-// second), the page switches to the lighter look for the rest of the visit. After ten smooth batches it stops
-if (graphicsSeen !== "low") {
+// second), the page switches to the lighter look, and stays in it on later visits. After ten smooth batches it stops
+if (graphicsSeen !== "low" && graphicsSeen !== "slow") {
     let gaps = [];
     let lastFrame = 0;
     let frame = 0;
@@ -246,7 +271,7 @@ if (graphicsSeen !== "low") {
             gaps = [];
             batchTime = 0;
             if (isSlow) {
-                markLowGraphics();
+                markLowGraphics("slow");
                 window.removeEventListener("scroll", onScrollFrames);
                 frame = 0;
                 return;
@@ -299,8 +324,32 @@ applyTheme();
 
 let themeSwitch = 0; // the latest switch; a quick second click cuts the first one short
 
-themeToggleBtn.addEventListener("click", () => {
+// The covers' pictures in the other theme only download when needed, so pointing at the switch fetches them, and
+// switching waits (briefly) until they're ready to draw: the page changes theme whole, never with a blank cover
+function picturesForTheme(theme) {
+    const imgs = [];
+    document.querySelectorAll(".work-thumbnail :is(.cover-screens, .cover-wall)").forEach((cover) => {
+        if (cover.matches(".is-live, .is-still")) imgs.push(...livePictures(cover, theme));
+        imgs.push(...cover.querySelectorAll(`img.cover-poster.is-${theme}`));
+    });
+    // only the ones on or near the screen hold the switch up; the rest just start loading
+    const near = (img) => {
+        const r = img.parentElement.getBoundingClientRect();
+        return r.bottom > -window.innerHeight && r.top < window.innerHeight * 2;
+    };
+    fetchPictures(imgs);
+    return imgs.filter(near);
+}
+
+const otherTheme = () => (pageTheme() === "dark" ? "light" : "dark");
+themeToggleBtn.addEventListener("pointerenter", () => picturesForTheme(otherTheme()));
+themeToggleBtn.addEventListener("focus", () => picturesForTheme(otherTheme()));
+
+themeToggleBtn.addEventListener("click", async () => {
     const isDarkNow = !document.documentElement.classList.contains("dark-theme");
+    const thisSwitch = ++themeSwitch;
+    await readyPictures(picturesForTheme(isDarkNow ? "dark" : "light"), 400);
+    if (thisSwitch !== themeSwitch) return; // clicked again meanwhile: that click takes over
 
     // Matching the system clears the saved choice
     if (isDarkNow === darkQuery.matches) {
@@ -316,7 +365,6 @@ themeToggleBtn.addEventListener("click", () => {
         applyTheme();
         return;
     }
-    const thisSwitch = ++themeSwitch;
     page.classList.add("theme-switching");
     document.startViewTransition(applyTheme).finished.catch(() => {}).then(() => {
         if (thisSwitch === themeSwitch) page.classList.remove("theme-switching");
@@ -544,16 +592,107 @@ document.querySelectorAll(".work-thumbnail .view-project").forEach((pill) => {
     });
 });
 
-// The Apple Sports cover leans with the cursor: the floor (and its flat picture) slides a little away from it and
-// the lifted parts slide the other way, higher parts further, so the screen seems to have depth. The lean eases
-// toward the cursor here, frame by frame, and is written straight onto those pieces, each on its own layer
-// (style.css): following the cursor then only moves finished layers, with nothing redrawn
+// Covers: at rest each cover is one picture of itself (style.css, "Covers at rest"), so scrolling past it costs no more
+// than scrolling past a photo. The live cover is built only when it's about to be used: pointing at its project (or
+// tabbing to it) lays it out hidden while its pictures load and decode, then shows it in the picture's place, which
+// it matches exactly, and only then do the hover effects start. Nothing switches over mid-scroll: a switch waits
+// until the page has been still for a moment.
+// On computers with a mouse, the live covers' pictures are fetched once the page is idle, so pointing at a cover
+// brings it to life at once
+const SCROLL_QUIET = 150; // ms without scrolling before a cover switches over
+let lastScrollTime = -Infinity;
+window.addEventListener("scroll", () => (lastScrollTime = performance.now()), { passive: true });
+
+// run once the page has been still for a moment (right away if it already is)
+function whenScrollQuiet(fn) {
+    const wait = lastScrollTime + SCROLL_QUIET - performance.now();
+    if (wait > 0) return setTimeout(() => whenScrollQuiet(fn), wait);
+    fn();
+    return 0;
+}
+
+const pageTheme = () => (document.documentElement.classList.contains("dark-theme") ? "dark" : "light");
+
+// the pictures a live cover shows in a theme (the wall's tiles come in both; the Apple Sports screens don't)
+function livePictures(cover, theme = pageTheme()) {
+    const other = theme === "dark" ? "is-light" : "is-dark";
+    return [...cover.querySelectorAll("img:not(.cover-poster)")].filter((img) => !img.classList.contains(other));
+}
+
+// starts the downloads; the browser decodes them later, when they're needed
+function fetchPictures(imgs) {
+    imgs.forEach((img) => {
+        if (img.loading !== "eager") img.loading = "eager";
+    });
+}
+
+// downloaded and decoded, ready to draw without a gap; gives up waiting after `limit` ms
+function readyPictures(imgs, limit = Infinity) {
+    fetchPictures(imgs);
+    const all = Promise.all(imgs.map((img) => img.decode().catch(() => {})));
+    return limit === Infinity ? all : Promise.race([all, new Promise((done) => setTimeout(done, limit))]);
+}
+
+// Shared by both covers: is-warm while the live cover gets ready, then is-live. `onLive` runs once it shows
+function bringToLife(cover, onLive) {
+    if (cover.classList.contains("is-live") || cover.classList.contains("is-warm")) return;
+    cover.classList.add("is-warm");
+    readyPictures(livePictures(cover)).then(() => {
+        if (!cover.classList.contains("is-warm")) return; // put back to rest while loading
+        whenScrollQuiet(() => {
+            if (!cover.classList.contains("is-warm")) return;
+            getComputedStyle(cover.lastElementChild).visibility; // the hidden, resting state is the effects' starting point
+            cover.classList.replace("is-warm", "is-live");
+            if (onLive) onLive();
+        });
+    });
+}
+
+const coverPointer = window.matchMedia("(hover: hover) and (pointer: fine)");
+
+// is the visitor using this project right now: pointing at it, or tabbed into it
+const inUse = (card) => card.matches(":hover") || !!card.querySelector(":focus-visible");
+
+// The live cover's triggers: the mouse entering the project, or a keyboard focus inside it (a tap that focuses a link
+// on its way to opening it doesn't count). `onStart` brings it to life; `onEnd` runs once the visitor leaves
+function watchCoverUse(card, onStart, onEnd) {
+    card.addEventListener("pointerenter", (e) => {
+        if (e.pointerType === "mouse") onStart();
+    });
+    card.addEventListener("pointerleave", (e) => {
+        if (e.pointerType === "mouse" && !card.querySelector(":focus-visible")) onEnd();
+    });
+    card.addEventListener("focusin", () => {
+        if (card.querySelector(":focus-visible")) onStart();
+    });
+    card.addEventListener("focusout", (e) => {
+        if (!card.contains(e.relatedTarget) && !card.matches(":hover")) onEnd();
+    });
+}
+
+// Live pictures, fetched ahead once the page is idle (mouse-driven computers only; never with Save-Data on)
+function prefetchLiveCovers() {
+    if (!coverPointer.matches || navigator.connection?.saveData) return;
+    document.querySelectorAll(".work-thumbnail :is(.cover-screens, .cover-wall)").forEach((cover) => fetchPictures(livePictures(cover)));
+}
+
+window.addEventListener("load", () => {
+    if ("requestIdleCallback" in window) requestIdleCallback(prefetchLiveCovers, { timeout: 3000 });
+    else setTimeout(prefetchLiveCovers, 1500);
+});
+
+// The Apple Sports cover leans with the cursor: the floor slides a little away from it and the lifted parts slide
+// the other way, higher parts further, so the screen seems to have depth. The lean eases toward the cursor here,
+// frame by frame, and is written straight onto those pieces, each on its own layer (style.css): following the cursor
+// then only moves finished layers, with nothing redrawn.
+// Once the visitor leaves and the parts have settled back down, the cover goes back to its picture
 const LEAN_EASE = 0.1; // share of the remaining distance covered per frame (at 60fps): about half a second to settle
+const LIFT_SETTLE = 1000; // ms for the lifted parts to settle back down (style.css: 0.8s, after up to 0.1s)
 
 document.querySelectorAll(".work-thumbnail .cover-screens").forEach((cover) => {
     const thumb = cover.closest(".work-thumbnail");
+    const card = cover.closest(".work-card") || thumb;
     const floor = cover.querySelector(".cover-floor");
-    const flats = cover.querySelectorAll(".cover-flat");
     const parts = [...cover.querySelectorAll(".cover-layer")].map((el) => ({
         el,
         depth: getComputedStyle(el).getPropertyValue("--depth").trim() || "1cqh",
@@ -562,11 +701,11 @@ document.querySelectorAll(".work-thumbnail .cover-screens").forEach((cover) => {
     const current = { x: 0, y: 0 };
     let frame = 0;
     let lastTime = 0;
+    let restTimer = 0;
 
     function place() {
         const { x, y } = current;
         if (floor) floor.style.translate = `calc(-50% + ${(-x).toFixed(3)}cqh) calc(-50% + 8cqh + ${(-y).toFixed(3)}cqh)`;
-        flats.forEach((flat) => (flat.style.translate = `calc(-50% + ${(-x).toFixed(3)}cqh) ${(-y).toFixed(3)}cqh`));
         parts.forEach(({ el, depth }) => {
             const dx = (x * 0.819 + y * 0.932).toFixed(3);
             const dy = (x * -0.574 + y * 1.331).toFixed(3);
@@ -596,8 +735,33 @@ document.querySelectorAll(".work-thumbnail .cover-screens").forEach((cover) => {
         }
     }
 
+    // back to the picture, once nothing is moving and nobody is using it
+    function rest() {
+        restTimer = 0;
+        if (inUse(card)) return;
+        if (frame || current.x || current.y) {
+            restTimer = setTimeout(rest, 200);
+            return;
+        }
+        restTimer = whenScrollQuiet(() => {
+            if (!inUse(card)) cover.classList.remove("is-live", "is-warm");
+        });
+    }
+
+    watchCoverUse(card, () => {
+        clearTimeout(restTimer);
+        bringToLife(cover);
+    }, () => {
+        clearTimeout(restTimer);
+        if (cover.classList.contains("is-warm")) {
+            cover.classList.remove("is-warm"); // left before it was ready
+            return;
+        }
+        restTimer = setTimeout(rest, reduceMotion.matches ? 0 : LIFT_SETTLE);
+    });
+
     thumb.addEventListener("pointermove", (e) => {
-        if (e.pointerType !== "mouse" || reduceMotion.matches) return;
+        if (e.pointerType !== "mouse" || reduceMotion.matches || !cover.classList.contains("is-live")) return;
         const rect = thumb.getBoundingClientRect();
         target.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
         target.y = ((e.clientY - rect.top) / rect.height) * 2 - 1;
@@ -607,33 +771,56 @@ document.querySelectorAll(".work-thumbnail .cover-screens").forEach((cover) => {
     thumb.addEventListener("pointerleave", () => {
         target.x = 0;
         target.y = 0;
-        go();
+        if (current.x || current.y) go();
     });
 });
 
 // The portfolio cover's wall of sections: pointing at it (or at its slice on the Work page, or tabbing to its
 // project) eases the columns up to speed, and leaving eases them to a stop where they are, so the motion never
 // starts or stops with a jolt. Each column's own speed and direction come from style.css; this only scales them.
-// With reduced motion on, the wall holds still (style.css)
+// Once stopped (and no longer pointed at), the wall stays as it stopped, drawn as part of the page (is-still): each
+// column is fixed where it is and its animation let go, and they pick up from there next time.
+// With reduced motion on, the wall holds still (style.css) and is always drawn live, still
 const WALL_SPEED_UP = 1000; // ms from still to full speed
 const WALL_SLOW_DOWN = 700; // ms from full speed to still
+const WALL_SETTLE = 750; // ms for the wall to shrink back after being pointed at (style.css: 0.7s)
 
 document.querySelectorAll(".work-thumbnail .cover-wall").forEach((wall) => {
-    if (reduceMotion.matches) return;
     const zone = wall.closest(".work-grid .work-card") || wall.closest(".work-thumbnail");
-    const card = wall.closest(".work-card");
+    const card = wall.closest(".work-card") || zone;
+    const tracks = [...wall.querySelectorAll(".cover-wall-track")];
+    const stoppedAt = new Map(); // track -> its animation's time when the wall went still
     let runs = [];
     let level = 0; // 0 = still, 1 = full speed
     let target = 0;
     let frame = 0;
     let lastTime = 0;
+    let stillTimer = 0;
+    let started = false; // the columns' animations have started; until then their speed is left alone
 
-    // the columns' animations, taken over from the stylesheet: running, but at no speed until pointed at
+    if (reduceMotion.matches) wall.classList.add("is-still");
+
+    // the columns' animations, taken over from the stylesheet: running, but at no speed until pointed at,
+    // and picking up where they stopped. Their speed only starts changing once they've started (changing it before
+    // keeps them waiting to start, and they'd then jump in at full speed)
     function takeOver() {
-        runs = wall.getAnimations({ subtree: true });
-        runs.forEach((run) => {
+        runs = [];
+        started = false;
+        if (reduceMotion.matches) return;
+        tracks.forEach((track) => {
+            track.style.transform = "";
+            const run = track.getAnimations()[0];
+            if (!run) return;
             run.playbackRate = 0;
             run.play();
+            if (stoppedAt.has(track)) run.currentTime = stoppedAt.get(track);
+            runs.push(run);
+        });
+        const these = runs;
+        Promise.all(these.map((run) => run.ready)).catch(() => {}).then(() => {
+            if (runs !== these) return; // gone still (or live again) meanwhile
+            started = true;
+            go(target);
         });
     }
 
@@ -651,22 +838,74 @@ document.querySelectorAll(".work-thumbnail .cover-wall").forEach((wall) => {
     }
 
     function go(to) {
-        if (!runs.length) takeOver();
         target = to;
+        if (!runs.length || !started) return; // not live (or not started) yet: it heads for this speed once it is
         if (!frame) {
             lastTime = 0;
             frame = requestAnimationFrame(step);
         }
     }
 
-    takeOver();
+    function start() {
+        clearTimeout(stillTimer);
+        if (wall.classList.contains("is-still")) {
+            // straight from still to live: the same picture, with its pictures already there
+            wall.classList.replace("is-still", "is-live");
+            takeOver();
+        } else {
+            bringToLife(wall, takeOver);
+        }
+    }
+
+    // fix each column where it stopped and let the animations go
+    function settle() {
+        stillTimer = 0;
+        if (inUse(card)) return;
+        if (frame || level) {
+            stillTimer = setTimeout(settle, 100);
+            return;
+        }
+        stillTimer = whenScrollQuiet(() => {
+            if (inUse(card) || !wall.classList.contains("is-live")) return;
+            if (!reduceMotion.matches && !runs.some((run) => run.currentTime > 0)) {
+                // never got going: its picture still matches, so back to that
+                wall.classList.remove("is-live");
+                runs = [];
+                return;
+            }
+            tracks.forEach((track) => {
+                const run = track.getAnimations()[0];
+                if (!run) return;
+                // where it is, as a share of its own length (style.css: up runs 0 to -50%, down -50% to 0), so it
+                // stays put however the cover is resized
+                const at = run.effect.getComputedTiming().progress || 0;
+                const y = run.animationName === "cover-wall-up" ? -50 * at : -50 + 50 * at;
+                track.style.transform = `translateY(${y.toFixed(5)}%)`;
+                stoppedAt.set(track, run.currentTime);
+            });
+            runs = [];
+            wall.classList.replace("is-live", "is-still");
+        });
+    }
+
+    watchCoverUse(card, start, () => {
+        clearTimeout(stillTimer);
+        if (wall.classList.contains("is-warm")) {
+            wall.classList.remove("is-warm"); // left before it was ready
+            return;
+        }
+        stillTimer = setTimeout(settle, reduceMotion.matches ? 0 : WALL_SETTLE);
+    });
+
     zone.addEventListener("pointerenter", (e) => {
         if (e.pointerType === "mouse") go(1);
     });
     zone.addEventListener("pointerleave", () => go(0));
-    card.addEventListener("focusin", () => go(1));
-    card.addEventListener("focusout", () => {
-        if (!card.matches(":hover")) go(0);
+    card.addEventListener("focusin", () => {
+        if (card.querySelector(":focus-visible")) go(1);
+    });
+    card.addEventListener("focusout", (e) => {
+        if (!card.contains(e.relatedTarget) && !zone.matches(":hover")) go(0);
     });
 });
 
@@ -1005,13 +1244,28 @@ function addMediaControls(video) {
         btn.setAttribute("aria-label", paused ? "Play video" : "Pause video");
     }
 
-    // the bar follows the video: every frame while it plays, and after any jump
+    // the bar follows the video: every frame while it plays, and after any jump. Only what changed is written, so
+    // most frames touch nothing (the time reads in whole seconds; the timeline moves in steps of 1/1000)
+    let shownStep = null;
+    let shownTime = null;
+
     function sync() {
         const duration = video.duration;
-        if (!dragging && duration) seek.value = Math.round((video.currentTime / duration) * SEEK_STEPS);
-        seek.style.setProperty("--progress", `${(seek.value / SEEK_STEPS) * 100}%`);
-        now.textContent = formatTime(video.currentTime);
-        seek.setAttribute("aria-valuetext", `${formatTime(video.currentTime)} of ${formatTime(duration)}`);
+        if (!dragging && duration) {
+            const at = String(Math.round((video.currentTime / duration) * SEEK_STEPS));
+            if (seek.value !== at) seek.value = at;
+        }
+        const step = seek.value;
+        if (step !== shownStep) {
+            shownStep = step;
+            seek.style.setProperty("--progress", `${(step / SEEK_STEPS) * 100}%`);
+        }
+        const time = `${formatTime(video.currentTime)}|${formatTime(duration)}`;
+        if (time !== shownTime) {
+            shownTime = time;
+            now.textContent = formatTime(video.currentTime);
+            seek.setAttribute("aria-valuetext", `${formatTime(video.currentTime)} of ${formatTime(duration)}`);
+        }
     }
 
     function follow() {

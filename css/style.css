@@ -364,6 +364,25 @@ body {
     will-change: transform;
 }
 
+/* tied straight to the scroll where the browser can: it fills off the page's main thread, in step with the scroll
+   on every frame (script.js sets it elsewhere) */
+@supports (animation-timeline: scroll()) {
+    .header-progress {
+        animation: header-progress linear both;
+        animation-timeline: scroll(root block);
+    }
+
+    @keyframes header-progress {
+        from {
+            transform: scaleX(0);
+        }
+
+        to {
+            transform: scaleX(1);
+        }
+    }
+}
+
 .header.scrolled::before,
 .header.scrolled .header-progress {
     opacity: 1;
@@ -1235,6 +1254,7 @@ a.work-thumbnail:active {
    Light or dark with the site, pictures included. With reduced motion on, the wall holds still. Sized in cqh
    (thumbnail height), so it keeps its size when a Work slice widens on hover */
 .cover-wall {
+    --bg-w: 100%; /* the width its background is drawn for: its own (_tools/render-covers.py draws its picture's for a 16:9 cover) */
     --canvas: #DCDFE0;
     --tile-edge: rgb(0 0 0 / 0.06);
     --panel: #FFFFFF;
@@ -1256,7 +1276,7 @@ a.work-thumbnail:active {
     overflow: hidden;
     border-radius: inherit;
     container-type: size;
-    background: radial-gradient(80% 90% at 50% 40%, #E9EBEB, var(--canvas));
+    background: radial-gradient(calc(0.8 * var(--bg-w)) 90% at 50% 40%, #E9EBEB, var(--canvas));
 }
 
 :root.dark-theme .cover-wall {
@@ -1274,7 +1294,7 @@ a.work-thumbnail:active {
     --code-val: #FFB283;
     --shadow: 0 0 0;
     --s: 1.8;
-    background: radial-gradient(80% 90% at 50% 40%, #262624, var(--canvas));
+    background: radial-gradient(calc(0.8 * var(--bg-w)) 90% at 50% 40%, #262624, var(--canvas));
 }
 
 /* no photo here, so the year needs no shade behind it; on the light version it reads dark */
@@ -1297,9 +1317,16 @@ a.work-thumbnail:active {
     gap: 4cqh;
     height: 280cqh;
     translate: -50% -50%;
-    transform: rotateX(38deg) rotateZ(-24deg);
+    /* tipped back 38deg and turned -24deg. Without perspective, tipping a flat plane back only squashes it by
+       cos(38deg), so this is written as that squash: the same picture as rotateX(38deg) rotateZ(-24deg), but a flat
+       (2D) transform, which browsers can draw as part of the page instead of on a 3D layer of its own */
+    transform: scaleY(0.788011) rotate(-24deg);
     transition: scale 0.7s cubic-bezier(0.22, 1, 0.36, 1);
-    will-change: transform; /* grows on hover without the browser redrawing every tile at the new size */
+}
+
+/* live (pointed at): on its own layer, so it grows on hover without the browser redrawing every tile at the new size */
+.cover-wall.is-live .cover-wall-plane {
+    will-change: transform;
 }
 
 .cover-wall-col {
@@ -1326,14 +1353,14 @@ a.work-thumbnail:active {
     animation: none;
 }
 
-/* pointed at, the wall also grows a little, toward the viewer */
-.work-card:focus-within .cover-wall-plane {
+/* pointed at, the wall also grows a little, toward the viewer (once it's live: see "Covers at rest" below) */
+.work-card:focus-within .cover-wall.is-live .cover-wall-plane {
     scale: 1.06;
 }
 
 @media (hover: hover) {
-    .work-thumbnail:hover .cover-wall-plane,
-    .work-grid .work-card:hover .cover-wall-plane {
+    .work-thumbnail:hover .cover-wall.is-live .cover-wall-plane,
+    .work-grid .work-card:hover .cover-wall.is-live .cover-wall-plane {
         scale: 1.06;
     }
 }
@@ -1381,12 +1408,6 @@ a.work-thumbnail:active {
     box-shadow:
         0 0 0 0.12cqh var(--tile-edge),
         0 1.2cqh 3cqh rgb(var(--shadow) / calc(0.14 * var(--s)));
-}
-
-/* drawing slowly (no graphics card, script.js): just the hairline edge. A soft shadow under every tile on a turned
-   plane is what made those browsers stutter as the wall scrolled into view */
-:root.low-gfx .cover-wall-tile {
-    box-shadow: 0 0 0 0.12cqh var(--tile-edge);
 }
 
 .work-thumbnail .cover-wall img {
@@ -1508,8 +1529,9 @@ a.work-thumbnail:active {
    Sized in cqh (thumbnail height), so it keeps its size when a Work slice widens on hover.
    Light by default; :root.dark-theme switches to the night version */
 .cover-screens {
+    --bg-w: 100%; /* the width its background is drawn for: its own (_tools/render-covers.py draws its picture's for a 16:9 cover) */
     --cover-bg:
-        radial-gradient(70% 90% at 50% 45%, #F7F5F1, transparent 75%),
+        radial-gradient(calc(0.7 * var(--bg-w)) 90% at 50% 45%, #F7F5F1, transparent 75%),
         linear-gradient(165deg, #EAE7E1, #D3CFC6);
     --cover-pool: rgb(47 99 207 / 0.16);
     --cover-shadow: 43 42 39;
@@ -1525,14 +1547,11 @@ a.work-thumbnail:active {
     border-radius: inherit;
     container-type: size;
     background: var(--cover-bg);
-    /* drawn once into its own layer and kept there, so scrolling moves the finished picture instead of
-       redrawing the phones, their sides, and their shadows */
-    will-change: transform;
 }
 
 :root.dark-theme .cover-screens {
     --cover-bg:
-        radial-gradient(70% 90% at 50% 45%, #45443F, transparent 75%),
+        radial-gradient(calc(0.7 * var(--bg-w)) 90% at 50% 45%, #45443F, transparent 75%),
         linear-gradient(165deg, #2F2E2C, #1C1C1A);
     --cover-pool: rgb(64 120 235 / 0.26);
     --cover-shadow: 0 0 0;
@@ -1807,23 +1826,23 @@ a.work-thumbnail:active {
     border-radius: 50%;
 }
 
-/* lifted higher (pointed at, or tabbed to): the softer shadow takes over */
-.work-card:focus-within .cover-shade::before {
+/* lifted higher (pointed at, or tabbed to, once live): the softer shadow takes over */
+.work-card:focus-within .is-live .cover-shade::before {
     opacity: 0;
 }
 
-.work-card:focus-within .cover-shade::after {
+.work-card:focus-within .is-live .cover-shade::after {
     opacity: 1;
 }
 
 @media (hover: hover) {
-    .work-thumbnail:hover .cover-shade::before,
-    .work-grid .work-card:hover .cover-shade::before {
+    .work-thumbnail:hover .is-live .cover-shade::before,
+    .work-grid .work-card:hover .is-live .cover-shade::before {
         opacity: 0;
     }
 
-    .work-thumbnail:hover .cover-shade::after,
-    .work-grid .work-card:hover .cover-shade::after {
+    .work-thumbnail:hover .is-live .cover-shade::after,
+    .work-grid .work-card:hover .is-live .cover-shade::after {
         opacity: 1;
     }
 }
@@ -1855,32 +1874,33 @@ a.work-thumbnail:active {
     border-radius: 50%;
 }
 
-/* pointing at the cover (or at its slice on the Work page, or tabbing to its project) lifts the parts higher */
-.work-card:focus-within .cover-layer.is-list {
+/* pointing at the cover (or at its slice on the Work page, or tabbing to its project) lifts the parts higher,
+   once it's live */
+.work-card:focus-within .is-live .cover-layer.is-list {
     --lift: 7cqh;
 }
 
-.work-card:focus-within .cover-layer.is-today {
+.work-card:focus-within .is-live .cover-layer.is-today {
     --lift: 15cqh;
 }
 
-.work-card:focus-within .cover-layer.is-logo {
+.work-card:focus-within .is-live .cover-layer.is-logo {
     --lift: 29cqh;
 }
 
 @media (hover: hover) {
-    .work-thumbnail:hover .cover-layer.is-list,
-    .work-grid .work-card:hover .cover-layer.is-list {
+    .work-thumbnail:hover .is-live .cover-layer.is-list,
+    .work-grid .work-card:hover .is-live .cover-layer.is-list {
         --lift: 7cqh;
     }
 
-    .work-thumbnail:hover .cover-layer.is-today,
-    .work-grid .work-card:hover .cover-layer.is-today {
+    .work-thumbnail:hover .is-live .cover-layer.is-today,
+    .work-grid .work-card:hover .is-live .cover-layer.is-today {
         --lift: 15cqh;
     }
 
-    .work-thumbnail:hover .cover-layer.is-logo,
-    .work-grid .work-card:hover .cover-layer.is-logo {
+    .work-thumbnail:hover .is-live .cover-layer.is-logo,
+    .work-grid .work-card:hover .is-live .cover-layer.is-logo {
         --lift: 29cqh;
     }
 }
@@ -1894,51 +1914,73 @@ a.work-thumbnail:active {
     }
 }
 
-/* For browsers that draw slowly: without a graphics card, the phones, their sides, and their shadows on a turned
-   floor take too long to redraw on every scroll frame. script.js marks the page .low-gfx when that's the case, and
-   the parts that never move become one flat picture (rendered from this cover, in each theme, with empty spots
-   where the lifting parts sit). The floor stays, with its phones invisible, so the list, today's game, and the logo
-   still lift and lean over the picture, and the picture slides with the cursor just as the floor does. The picture
-   is never downloaded otherwise. It's wider than any thumbnail and centered at full height, so each one shows the
-   same part the live cover does */
-/* as specific as the rule that shows every picture in the cover (.work-thumbnail .cover-screens img), or that rule
-   wins and the flat picture shows under the live phones */
-.work-thumbnail .cover-screens .cover-flat {
-    display: none;
-}
-
-:root.low-gfx .cover-screens::before {
-    display: none;
-}
-
-:root.low-gfx .cover-screens .cover-phone {
-    visibility: hidden;
-    box-shadow: none;
-    filter: none;
-}
-
-:root.low-gfx .work-thumbnail .cover-screens .cover-layer,
-:root.low-gfx .work-thumbnail .cover-screens .cover-shade {
-    visibility: visible;
-}
-
-:root.low-gfx .work-thumbnail .cover-screens .cover-flat.is-light,
-:root.low-gfx.dark-theme .work-thumbnail .cover-screens .cover-flat.is-dark {
-    display: block;
+/* ===== Covers at rest: one still picture =====
+   Both covers are many pieces: the wall is dozens of tiles on a turned plane, the Apple Sports cover is three phones
+   with stacked sides, soft shadows and blurred parts. Drawn live, every one of those pieces is redrawn on every frame
+   as the page scrolls, which is what made scrolling past them drop frames (badly without a graphics card).
+   So at rest each cover is one picture of itself: rendered from the live cover by the browser (_tools/render-covers.py),
+   in each theme. It's wider than any thumbnail gets (twice as wide as it is tall) and fills the cover's height,
+   centered, like the live cover, so every thumbnail shows exactly the part the live cover would. Scrolling past it
+   costs no more than scrolling past a photo.
+   The live cover is built only when it's about to be used (script.js): pointing at the project, or tabbing to it,
+   lays it out hidden (is-warm) while its pictures load, then shows it in place of the still one (is-live) and only
+   then do the hover effects start, so they always start from rest. When they've settled, the Apple Sports cover goes
+   back to its picture; the wall, whose columns stop wherever they are, stays as it stopped (is-still), drawn as part
+   of the page, with no layers and nothing running */
+.work-thumbnail :is(.cover-screens, .cover-wall) > img.cover-poster {
     position: absolute;
-    top: 0;
-    left: 50%;
-    width: auto;
-    max-width: none;
+    inset: 0;
+    z-index: auto;
+    width: 100%;
     height: 100%;
-    /* slides with the floor as the cover leans (script.js) */
-    translate: -50% 0;
-    will-change: transform;
+    max-width: none;
+    object-fit: cover;
     border-radius: 0;
 }
 
-:root.low-gfx.dark-theme .work-thumbnail .cover-screens .cover-flat.is-light {
+/* the picture in the site's current theme; the other downloads only once the theme switch is pointed at (script.js) */
+.work-thumbnail :is(.cover-screens, .cover-wall) > img.cover-poster.is-dark,
+:root.dark-theme .work-thumbnail :is(.cover-screens, .cover-wall) > img.cover-poster.is-light {
     display: none;
+}
+
+:root.dark-theme .work-thumbnail :is(.cover-screens, .cover-wall) > img.cover-poster.is-dark {
+    display: block;
+}
+
+/* at rest the live cover isn't built at all: nothing in it is laid out, downloaded or drawn */
+.cover-screens:not(.is-warm, .is-live) > .cover-floor,
+.cover-wall:not(.is-warm, .is-live, .is-still) > .cover-wall-plane {
+    display: none;
+}
+
+/* the pool of light under the middle phone is part of the picture */
+.cover-screens:not(.is-live)::before {
+    display: none;
+}
+
+/* warming up: laid out and loading, not drawn */
+.cover-screens.is-warm > .cover-floor,
+.cover-wall.is-warm > .cover-wall-plane {
+    visibility: hidden;
+}
+
+/* live (or still): the picture steps aside */
+.work-thumbnail :is(.cover-screens, .cover-wall):is(.is-live, .is-still) > img.cover-poster {
+    visibility: hidden;
+}
+
+/* still: the columns hold where they stopped (script.js writes each one's place), with no animation kept running */
+.cover-wall.is-still .cover-wall-track {
+    animation: none;
+}
+
+/* With reduced motion on, the wall rests at a different spot than its picture shows, so it's always drawn live,
+   still (script.js) */
+@media (prefers-reduced-motion: reduce) {
+    .work-thumbnail .cover-wall > img.cover-poster {
+        display: none !important;
+    }
 }
 
 .section-item {
