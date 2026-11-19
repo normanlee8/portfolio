@@ -1096,10 +1096,22 @@ h1.work-header {
     border-radius: 10px;
     position: relative;
     isolation: isolate; /* no overflow clip, so the "View Details" pill can pass the edges */
-    /* same faint ring as the About photos */
-    outline: 1px solid var(--line-faint);
-    outline-offset: -1px;
     transition: scale 0.2s ease;
+}
+
+/* The same faint ring as the About photos, over the cover and the year but under the "View Details" pill (z-index 1),
+   just as an outline would sit. Drawn as an inner edge on a layer of its own rather than as an outline: the browser
+   redraws an element's outline whenever anything inside it moves, so while a live cover moved (its columns running,
+   its parts lifting, the pill appearing) the whole thumbnail and the page around it were redrawn on every frame of a
+   scroll, about 2,000 tiles in a couple of seconds. This edge is redrawn only when the thumbnail itself changes.
+   It matches the outline to the pixel (outline-offset -1px: the line runs along the inside of the edge) */
+.work-thumbnail::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    box-shadow: inset 0 0 0 1px var(--line-faint);
+    pointer-events: none;
 }
 
 /* Photo fills the frame */
@@ -1126,6 +1138,7 @@ h1.work-header {
 /* "View Details" pill: follows the cursor over the thumbnail (position set by script.js) */
 .view-project {
     position: absolute;
+    z-index: 1; /* above the thumbnail's ring (::after) */
     left: 0;
     top: 0;
     display: flex;
@@ -1705,8 +1718,6 @@ a.work-thumbnail:active {
     top: calc(var(--bezel) + var(--screen-h) * var(--at-y));
     width: calc(var(--screen-w) * var(--at-w));
     border-radius: calc(var(--screen-w) * 0.0407);
-    outline: 0.2cqh solid rgb(255 255 255 / 0.16);
-    outline-offset: -0.2cqh;
     /* Two separate motions, so neither interrupts the other:
        translate lifts the part straight up off the screen (and settles it back), slowly and one part after another;
        transform leans it toward the cursor, more for higher parts, so the screen seems to have real depth */
@@ -1718,6 +1729,17 @@ a.work-thumbnail:active {
         0.28cqh 0.40cqh 0 rgb(120 150 215 / 0.55),
         0.56cqh 0.80cqh 0 rgb(40 60 110 / 0.75);
     transition: translate 0.8s cubic-bezier(0.22, 1, 0.36, 1) var(--wait, 0s);
+}
+
+/* Each part's thin lit rim, on the element right after it (same place, size, lift and lean: it's a .cover-layer too,
+   and script.js leans it with its part). Drawn as an inner edge rather than as an outline on the picture: the browser
+   redraws an outline whenever its element moves, so while the parts lifted and leaned during a scroll, each was redrawn
+   on every frame; an edge on a layer of its own only moves. It lines up with the outline it replaces (outline-offset
+   -0.2cqh: the rim runs along the inside of the edge) */
+.work-thumbnail .cover-screens .cover-rim {
+    aspect-ratio: var(--ratio);
+    box-shadow: inset 0 0 0 0.2cqh rgb(255 255 255 / 0.16);
+    pointer-events: none;
 }
 
 /* The shadow each lifted part throws onto the spot it came from: soft at rest, softer when the part rises higher.
@@ -1811,6 +1833,7 @@ a.work-thumbnail:active {
     --at-x: 0.0611;
     --at-y: 0.4284;
     --at-w: 0.8779;
+    --ratio: 562 / 774; /* the picture's shape, for its rim */
     --lift: 3cqh;
     --depth: 0.7cqh;
 }
@@ -1819,6 +1842,7 @@ a.work-thumbnail:active {
     --at-x: 0.0611;
     --at-y: 0.3392;
     --at-w: 0.8779;
+    --ratio: 562 / 111;
     --lift: 7.5cqh;
     --depth: 1.5cqh;
     --wait: 0.05s;
@@ -1828,6 +1852,7 @@ a.work-thumbnail:active {
     --at-x: 0.3647;
     --at-y: 0.1745;
     --at-w: 0.268;
+    --ratio: 1;
     --lift: 18cqh;
     --depth: 2.6cqh;
     --wait: 0.1s;
@@ -1882,7 +1907,8 @@ a.work-thumbnail:active {
    in each theme. It's wider than any thumbnail gets (twice as wide as it is tall) and fills the cover's height,
    centered, like the live cover, so every thumbnail shows exactly the part the live cover would. Scrolling past it
    costs no more than scrolling past a photo.
-   The live cover is built only when it's about to be used (script.js): pointing at the project, or tabbing to it,
+   The live cover is built only when it's about to be used (script.js): pointing at the cover (or at its slice on the
+   Work page), or tabbing to its project,
    lays it out hidden (is-warm) while its pictures load, then shows it in place of the still one (is-live) and only
    then do the hover effects start, so they always start from rest. When they've settled, the Apple Sports cover goes
    back to its picture; the wall, whose columns stop wherever they are, stays as it stopped (is-still), drawn as part

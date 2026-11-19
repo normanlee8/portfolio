@@ -238,34 +238,59 @@ if (!graphicsChecked) {
 
 // Frame check: some browsers pass the check above and still draw slowly (Firefox with hardware acceleration off
 // keeps WebGL). While the page scrolls, the time between frames is measured in batches (40 frames, or 0.6s of
-// scrolling when frames are that slow); if a third or more of a batch ran long (over 30ms, under about 33 frames a
-// second), the page switches to the lighter look, and stays in it on later visits. After ten smooth batches it stops
+// scrolling when frames are that slow). A batch is very slow if a third or more of it ran long (over 30ms, under
+// about 33 frames a second): the page switches to the lighter look at once. It's slow if a third or more of the
+// frames the screen could have shown were missed: each gap is counted against the screen's own pace (the gap a
+// quarter of the batch comes in under), so a steady 60 frames a second on a 120Hz screen isn't slow, but scrolling
+// that keeps skipping frames is, even when no single frame runs long (Firefox without hardware acceleration scrolls
+// at 16-25ms frames under the glass header, 40-60 a second on a 120Hz screen, and drops none with the lighter look).
+// Three slow batches switch it. Measured, smooth scrolling misses at most about a quarter in a batch (the page's own
+// main thread skips the odd frame even while the scrolling itself is smooth); the slowest drawing a third or more,
+// batch after batch. Either way it stays in the lighter look on later visits. After ten smooth batches it stops
+const FRAME_PAUSE = 250; // ms: a gap this long is a pause (the page or window wasn't drawing), not slow drawing
+
+function missedShare(gaps) {
+    const sorted = [...gaps].sort((a, b) => a - b);
+    const pace = Math.max(sorted[Math.floor(sorted.length / 4)], 4);
+    let shown = 0;
+    let missed = 0;
+    gaps.forEach((gap) => {
+        const frames = Math.max(1, Math.round(gap / pace));
+        shown += frames;
+        missed += frames - 1;
+    });
+    return missed / shown;
+}
+
 if (graphicsSeen !== "low" && graphicsSeen !== "slow") {
     let gaps = [];
     let lastFrame = 0;
     let frame = 0;
     let scrolling = 0; // timer: scrolling counts as stopped 0.7s after the last scroll event (longer than a slow frame)
     let smoothBatches = 0;
+    let slowBatches = 0;
     let batchTime = 0;
 
     function timeFrame(now) {
-        if (lastFrame) {
-            gaps.push(now - lastFrame);
-            batchTime += now - lastFrame;
+        const gap = now - lastFrame;
+        if (lastFrame && gap < FRAME_PAUSE) {
+            gaps.push(gap);
+            batchTime += gap;
         }
         lastFrame = now;
         if (gaps.length >= 40 || (gaps.length >= 8 && batchTime >= 600)) {
-            const slow = gaps.filter((gap) => gap > 30).length;
-            const isSlow = slow * 3 >= gaps.length;
+            const verySlow = gaps.filter((g) => g > 30).length * 3 >= gaps.length;
+            const slow = verySlow || missedShare(gaps) >= 1 / 3;
             gaps = [];
             batchTime = 0;
-            if (isSlow) {
+            if (slow) slowBatches += verySlow ? 3 : 1;
+            if (slowBatches >= 3) {
                 markLowGraphics("slow");
                 window.removeEventListener("scroll", onScrollFrames);
                 frame = 0;
                 return;
             }
-            if (++smoothBatches >= 10) {
+            if (!slow && ++smoothBatches >= 10) {
                 window.removeEventListener("scroll", onScrollFrames);
                 frame = 0;
                 return;
@@ -583,10 +608,13 @@ document.querySelectorAll(".work-thumbnail .view-project").forEach((pill) => {
 });
 
 // Covers: at rest each cover is one picture of itself (style.css, "Covers at rest"), so scrolling past it costs no more
-// than scrolling past a photo. The live cover is built only when it's about to be used: pointing at its project (or
-// tabbing to it) lays it out hidden while its pictures load and decode, then shows it in the picture's place, which
-// it matches exactly, and only then do the hover effects start. Nothing switches over mid-scroll: a switch waits
-// until the page has been still for a moment.
+// than scrolling past a photo. The live cover is built only when it's about to be used: pointing at the part that
+// moves it (the thumbnail; on the Work page, the whole slice), or tabbing to its project, lays it out hidden while its
+// pictures load and decode, then shows it in the picture's place, which it matches exactly, and only then do the hover
+// effects start. Pointing at the rest of the project (its title, description, tags) does nothing to the cover, so it
+// doesn't build it either: the whole card used to, and as the page scrolled under a resting cursor that meant decoding
+// every live picture and swapping the cover back and forth between its picture and its live version, for no visible
+// change. Nothing switches over mid-scroll: a switch waits until the page has been still for a moment.
 // On computers with a mouse, the live covers' pictures are fetched once the page is idle, so pointing at a cover
 // brings it to life at once
 const SCROLL_QUIET = 150; // ms without scrolling before a cover switches over
@@ -640,23 +668,27 @@ function bringToLife(cover, onLive) {
 
 const coverPointer = window.matchMedia("(hover: hover) and (pointer: fine)");
 
-// is the visitor using this project right now: pointing at it, or tabbed into it
-const inUse = (card) => card.matches(":hover") || !!card.querySelector(":focus-visible");
+// the part of the page that moves a cover when pointed at: its slice on the Work page, its thumbnail elsewhere
+// (the hover effects in style.css are written for exactly these)
+const coverZone = (cover) => cover.closest(".work-grid .work-card") || cover.closest(".work-thumbnail");
 
-// The live cover's triggers: the mouse entering the project, or a keyboard focus inside it (a tap that focuses a link
-// on its way to opening it doesn't count). `onStart` brings it to life; `onEnd` runs once the visitor leaves
-function watchCoverUse(card, onStart, onEnd) {
-    card.addEventListener("pointerenter", (e) => {
+// is the visitor using this cover right now: pointing at its zone, or tabbed into its project
+const inUse = (zone, card) => zone.matches(":hover") || !!card.querySelector(":focus-visible");
+
+// The live cover's triggers: the mouse entering its zone, or a keyboard focus inside its project (a tap that focuses a
+// link on its way to opening it doesn't count). `onStart` brings it to life; `onEnd` runs once the visitor leaves
+function watchCoverUse(zone, card, onStart, onEnd) {
+    zone.addEventListener("pointerenter", (e) => {
         if (e.pointerType === "mouse") onStart();
     });
-    card.addEventListener("pointerleave", (e) => {
+    zone.addEventListener("pointerleave", (e) => {
         if (e.pointerType === "mouse" && !card.querySelector(":focus-visible")) onEnd();
     });
     card.addEventListener("focusin", () => {
         if (card.querySelector(":focus-visible")) onStart();
     });
     card.addEventListener("focusout", (e) => {
-        if (!card.contains(e.relatedTarget) && !card.matches(":hover")) onEnd();
+        if (!card.contains(e.relatedTarget) && !zone.matches(":hover")) onEnd();
     });
 }
 
@@ -681,6 +713,7 @@ const LIFT_SETTLE = 1000; // ms for the lifted parts to settle back down (style.
 
 document.querySelectorAll(".work-thumbnail .cover-screens").forEach((cover) => {
     const thumb = cover.closest(".work-thumbnail");
+    const zone = coverZone(cover);
     const card = cover.closest(".work-card") || thumb;
     const floor = cover.querySelector(".cover-floor");
     const parts = [...cover.querySelectorAll(".cover-layer")].map((el) => ({
@@ -728,17 +761,17 @@ document.querySelectorAll(".work-thumbnail .cover-screens").forEach((cover) => {
     // back to the picture, once nothing is moving and nobody is using it
     function rest() {
         restTimer = 0;
-        if (inUse(card)) return;
+        if (inUse(zone, card)) return;
         if (frame || current.x || current.y) {
             restTimer = setTimeout(rest, 200);
             return;
         }
         restTimer = whenScrollQuiet(() => {
-            if (!inUse(card)) cover.classList.remove("is-live", "is-warm");
+            if (!inUse(zone, card)) cover.classList.remove("is-live", "is-warm");
         });
     }
 
-    watchCoverUse(card, () => {
+    watchCoverUse(zone, card, () => {
         clearTimeout(restTimer);
         bringToLife(cover);
     }, () => {
@@ -776,7 +809,7 @@ const WALL_SLOW_DOWN = 700; // ms from full speed to still
 const WALL_SETTLE = 750; // ms for the wall to shrink back after being pointed at (style.css: 0.7s)
 
 document.querySelectorAll(".work-thumbnail .cover-wall").forEach((wall) => {
-    const zone = wall.closest(".work-grid .work-card") || wall.closest(".work-thumbnail");
+    const zone = coverZone(wall);
     const card = wall.closest(".work-card") || zone;
     const tracks = [...wall.querySelectorAll(".cover-wall-track")];
     const stoppedAt = new Map(); // track -> its animation's time when the wall went still
@@ -817,13 +850,30 @@ document.querySelectorAll(".work-thumbnail .cover-wall").forEach((wall) => {
     // ease in and out: slow at both ends of the change, so speed builds and fades smoothly
     const ease = (t) => t * t * (3 - 2 * t);
 
+    // Sets the columns' speed. Stopped, they're paused rather than left running at no speed: the browser can't hand
+    // an animation at no speed to the graphics card, so it moved each column itself on every frame, redrawing the wall's
+    // tiles and the thumbnail's ring each time, for as long as the wall stayed live (the switch to still waits for the
+    // scrolling to stop, so scrolling with the pointer just off the cover kept it that way). A column picking up again
+    // is played from where it paused, and its speed is only changed again once it has started (see takeOver)
+    function setRate(rate) {
+        runs.forEach((run) => {
+            if (rate === 0) {
+                if (run.playState !== "paused") run.pause();
+            } else if (run.playState === "paused") {
+                run.playbackRate = rate;
+                run.play();
+            } else if (!run.pending) {
+                run.playbackRate = rate;
+            }
+        });
+    }
+
     function step(now) {
         const dt = lastTime ? now - lastTime : 16;
         lastTime = now;
         const span = target > level ? WALL_SPEED_UP : WALL_SLOW_DOWN;
         level = target > level ? Math.min(target, level + dt / span) : Math.max(target, level - dt / span);
-        const rate = ease(level);
-        runs.forEach((run) => (run.playbackRate = rate));
+        setRate(ease(level));
         frame = level === target ? 0 : requestAnimationFrame(step);
     }
 
@@ -850,13 +900,13 @@ document.querySelectorAll(".work-thumbnail .cover-wall").forEach((wall) => {
     // fix each column where it stopped and let the animations go
     function settle() {
         stillTimer = 0;
-        if (inUse(card)) return;
+        if (inUse(zone, card)) return;
         if (frame || level) {
             stillTimer = setTimeout(settle, 100);
             return;
         }
         stillTimer = whenScrollQuiet(() => {
-            if (inUse(card) || !wall.classList.contains("is-live")) return;
+            if (inUse(zone, card) || !wall.classList.contains("is-live")) return;
             if (!reduceMotion.matches && !runs.some((run) => run.currentTime > 0)) {
                 // never got going: its picture still matches, so back to that
                 wall.classList.remove("is-live");
@@ -878,7 +928,7 @@ document.querySelectorAll(".work-thumbnail .cover-wall").forEach((wall) => {
         });
     }
 
-    watchCoverUse(card, start, () => {
+    watchCoverUse(zone, card, start, () => {
         clearTimeout(stillTimer);
         if (wall.classList.contains("is-warm")) {
             wall.classList.remove("is-warm"); // left before it was ready
@@ -1247,14 +1297,32 @@ function addMediaControls(video) {
         btn.setAttribute("aria-label", paused ? "Play video" : "Pause video");
     }
 
-    // the bar follows the video: every frame while it plays, and after any jump. Only what changed is written, so
-    // most frames touch nothing (the time reads in whole seconds; the timeline moves in steps of 1/1000)
+    // the bar follows the video: every frame while it plays and the timeline can be seen, and after any jump. Only what
+    // changed is written, so most frames touch nothing (the time reads in whole seconds; the timeline moves in steps of
+    // 1/1000). On the page the bar is folded down to its button until the phone is pointed at (style.css), and a moving
+    // timeline nobody can see still had to be laid out and redrawn on nearly every frame while the recording played,
+    // scrolling or not. So while folded it moves only as the time ticks over (it stays current for screen readers),
+    // and catches up the moment the bar opens, before that frame is drawn
     let shownStep = null;
     let shownTime = null;
+    let lastOpen = -Infinity;
+    const FOLD_TIME = 500; // ms: the bar is still folding away this long after it was last open (style.css: 0.35s)
 
-    function sync() {
+    // can the timeline be seen: always in the larger view; on the page while the phone is pointed at or the bar is
+    // tabbed into, and while it folds away after
+    function timelineShown() {
+        if (!bar.isConnected || bar.closest(".media-stage") || bar.parentElement.matches(":hover") || bar.querySelector(":focus-visible")) {
+            lastOpen = performance.now();
+            return true;
+        }
+        return performance.now() - lastOpen < FOLD_TIME;
+    }
+
+    function sync(always = true) {
         const duration = video.duration;
-        if (!dragging && duration) {
+        const time = `${formatTime(video.currentTime)}|${formatTime(duration)}`;
+        const ticked = time !== shownTime;
+        if (!dragging && duration && (always || ticked || timelineShown())) {
             const at = String(Math.round((video.currentTime / duration) * SEEK_STEPS));
             if (seek.value !== at) seek.value = at;
         }
@@ -1263,18 +1331,34 @@ function addMediaControls(video) {
             shownStep = step;
             seek.style.setProperty("--progress", `${(step / SEEK_STEPS) * 100}%`);
         }
-        const time = `${formatTime(video.currentTime)}|${formatTime(duration)}`;
-        if (time !== shownTime) {
+        if (ticked) {
             shownTime = time;
             setText(now, formatTime(video.currentTime));
             seek.setAttribute("aria-valuetext", `${formatTime(video.currentTime)} of ${formatTime(duration)}`);
         }
     }
 
+    // every frame while the timeline can be seen; folded, the video's own time updates (a few a second) keep the time
+    // and timeline current to the second instead
     function follow() {
-        sync();
-        frame = requestAnimationFrame(follow);
+        sync(false);
+        frame = timelineShown() ? requestAnimationFrame(follow) : 0;
     }
+
+    function startFollowing() {
+        if (!video.paused && !frame) frame = requestAnimationFrame(follow);
+    }
+
+    // opening the bar: caught up at once, then followed frame by frame
+    function opened() {
+        sync();
+        startFollowing();
+    }
+
+    video.addEventListener("timeupdate", () => {
+        if (!frame) sync(false);
+    });
+    bar.addEventListener("focusin", opened);
 
     function showDuration() {
         setText(total, ` / ${formatTime(video.duration)}`);
@@ -1314,6 +1398,7 @@ function addMediaControls(video) {
     video.addEventListener("pause", () => {
         show();
         cancelAnimationFrame(frame);
+        frame = 0;
         sync();
     });
     video.addEventListener("seeked", sync);
@@ -1328,6 +1413,7 @@ function addMediaControls(video) {
     else show();
     btn.setAttribute("aria-label", btn.classList.contains("is-paused") ? "Play video" : "Pause video");
     video.parentElement.append(bar);
+    video.parentElement.addEventListener("pointerenter", opened); // pointing at the phone opens the bar (style.css)
 }
 
 const recordings = document.querySelectorAll(".phone > video");

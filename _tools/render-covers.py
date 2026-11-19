@@ -41,6 +41,8 @@ body *:not(.render-target, .render-target *) { visibility: hidden !important; }
     z-index: 2147483647 !important; visibility: visible !important;
 }
 .render-target > p, .render-target > .view-project { display: none !important; }
+/* the thumbnail's faint ring (style.css) is drawn over the picture on the page, so it isn't part of the picture */
+.render-target::after { content: none !important; }
 /* painted straight into the picture at full resolution: no layers of their own (a layer can be drawn at less than
    full resolution and then stretched, which comes out soft) */
 .render-target *, .render-target *::before, .render-target *::after { will-change: auto !important; }
