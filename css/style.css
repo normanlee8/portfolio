@@ -298,23 +298,35 @@ body {
    page under the status bar and its own toolbar too, above the page's top edge, and without it text scrolling up
    there showed sharp above a hard-edged header. The extra height sits above the header and is taken back by the
    negative margin and top, so the header's own 56px stays exactly where it was. Elsewhere nothing is drawn up there,
-   so the glass stays the header's own size: blurring three times the area on every scroll frame was the main cost
+   so the glass stays the header's own height: blurring three times the area on every scroll frame was the main cost
    of scrolling on computers without hardware acceleration */
 .header {
     --header-bleed: 0px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    /* spans the content's width, not the page's: the glass stops at the content's edges instead of running on into
-       the side margins, where anything colorful scrolling under it (a cover, a screenshot) would glow past the content */
+    /* the header's contents (and its line) keep to the content's width; only the glass (::after) runs edge to edge */
     padding: var(--header-bleed) 0 0;
     height: calc(var(--header-height) + var(--header-bleed));
     margin: calc(-1 * var(--header-bleed)) var(--space-md) 0;
     position: sticky;
     top: calc(-1 * var(--header-bleed));
     z-index: 100;
-    /* glass: a light tint over a deep blur, with the colors behind it turned up so they glow through
-       instead of going gray */
+}
+
+/* glass: a light tint over a deep blur, with the colors behind it turned up so they glow through instead of going
+   gray. Fixed to the window so it spans the whole top, past the content's 1440px and the side margins, without
+   adding sideways scroll (100vw would run under the scrollbar). The header is always first on the page and pinned
+   to the top, so the two stay together; z-index -1 keeps it behind the header's contents */
+.header::after {
+    content: "";
+    position: fixed;
+    top: calc(-1 * var(--header-bleed));
+    left: 0;
+    right: 0;
+    height: calc(var(--header-height) + var(--header-bleed));
+    z-index: -1;
+    pointer-events: none;
     background-color: var(--header-bg);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
     backdrop-filter: blur(20px) saturate(180%);
@@ -331,7 +343,7 @@ body {
    behind a piece of glass is worked out by the processor on every frame, which made scrolling and the popups
    stutter. There script.js marks the page .low-gfx, and each piece of glass becomes a nearly solid tint of the same
    color instead, which looks almost the same */
-:root.low-gfx .header,
+:root.low-gfx .header::after,
 :root.low-gfx .proto-close,
 :root.low-gfx .media-controls,
 :root.low-gfx .media-nav,
@@ -340,7 +352,7 @@ body {
     backdrop-filter: none;
 }
 
-:root.low-gfx .header {
+:root.low-gfx .header::after {
     background-color: color-mix(in srgb, var(--bg-color) 95%, transparent);
 }
 
