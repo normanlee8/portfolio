@@ -131,8 +131,6 @@
     /* Left edge of the content, for fixed elements */
     --page-edge: max(var(--space-md), calc((100% - 1440px) / 2 + var(--space-md)));
 
-    /* Header Blur */
-    --header-bg: rgba(236, 234, 229, 0.62);
 }
 
 /* Dark Mode */
@@ -163,9 +161,6 @@
     --color-purple: #B47EFF;
     --color-orange: #FF9F45;
     --color-pink:   #FF6EA8;
-
-    /* Header Blur */
-    --header-bg: rgba(42, 42, 40, 0.6);
 }
 
 html {
@@ -294,12 +289,10 @@ body {
 }
 
 /* Header
-   On iPhone and iPad the glass runs on past the top of the page (--header-bleed, set below): Safari there draws the
-   page under the status bar and its own toolbar too, above the page's top edge, and without it text scrolling up
-   there showed sharp above a hard-edged header. The extra height sits above the header and is taken back by the
-   negative margin and top, so the header's own 56px stays exactly where it was. Elsewhere nothing is drawn up there,
-   so the glass stays the header's own height: blurring three times the area on every scroll frame was the main cost
-   of scrolling on computers without hardware acceleration */
+   On iPhone and iPad the background runs on past the top of the page (--header-bleed, set below): Safari there draws
+   the page under the status bar and its own toolbar too, above the page's top edge, and without it text scrolling up
+   would show there above the header. The extra height sits above the header and is taken back by the negative
+   margin and top, so the header's own 56px stays exactly where it was. Elsewhere nothing is drawn up there */
 .header {
     --header-bleed: 0px;
     display: flex;
@@ -314,10 +307,9 @@ body {
     z-index: 100;
 }
 
-/* glass: a light tint over a deep blur, with the colors behind it turned up so they glow through instead of going
-   gray. Fixed to the window so it spans the whole top, past the content's 1440px and the side margins, without
-   adding sideways scroll (100vw would run under the scrollbar). The header is always first on the page and pinned
-   to the top, so the two stay together; z-index -1 keeps it behind the header's contents */
+/* background: solid page color, no blur. Fixed to the window so it spans the whole top, past the content's 1440px
+   and the side margins, without adding sideways scroll (100vw would run under the scrollbar). The header is always
+   first on the page and pinned to the top, so the two stay together; z-index -1 keeps it behind the header's contents */
 .header::after {
     content: "";
     position: fixed;
@@ -327,9 +319,7 @@ body {
     height: calc(var(--header-height) + var(--header-bleed));
     z-index: -1;
     pointer-events: none;
-    background-color: var(--header-bg);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
-    backdrop-filter: blur(20px) saturate(180%);
+    background-color: var(--bg-color);
 }
 
 /* iPhone and iPad (only their Safari knows -webkit-touch-callout) */
@@ -343,17 +333,12 @@ body {
    behind a piece of glass is worked out by the processor on every frame, which made scrolling and the popups
    stutter. There script.js marks the page .low-gfx, and each piece of glass becomes a nearly solid tint of the same
    color instead, which looks almost the same */
-:root.low-gfx .header::after,
 :root.low-gfx .proto-close,
 :root.low-gfx .media-controls,
 :root.low-gfx .media-nav,
 :root.low-gfx .proto-dialog::backdrop {
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
-}
-
-:root.low-gfx .header::after {
-    background-color: color-mix(in srgb, var(--bg-color) 95%, transparent);
 }
 
 :root.low-gfx .proto-close,
@@ -536,7 +521,9 @@ body {
     align-items: center;
     justify-content: center;
     padding: var(--space-xs);
-    margin-right: calc(var(--space-xs) * -1);
+    /* steps in from the content's right edge by the same amount the divider sits to its left (half of --space-md),
+       so the icon (and the X it turns into) has the same space on both sides, as the theme button does on wider screens */
+    margin-right: calc(var(--space-md) / 2);
     border: none;
     border-radius: 10px;
     background: none;
