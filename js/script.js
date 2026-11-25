@@ -425,7 +425,7 @@ window.addEventListener("pageshow", (e) => {
 });
 
 // Header links to the page you're on scroll back to the top instead of reloading
-// ("/", "/index.html", "/work" and "/work.html" count as the same page)
+// ("/", "/index.html", "/work", "/work/" and "/work/index.html" count as the same page)
 const pagePath = (path) => path.replace(/(index)?\.html$/, "").replace(/\/$/, "") || "/";
 
 document.addEventListener("click", (e) => {
@@ -458,23 +458,50 @@ if (!(HTMLScriptElement.supports && HTMLScriptElement.supports("speculationrules
     document.addEventListener("focusin", warmLink);
 }
 
-// Copy Email: a click copies it: the toast shows, and the copy icon swaps for a green check for 1.5 seconds
-// (style.css). The address is plain text, so it can be selected like any other; a click that ends a selection
-// doesn't copy
+// Copy Email: a click copies it, and for 2 seconds the copy icon swaps for a green check
+// (style.css) while the address fades into "Email copied to clipboard". The address is plain text, so it can
+// be selected like any other; a click that ends a selection doesn't copy
 const copyEmailBtn = document.getElementById("copy-email");
-const toast = document.getElementById("toast");
 const EMAIL = "normanlee2002@gmail.com";
-let toastTimer;
+const COPIED_MESSAGE = "Email copied to clipboard";
 let copiedTimer;
-
-function showToast() {
-    toast.classList.add("show");
-    clearTimeout(toastTimer); // restart the timer if clicked again
-    toastTimer = setTimeout(() => toast.classList.remove("show"), 3000); // on screen for 3 seconds
-}
+let uncopyingTimer;
 
 // Only run on pages that have the footer
-if (copyEmailBtn && toast) {
+if (copyEmailBtn) {
+    const label = copyEmailBtn.querySelector("p");
+    const status = document.getElementById("copy-email-status"); // read out by screen readers
+
+    // The words fade out, then the new ones fade in (the message a little bolder, style.css). On one line, the line
+    // eases to its new width meanwhile, so the icon beside it slides over rather than jumping (the message is a
+    // little shorter than the address)
+    function swapEmailText(text) {
+        const isMessage = text !== EMAIL;
+        label.getAnimations().forEach((a) => a.cancel());
+        if (reduceMotion.matches) {
+            setText(label, text);
+            label.classList.toggle("is-message", isMessage);
+            return;
+        }
+        const fromWidth = label.getBoundingClientRect().width;
+        const oneLine = label.getBoundingClientRect().height < parseFloat(getComputedStyle(label).lineHeight) * 1.5;
+        const fadeOut = label.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 90, easing: "ease-in", fill: "forwards" });
+        fadeOut.finished
+            .then(() => {
+                setText(label, text);
+                label.classList.toggle("is-message", isMessage);
+                if (oneLine) {
+                    const toWidth = label.getBoundingClientRect().width;
+                    label.animate([{ width: `${fromWidth}px`, whiteSpace: "nowrap" }, { width: `${toWidth}px`, whiteSpace: "nowrap" }], {
+                        duration: 200,
+                        easing: "cubic-bezier(0.2, 0.8, 0.2, 1)",
+                    });
+                }
+                fadeOut.cancel();
+                label.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 160, easing: "ease-out" });
+            })
+            .catch(() => {}); // cancelled by a newer swap, which sets its own words
+    }
 
     async function copyEmail() {
         try {
@@ -483,12 +510,21 @@ if (copyEmailBtn && toast) {
             console.error("Copy failed:", err);
             return;
         }
-        showToast();
-        copyEmailBtn.classList.add("is-copied");
+        setText(status, "Email copied");
+        if (!copyEmailBtn.classList.contains("is-copied")) {
+            clearTimeout(uncopyingTimer);
+            copyEmailBtn.classList.remove("is-uncopying");
+            copyEmailBtn.classList.add("is-copied");
+            swapEmailText(COPIED_MESSAGE);
+        }
         clearTimeout(copiedTimer); // restart the timer if clicked again
         copiedTimer = setTimeout(() => {
             copyEmailBtn.classList.remove("is-copied");
-        }, 1500);
+            copyEmailBtn.classList.add("is-uncopying"); // the check leaves first, then the copy icon returns (style.css)
+            uncopyingTimer = setTimeout(() => copyEmailBtn.classList.remove("is-uncopying"), 400);
+            swapEmailText(EMAIL);
+            setText(status, "");
+        }, 2000);
     }
 
     copyEmailBtn.addEventListener("click", () => {

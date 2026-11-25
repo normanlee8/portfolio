@@ -3411,15 +3411,13 @@ div.shot > span {
     overflow-wrap: anywhere; /* long email can wrap on very narrow screens */
 }
 
-/* Email: copies on click. The address stays plain text (no underline: it doesn't take you anywhere); the copy
-   icon says what it does. It fills on hover, like the other footer icons; after a click it swaps for a
-   green check, shrinking and blurring out as the check grows in, then swaps back (script.js) */
+/* Email: copies on click. It underlines on hover like the other footer items, and the copy icon says what it
+   does: it fills, and a small "Copy" slides out from behind its left side, and back in when the pointer leaves.
+   After a click the icon swaps for a green check, shrinking and blurring out as the check grows in, while the
+   address fades into "Email copied to clipboard", a little bolder, and the underline sweeps away; then both swap
+   back (script.js) */
 .email {
     text-align: left;
-}
-
-.nav-content.email p::after {
-    content: none;
 }
 
 .email-icon {
@@ -3428,11 +3426,36 @@ div.shot > span {
     flex-shrink: 0;
 }
 
+/* in the open space left of the icon (the column is right-aligned), so nothing moves. The box clips the word at
+   its right edge, beside the icon, so it seems to come out from behind it */
+.email-hint {
+    position: absolute;
+    right: calc(100% + var(--space-xs));
+    top: 50%;
+    transform: translateY(-50%);
+    overflow: hidden;
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-semibold); /* the action, set apart from the address */
+    line-height: var(--leading-normal);
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+.email-hint-text {
+    display: block;
+    padding-right: 2px; /* room for the last letter's edge inside the clip */
+    opacity: 0;
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.2s ease;
+}
+
+/* an even ease-out, no overshoot. Swapping to the check and back, the one leaving goes first and the one
+   arriving follows a beat later (the delays below), so the two never sit half-faded over each other */
 .email-icon svg {
     transition:
-        opacity 0.25s cubic-bezier(0.2, 0.8, 0.2, 1),
-        transform 0.35s cubic-bezier(0.3, 1.35, 0.5, 1),
-        filter 0.25s ease;
+        opacity 0.18s ease,
+        transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1),
+        filter 0.18s ease;
 }
 
 .email .icon-copy-fill,
@@ -3444,11 +3467,16 @@ div.shot > span {
 
 .email .email-check {
     color: var(--color-green);
-    transform: scale(0.4);
-    filter: blur(3px);
+    transform: scale(0.7);
+    filter: blur(1px);
 }
 
 @media (hover: hover) {
+    .email:hover .email-hint-text {
+        opacity: 1;
+        transform: none;
+    }
+
     .email:hover .icon-copy {
         opacity: 0;
     }
@@ -3456,6 +3484,11 @@ div.shot > span {
     .email:hover .icon-copy-fill {
         opacity: 1;
     }
+}
+
+.email:focus-visible .email-hint-text {
+    opacity: 1;
+    transform: none;
 }
 
 .email:focus-visible .icon-copy {
@@ -3469,71 +3502,51 @@ div.shot > span {
 .email.is-copied .icon-copy,
 .email.is-copied .icon-copy-fill {
     opacity: 0;
-    transform: scale(0.4);
-    filter: blur(3px);
+    transform: scale(0.7);
+    filter: blur(1px);
 }
 
 .email.is-copied .email-check {
     opacity: 1;
     transform: none;
     filter: none;
+    transition-delay: 0.08s;
 }
 
-@media (prefers-reduced-motion: reduce) {
-    .email-icon svg {
-        transition: none;
+/* coming back from the check (script.js sets this for a moment) */
+.email.is-uncopying .icon-copy,
+.email.is-uncopying .icon-copy-fill {
+    transition-delay: 0.08s;
+}
+
+/* the message, a little bolder than the address */
+.email p.is-message {
+    font-weight: var(--weight-medium);
+}
+
+/* the underline goes once it's copied: the line is a confirmation now, not something to click */
+.nav-content.email.is-copied p::after {
+    transform-origin: right;
+    transform: scaleX(0);
+}
+
+/* the check says it now: the word slides back in */
+.email.is-copied .email-hint-text {
+    opacity: 0;
+    transform: translateX(100%);
+}
+
+/* where the left column sits close, there's no room for the word */
+@media (max-width: 439px) {
+    .email-hint {
+        display: none;
     }
 }
 
-/* Toast */
-.toast {
-    position: fixed;
-    right: max(var(--space-lg), calc((100% - 1440px) / 2 + var(--space-lg)));
-    bottom: var(--space-xl);
-    z-index: 1000;
-    display: flex;
-    align-items: flex-start;
-    gap: var(--space-sm);
-    max-width: min(360px, calc(100vw - 2 * var(--space-lg)));
-    padding: var(--space-md);
-
-    background-color: var(--bg-card);
-    border: 1px solid var(--border-card);
-    border-radius: 16px;
-    box-shadow: 0 8px 24px var(--shadow-color);
-
-    /* hidden until .show */
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(8px);
-    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
-}
-
-.toast.show {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
-}
-
-.toast svg {
-    flex-shrink: 0;
-    margin-top: 2px; /* centers the 20px icon on the first text line */
-    color: var(--color-green);
-}
-
-.toast-title {
-    font-weight: var(--weight-semibold);
-}
-
-.toast-message {
-    font-size: var(--text-xs);
-    color: var(--text-secondary);
-}
-
-/* Small screens: beside the return-to-top button */
-@media (max-width: 480px) {
-    .toast {
-        max-width: calc(100vw - 2 * var(--space-lg) - 48px - var(--space-sm));
+@media (prefers-reduced-motion: reduce) {
+    .email-hint-text,
+    .email-icon svg {
+        transition: none;
     }
 }
 
@@ -3560,12 +3573,6 @@ div.shot > span {
 /* room for the bar */
 body:has(.page-nav) {
     padding-bottom: calc(var(--page-nav-height, 56px) + 2 * var(--space-md));
-}
-
-/* toast sits above the bar */
-body:has(.page-nav) .toast {
-    bottom: calc(56px + var(--space-md) + var(--space-sm));
-    max-width: min(360px, calc(100vw - 2 * var(--space-lg)));
 }
 
 .page-nav-back,
@@ -4935,9 +4942,6 @@ body:has(.page-nav) .toast {
         padding-bottom: 0;
     }
 
-    body:has(.page-nav) .toast {
-        bottom: var(--space-xl);
-    }
 
 
     /* sections container (set by script.js): sections | list. The list sits on the right, so the

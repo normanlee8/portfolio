@@ -79,7 +79,7 @@ PREPARE_JS = """
 
 
 class Handler(http.server.SimpleHTTPRequestHandler):
-    """Like GitHub Pages: /work serves work.html"""
+    """Like GitHub Pages: /about serves about.html"""
 
     def send_head(self):
         path = self.translate_path(self.path)
