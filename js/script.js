@@ -458,11 +458,14 @@ if (!(HTMLScriptElement.supports && HTMLScriptElement.supports("speculationrules
     document.addEventListener("focusin", warmLink);
 }
 
-// Copy Email
+// Copy Email: a click copies it: the toast shows, and the copy icon swaps for a green check for 1.5 seconds
+// (style.css). The address is plain text, so it can be selected like any other; a click that ends a selection
+// doesn't copy
 const copyEmailBtn = document.getElementById("copy-email");
 const toast = document.getElementById("toast");
 const EMAIL = "normanlee2002@gmail.com";
 let toastTimer;
+let copiedTimer;
 
 function showToast() {
     toast.classList.add("show");
@@ -472,13 +475,38 @@ function showToast() {
 
 // Only run on pages that have the footer
 if (copyEmailBtn && toast) {
-    copyEmailBtn.addEventListener("click", async () => {
+
+    async function copyEmail() {
         try {
             await navigator.clipboard.writeText(EMAIL);
-            showToast();
         } catch (err) {
             console.error("Copy failed:", err);
+            return;
         }
+        showToast();
+        copyEmailBtn.classList.add("is-copied");
+        clearTimeout(copiedTimer); // restart the timer if clicked again
+        copiedTimer = setTimeout(() => {
+            copyEmailBtn.classList.remove("is-copied");
+        }, 1500);
+    }
+
+    copyEmailBtn.addEventListener("click", () => {
+        const selection = getSelection();
+        if (!selection.isCollapsed && copyEmailBtn.contains(selection.anchorNode)) return; // selecting, not clicking
+        copyEmail();
+    });
+    // a button from the keyboard too: Enter, or Space on release (as buttons do)
+    copyEmailBtn.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && !e.repeat) {
+            e.preventDefault();
+            copyEmail();
+        } else if (e.key === " ") {
+            e.preventDefault(); // no page scroll
+        }
+    });
+    copyEmailBtn.addEventListener("keyup", (e) => {
+        if (e.key === " ") copyEmail();
     });
 }
 

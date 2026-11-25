@@ -3411,14 +3411,78 @@ div.shot > span {
     overflow-wrap: anywhere; /* long email can wrap on very narrow screens */
 }
 
-/* Email button: reset button styles */
+/* Email: copies on click. The address stays plain text (no underline: it doesn't take you anywhere); the copy
+   icon says what it does. It fills on hover, like the other footer icons; after a click it swaps for a
+   green check, shrinking and blurring out as the check grows in, then swaps back (script.js) */
 .email {
-    background: none;
-    border: none;
-    padding: 0;
-    font: inherit;
-    color: inherit;
     text-align: left;
+}
+
+.nav-content.email p::after {
+    content: none;
+}
+
+.email-icon {
+    position: relative; /* the filled icon and the check sit over the outline */
+    display: flex;
+    flex-shrink: 0;
+}
+
+.email-icon svg {
+    transition:
+        opacity 0.25s cubic-bezier(0.2, 0.8, 0.2, 1),
+        transform 0.35s cubic-bezier(0.3, 1.35, 0.5, 1),
+        filter 0.25s ease;
+}
+
+.email .icon-copy-fill,
+.email .email-check {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+}
+
+.email .email-check {
+    color: var(--color-green);
+    transform: scale(0.4);
+    filter: blur(3px);
+}
+
+@media (hover: hover) {
+    .email:hover .icon-copy {
+        opacity: 0;
+    }
+
+    .email:hover .icon-copy-fill {
+        opacity: 1;
+    }
+}
+
+.email:focus-visible .icon-copy {
+    opacity: 0;
+}
+
+.email:focus-visible .icon-copy-fill {
+    opacity: 1;
+}
+
+.email.is-copied .icon-copy,
+.email.is-copied .icon-copy-fill {
+    opacity: 0;
+    transform: scale(0.4);
+    filter: blur(3px);
+}
+
+.email.is-copied .email-check {
+    opacity: 1;
+    transform: none;
+    filter: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .email-icon svg {
+        transition: none;
+    }
 }
 
 /* Toast */
@@ -4874,6 +4938,7 @@ body:has(.page-nav) .toast {
     body:has(.page-nav) .toast {
         bottom: var(--space-xl);
     }
+
 
     /* sections container (set by script.js): sections | list. The list sits on the right, so the
        content lands nearer the middle of the screen */
