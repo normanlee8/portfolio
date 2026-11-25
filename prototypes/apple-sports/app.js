@@ -287,9 +287,9 @@ function spread(g) {
 // Wed, Mar 18, 2026. Generated games:
 //   - run from Feb 12 to the end of the regular season (Sun, Apr 12), with
 //     none over the All-Star break (Feb 13–18);
-//   - stay off the days the main list shows (and Mar 17 and 19), so those
-//     days list every game played on them, and Previous / Upcoming really are
-//     the nearest game days;
+//   - stay off the hand-written main list days (and Mar 17 and 19), so those
+//     days keep their hand-picked games; Previous and Upcoming then list
+//     every game day between them, too;
 //   - never put a team on the court two days running, or two teams against
 //     each other more than twice or within two weeks of another meeting.
 // Each night's national TV goes to its best matchups; the rest are on each
@@ -494,11 +494,17 @@ function buildLeague() {
   unplayed.forEach((g) => (g.time ??= generatedTime(g)));
   assignNetworks(unplayed);
 
-  // The main list's days list every game played on them
-  [...GAMES.previous, ...GAMES.upcoming].forEach((group) => {
-    const day = parseDate(group.date);
-    group.games = leagueGames().filter((g) => g.day === day);
-  });
+  // Previous and Upcoming list every game day in their range, not only the
+  // hand-written ones, each with every game played on it, so no team's game
+  // goes missing between them (Previous reaches back to its oldest
+  // hand-written day, Upcoming ahead to its last)
+  const gameDays = (from, to) =>
+    [...new Set(leagueGames().map((g) => g.day))].filter((day) => day >= from && day <= to);
+  const gamesOn = (day) => ({ date: dateLabel(day), games: leagueGames().filter((g) => g.day === day) });
+  const previousDays = GAMES.previous.map(({ date }) => parseDate(date));
+  const upcomingDays = GAMES.upcoming.map(({ date }) => parseDate(date));
+  GAMES.previous = gameDays(Math.min(...previousDays), TODAY - DAY_MS).sort((a, b) => b - a).map(gamesOn);
+  GAMES.upcoming = gameDays(TODAY + DAY_MS, Math.max(...upcomingDays)).sort((a, b) => a - b).map(gamesOn);
 }
 
 // "#1d428a" scaled toward black (< 1) or brighter (> 1), as "r, g, b"
