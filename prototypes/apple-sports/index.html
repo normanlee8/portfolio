@@ -139,6 +139,20 @@
       </div>
     </section>
 
+    <!-- One-time tip on launch, above the scores, like the game card's tip
+         (app.js shows it until it's closed or a team page is opened) -->
+    <div class="tip-slot tip-slot--home" id="launch-tip" hidden>
+      <aside class="tip tip--inline" aria-label="Tip">
+        <h2 class="tip-title">Discover Team Pages</h2>
+        <p class="tip-message">Tap a team's logo, or pick your team in the NBA menu, to explore upcoming and previous games.</p>
+        <button class="tip-close" type="button" aria-label="Close tip">
+          <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">
+            <path d="M1.4 1.4l7.2 7.2M8.6 1.4L1.4 8.6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+          </svg>
+        </button>
+      </aside>
+    </div>
+
     <!-- Scores card -->
     <section class="card">
       <nav class="tabs" role="tablist">

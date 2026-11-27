@@ -2262,7 +2262,19 @@ html:has(.proto-dialog[open]) {
     height: 852px;
     border: 0;
     border-radius: 52px;
-    background-color: #05070d; /* the prototype's own background, while it loads */
+    background-color: #05070d; /* the prototype's own background */
+    opacity: 0; /* hidden while it loads, so its half-drawn first moments never show (script.js) */
+}
+
+.proto-frame.is-loaded {
+    opacity: 1;
+    transition: opacity 0.25s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .proto-frame.is-loaded {
+        transition: none;
+    }
 }
 
 .proto-close {
@@ -2340,6 +2352,23 @@ html:has(.proto-dialog[open]) {
     .proto-close {
         top: max(var(--space-sm), env(safe-area-inset-top));
         right: var(--space-sm);
+    }
+
+    /* The prototype has its own button in that corner (NBA), so its close button sits at the top center instead,
+       over the empty space between "Sports" and NBA, as high as it sits in the corner elsewhere */
+    #proto-dialog .proto-close {
+        right: auto;
+        left: 50%;
+        translate: -50% 0;
+        transition: background-color 0.2s ease, opacity 0.2s ease, visibility 0s;
+    }
+
+    /* while the prototype's game card is open, its date sits right there, so the close button steps aside until
+       the card is closed (script.js) */
+    #proto-dialog.is-sheet-open .proto-close {
+        opacity: 0;
+        visibility: hidden;
+        transition: background-color 0.2s ease, opacity 0.2s ease, visibility 0s 0.2s;
     }
 }
 

@@ -341,11 +341,10 @@ img.menu-icon--league {
   display: none;
 }
 
-/* No divider under whatever ends the list: the last game (Today), the last
-   date group's last game, or that group's header when it's closed */
+/* No divider under whatever ends the list: the last game (Today), or the last
+   date group's last game (its first game when it's closed; see .keeps-one) */
 .games > .game:last-child,
-.games > .day:last-child .game:last-child,
-.games > .day:last-child > .day-header[aria-expanded="false"] {
+.games > .day:last-child .game:last-child {
   border-bottom: 0;
 }
 
@@ -457,15 +456,18 @@ img.menu-icon--league {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 5px;
   width: 100%;
   height: 26px;
   font-size: 12px;
   font-weight: 500;
 }
 
-/* Same timing and iOS ease-in-out curve as the list animation in app.js */
+/* In the team names' secondary color, so it reads as a control next to the
+   label. Same timing and iOS ease-in-out curve as the list animation in app.js */
 .day-header .chevron {
+  flex: none;
+  color: rgba(255, 255, 255, 0.6);
   transition: transform 0.3s cubic-bezier(0.42, 0, 0.58, 1);
 }
 
@@ -483,10 +485,6 @@ img.menu-icon--league {
   display: none;
 }
 
-.day-header[aria-expanded="false"] {
-  border-bottom: 1px solid var(--hairline);
-}
-
 /* ---------- Game sheet ---------- */
 .game.is-tappable {
   cursor: pointer;
@@ -494,6 +492,22 @@ img.menu-icon--league {
 
 .game.is-tappable:active {
   background: rgba(255, 255, 255, 0.04);
+}
+
+/* A team's end of the row opens its team page (app.js): pressing there dims
+   that team's logo and name instead of highlighting the row */
+.game.is-tappable[data-press]:active {
+  background: none;
+}
+
+.game .team-logo,
+.game .team-name {
+  transition: opacity 0.15s ease;
+}
+
+.game[data-press="away"] .is-away:is(.team-logo, .team-name),
+.game[data-press="home"] .is-home:is(.team-logo, .team-name) {
+  opacity: 0.6;
 }
 
 /* Heavy tint: the screen behind stays faintly visible around the sheet */
@@ -859,7 +873,8 @@ img.menu-icon--league {
 }
 
 /* Collapsible lists that keep one game showing when closed: the Series card
-   (its most recent final) and team-page months (their next / latest game) */
+   (its most recent final), team-page months (their next / latest game) and
+   the main list's dates (their first game) */
 .day-header[aria-expanded="false"] + .keeps-one {
   display: block;
 }
@@ -869,9 +884,10 @@ img.menu-icon--league {
 }
 
 /* No divider under a kept game that ends its card (the Series card, or the
-   team schedule's last month) */
+   team schedule's or main list's last group) */
 .day-header[aria-expanded="false"] + .series-games > .is-kept,
-.team-schedule .day:last-child > .day-header[aria-expanded="false"] + .keeps-one > .is-kept {
+.team-schedule .day:last-child > .day-header[aria-expanded="false"] + .keeps-one > .is-kept,
+.games > .day:last-child > .day-header[aria-expanded="false"] + .keeps-one > .is-kept {
   border-bottom: 0;
 }
 
@@ -907,10 +923,12 @@ img.menu-icon--league {
   --team-shade: 10, 21, 48;
   --team-top: #1d428a;
   --team-bottom: #0a1530;
-  background:
+  /* Also painted behind the schedule's pinned month (see .day-header.is-stuck) */
+  --team-layers:
     radial-gradient(56.5% 195px at 50% 0, rgba(var(--team-glow), 0.4) 0%, rgba(var(--team-glow), 0) 100%),
     linear-gradient(270deg, rgba(var(--team-shade), 0) 0%, rgba(var(--team-shade), 0.6) 100%),
     linear-gradient(180deg, var(--team-top) 0%, var(--team-bottom) 100%);
+  background: var(--team-layers);
   /* Content scrolls in the area below the back button (30px + 44px), so
      anything scrolled up disappears at the button's bottom edge */
   padding-top: 74px;
@@ -1001,8 +1019,9 @@ img.menu-icon--league {
 /* The cards stay together and stick at the top of the scroll area once the
    logo and record have scrolled away. The section is exactly as tall as the
    scroll area, so the page can only scroll by the logo + record. Scrolling
-   over the schedule scrolls its games directly; at the end of the list the
-   scroll carries on to the page (native scroll chaining). The schedule card
+   over the schedule scrolls its games directly, and scrolling them down also
+   scrolls the page that far (app.js), so the list's end is never left below
+   the sheet. The schedule card
    is only as tall as its content, up to the space left. */
 .team-sticky {
   position: sticky;
@@ -1033,10 +1052,32 @@ img.menu-icon--league {
 }
 
 .team-schedule > .team-games {
+  position: relative; /* the months' offsetTop, for pinning (app.js) */
   flex: 0 1 auto;
   min-height: 0;
   overflow-y: auto;
   scrollbar-width: none;
+}
+
+/* The month being scrolled through stays pinned at the top of the schedule,
+   as Apple Sports pins its dates, so you always know which month you're in;
+   the next month's label pushes it up and takes its place. */
+.team-schedule .day-header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+/* The pinned label covers the games scrolling under it. The card is
+   see-through, so the label repaints exactly what shows there: the card's
+   black over the team page's own background, lined up with the page
+   (--page-size / --page-at, set from the list's place on the page in app.js).
+   Labels still in the list stay clear, so they match the card around them. */
+.team-schedule .day-header.is-stuck {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.48), rgba(0, 0, 0, 0.48)), var(--team-layers);
+  background-size: 100% 100%, var(--page-size), var(--page-size), var(--page-size);
+  background-position: 0 0, var(--page-at), var(--page-at), var(--page-at);
+  background-repeat: no-repeat;
 }
 
 .team-schedule > .team-games::-webkit-scrollbar {
@@ -1220,6 +1261,78 @@ img.menu-icon--league {
 
 .segment[aria-selected="true"] {
   color: #fff;
+}
+
+/* ---------- Tips ---------- */
+/* One-time hints in the style of iOS tips (TipKit): a bold title, a short
+   message and a close button. Sizes and colors from the Figma mockups. */
+.tip {
+  position: relative;
+  padding: 9.5px 34px 11.5px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+}
+
+.tip-title {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 20px;
+}
+
+.tip-message {
+  margin-top: 3.5px;
+  font-size: 12px;
+  line-height: 15px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* A 44px tap area centered 21px in from the tip's top and right edges */
+.tip-close {
+  position: absolute;
+  top: -2px;
+  right: -1.5px;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Inline tips sit in the layout, each in a slot that holds the space above
+   it, so closing can shrink the slot away (app.js):
+   - on launch: between the "Sports" header and the scores card
+   - in a game's card: between the matchup and the betting odds */
+.tip-slot {
+  display: flow-root;
+  flex: none;
+}
+
+.tip-slot[hidden] {
+  display: none;
+}
+
+.tip--inline {
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.11);
+}
+
+.tip-slot--home {
+  margin: 0 12px;
+}
+
+.tip-slot--home > .tip {
+  margin-top: 13px; /* the scores card's own top margin */
+}
+
+.tip-slot--home:not([hidden]) + .card {
+  margin-top: 9px;
+}
+
+.sheet-body .tip-slot > .tip {
+  margin-top: 15px;
+}
+
+.tip-slot + .sheet-card {
+  margin-top: 9px;
 }
 
 @media (prefers-reduced-motion: reduce) {

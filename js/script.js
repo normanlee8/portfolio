@@ -165,15 +165,33 @@ if (protoDialog && protoLink && typeof protoDialog.showModal === 'function') {
     protoLink.addEventListener('click', (e) => {
         if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return; // still opens a new tab
         e.preventDefault();
+        protoFrame.classList.remove('is-loaded');
         protoFrame.src = protoFrame.dataset.src; // a fresh load each time, so it always starts on its home screen
         fitPrototype();
         protoDialog.showModal();
     });
 
+    // it stays hidden while it loads (style.css) and fades in once it's fully drawn: its games, logos and tip are
+    // all in place by the load event. The blank page swapped in on close loads too, and stays hidden
+    protoFrame.addEventListener('load', () => {
+        if (protoFrame.getAttribute('src') === protoFrame.dataset.src) protoFrame.classList.add('is-loaded');
+    });
+
     // unload it on close (by any route: button, backdrop or Esc), so it stops running and the next open starts over.
     // The close event arrives a moment after closing, so it skips the unload if the popup has been opened again
     protoDialog.addEventListener('close', () => {
-        if (!protoDialog.open) protoFrame.src = 'about:blank';
+        if (!protoDialog.open) {
+            protoFrame.classList.remove('is-loaded');
+            protoFrame.src = 'about:blank';
+        }
+        protoDialog.classList.remove('is-sheet-open');
+    });
+
+    // the prototype says when its game card is open: on phones the close button sits over the card's date, so it
+    // steps aside until the card is closed (style.css)
+    window.addEventListener('message', (e) => {
+        if (e.origin !== location.origin || e.source !== protoFrame.contentWindow || e.data?.type !== 'proto-sheet') return;
+        protoDialog.classList.toggle('is-sheet-open', Boolean(e.data.open));
     });
 
     window.addEventListener('resize', fitPrototype);

@@ -616,10 +616,10 @@ function teamName(id, side) {
   return `<span class="team-name is-${side}"><span>${TEAMS[id].name}</span></span>`;
 }
 
-function gameRow(g, { awayStat, homeStat, time, detail }) {
+function gameRow(g, { awayStat, homeStat, time, detail, isKept = false }) {
   const key = `${g.away}@${g.home}`;
   return `
-    <li class="game is-tappable" data-matchup="${key}" role="button" tabindex="0">
+    <li class="game is-tappable${isKept ? " is-kept" : ""}" data-matchup="${key}" role="button" tabindex="0">
       <img class="team-logo is-away" src="logos/${g.away}.svg" alt="" />
       ${awayStat}
       <span class="time">${time}</span>
@@ -631,35 +631,38 @@ function gameRow(g, { awayStat, homeStat, time, detail }) {
     </li>`;
 }
 
-function scheduledRow(g) {
+function scheduledRow(g, { isKept = false } = {}) {
   return gameRow(g, {
     awayStat: `<span class="record is-away">${TEAMS[g.away].record}</span>`,
     homeStat: `<span class="record is-home">${TEAMS[g.home].record}</span>`,
     time: g.time,
     detail: spread(g),
+    isKept,
   });
 }
 
-function finalRow(g) {
+function finalRow(g, { isKept = false } = {}) {
   const awayWon = g.awayScore > g.homeScore;
   return gameRow(g, {
     awayStat: `<span class="score is-away${awayWon ? "" : " is-loser"}">${g.awayScore}</span>`,
     homeStat: `<span class="score is-home${awayWon ? " is-loser" : ""}">${g.homeScore}</span>`,
     time: g.overtime ? "Final/OT" : "Final",
+    isKept,
   });
 }
 
 const CHEVRON_UP = `
-  <svg class="chevron" width="9" height="6" viewBox="0 0 9 6" aria-hidden="true">
-    <path d="M1 5l3.5-3.5L8 5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+  <svg class="chevron" width="12" height="8" viewBox="0 0 12 8" aria-hidden="true">
+    <path d="M1.25 6.5 6 1.75l4.75 4.75" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
   </svg>`;
 
-// A tappable date label that collapses that day's games.
+// A tappable date label that collapses that day's games down to its first
+// one, like the team page's months.
 function dayGroup({ date, games }, row) {
   return `
     <li class="day" data-date="${date}">
       <button class="day-header" type="button" aria-expanded="true">${date}${CHEVRON_UP}</button>
-      <ul class="day-games">${games.map(row).join("")}</ul>
+      <ul class="day-games keeps-one">${games.map((g, i) => row(g, { isKept: i === 0 })).join("")}</ul>
     </li>`;
 }
 
@@ -740,6 +743,7 @@ function sheetContent(game) {
       ${sheetCenter(game)}
       ${sheetTeam(game.home, sheetFinal(game, "home"), pull)}
     </div>
+    ${tipsDone.card ? "" : CARD_TIP}
     <section class="sheet-card">
       <h3 class="sheet-card-title">Betting Odds</h3>
       <table class="odds">
@@ -834,9 +838,9 @@ function teamMonths(teamId, months) {
     .join("");
 }
 
-// The schedule's games scroll inside their card; scrolling past the end of
-// the list carries on to the page, which scrolls the logo and record away
-// (and pulling down at the list's top brings them back).
+// The schedule's games scroll inside their card; scrolling down the list also
+// scrolls the page, which moves the logo and record away (see the schedule's
+// scroll listener), and pulling down at the list's top brings them back.
 function teamPageContent(teamId, cardRow, schedule) {
   return `
     <div class="team-hero" style="--record-pull: ${recordPull(teamId)}">
@@ -866,7 +870,7 @@ function render(tab) {
   activeTab = tab;
   const rows =
     tab === "today"
-      ? GAMES.today.map(scheduledRow)
+      ? GAMES.today.map((g) => scheduledRow(g))
       : GAMES[tab].map((day) => dayGroup(day, ROW_FOR_DAY_TAB[tab]));
   list.innerHTML = rows.join("");
   list.scrollTop = 0;
@@ -885,8 +889,8 @@ const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
 // Opens or closes the list under a date header (or the sheet's Series header),
 // smoothly animating the height of whatever appears or disappears. A collapsed
-// Series card keeps its latest final, so only the other games animate there.
-// Toggling mid-animation picks up from the current height.
+// list that keeps one game (a date, a month, the Series card) only animates
+// the others. Toggling mid-animation picks up from the current height.
 function setSectionOpen(header, open) {
   const list = header.nextElementSibling;
   const targets = list.classList.contains("keeps-one")
@@ -902,6 +906,8 @@ function setSectionOpen(header, open) {
   });
 
   header.setAttribute("aria-expanded", String(open));
+  const schedule = header.closest("#team-schedule");
+  if (schedule) followPinnedMonth(schedule, reduceMotion.matches ? 0 : SECTION_DURATION + 50);
   if (reduceMotion.matches) return;
 
   targets.forEach((el, i) => {
@@ -950,10 +956,45 @@ function sheetGameFor(row) {
   };
 }
 
+// Each end of a row opens that team's page: its whole outer column, top to
+// bottom (above the logo, the logo, the name and below it), the grid's 58px
+// or as wide as the name when a long one (Timberwolves) spills past it.
+// Anywhere else opens the game.
+const TEAM_COLUMN = 58; // px
+
+function teamTappedIn(row, x) {
+  const box = row.getBoundingClientRect();
+  const name = (side) => row.querySelector(`.team-name.is-${side} > span`).getBoundingClientRect();
+  const [away, home] = row.dataset.matchup.split("@");
+  if (x < Math.max(box.left + TEAM_COLUMN, name("away").right)) return { team: away, side: "away" };
+  if (x > Math.min(box.right - TEAM_COLUMN, name("home").left)) return { team: home, side: "home" };
+  return null;
+}
+
 list.addEventListener("click", (e) => {
   const row = e.target.closest(".game[data-matchup]");
-  if (row) openSheet(sheetGameFor(row));
+  if (!row) return;
+  // A click with no pointer position (e.detail 0: keyboard or script) opens the game
+  const tapped = e.detail ? teamTappedIn(row, e.clientX) : null;
+  if (tapped) openTeamSheet(tapped.team);
+  else openSheet(sheetGameFor(row));
 });
+
+// Pressing a team's end dims its logo instead of highlighting the whole row,
+// so it's clear the team (not the game) is what opens
+let pressedRow = null;
+list.addEventListener("pointerdown", (e) => {
+  const row = e.target.closest(".game[data-matchup]");
+  const tapped = row && teamTappedIn(row, e.clientX);
+  if (!tapped) return;
+  pressedRow = row;
+  row.dataset.press = tapped.side;
+});
+const endPress = () => {
+  if (pressedRow) delete pressedRow.dataset.press;
+  pressedRow = null;
+};
+["pointerup", "pointercancel", "pointerleave"].forEach((type) => list.addEventListener(type, endPress));
 list.addEventListener("keydown", (e) => {
   const row = e.target.closest(".game[data-matchup]");
   if (row && (e.key === "Enter" || e.key === " ")) {
@@ -984,6 +1025,9 @@ function setSheetOpen(open, { showDate = true } = {}) {
   sheetDate.classList.toggle("is-open", open && showDate);
   sheet.setAttribute("aria-hidden", String(!open));
   sheet.inert = !open;
+  // Shown inside the case study's popup, which keeps its close button off the
+  // card's date while it's open (script.js there)
+  if (window.parent !== window) window.parent.postMessage({ type: "proto-sheet", open }, location.origin);
 }
 
 // The game the sheet was opened for, and its date (null for Today)
@@ -1001,7 +1045,8 @@ function openSheet({ game, date, dateLabel }) {
   setSheetOpen(true);
 }
 
-// Opens the sheet straight to a team page (from the NBA menu). With no game
+// Opens the sheet straight to a team page (from the NBA menu, or a team's end
+// of a row in the main list). With no game
 // underneath, the team page is the sheet's only page: no back button, no
 // game date above the sheet.
 function openTeamSheet(teamId) {
@@ -1054,6 +1099,7 @@ function scheduleWithout(teamId, shown) {
 }
 
 function showTeamPage(teamId, opened = null) {
+  dismissLaunchTip({ retire: true }); // they've found team pages
   teamTitle.textContent = TEAM_PAGES[teamId].fullName;
   teamPage.dataset.team = teamId; // per-team styling hooks
   Object.entries(TEAM_PAGES[teamId].theme).forEach(([name, value]) =>
@@ -1063,6 +1109,8 @@ function showTeamPage(teamId, opened = null) {
   teamBody.innerHTML = teamPageContent(teamId, teamCardRow(teamId, opened), teamUpcoming);
   teamBody.dataset.team = teamId;
   teamBody.scrollTop = 0;
+  placeSchedule();
+  markPinnedMonth(document.getElementById("team-schedule"));
   sheet.classList.add("is-team");
   teamPage.inert = false;
   gamePage.inert = true;
@@ -1135,8 +1183,14 @@ function headerLogo(teamId) {
 }
 
 sheetBody.addEventListener("click", (e) => {
+  if (e.target.closest(".tip-close")) {
+    retireTip("card");
+    collapseCardTip();
+    return;
+  }
   const team = e.target.closest(".sheet-team[data-team]");
   if (!team) return;
+  retireTip("card"); // they've found the logo; the tip goes once they're back
   showTeamPage(team.dataset.team, sheetGame);
   flyLogo(headerLogo(team.dataset.team), teamBody.querySelector(".team-page-logo"));
 });
@@ -1148,6 +1202,7 @@ document.getElementById("sheet-back").addEventListener("click", () => {
     flyLogo(teamLogo, headerLogo(teamBody.dataset.team));
   }
   showGamePage();
+  if (tipsDone.card) collapseCardTip();
 });
 
 // Previous Games | Upcoming
@@ -1163,7 +1218,79 @@ teamBody.addEventListener("click", (e) => {
   const schedule = document.getElementById("team-schedule");
   schedule.innerHTML = teamMonths(teamId, view === "upcoming" ? teamUpcoming : TEAM_PAGES[teamId].previous);
   schedule.scrollTop = 0;
+  scheduleTop = 0; // swapping the list can reset its scroll without a scroll event
+  markPinnedMonth(schedule);
 });
+
+// ---- Pinned months ----
+// The month label at the top of the schedule stays put while its games scroll
+// under it (position: sticky). Since the card is see-through, the pinned label
+// paints the page's background behind itself (styles.css, .is-stuck), lined up
+// using where the schedule sits on the page. That only moves while the page
+// scrolls the logo away, or if the window resizes.
+function placeSchedule() {
+  const schedule = document.getElementById("team-schedule");
+  if (!schedule) return;
+  const page = teamPage.getBoundingClientRect();
+  const box = schedule.getBoundingClientRect();
+  schedule.style.setProperty("--page-size", `${page.width}px ${page.height}px`);
+  schedule.style.setProperty("--page-at", `${page.left - box.left}px ${page.top - box.top}px`);
+}
+
+// Marks the label of the month being scrolled through (the pinned one)
+function markPinnedMonth(schedule) {
+  const top = schedule.scrollTop;
+  for (const day of schedule.children) {
+    const pinned = day.offsetTop <= top && top < day.offsetTop + day.offsetHeight;
+    day.firstElementChild.classList.toggle("is-stuck", pinned);
+  }
+}
+
+// While a month opens or closes, the months below it move without the list
+// scrolling, so the pinned label is checked every frame until it's done
+function followPinnedMonth(schedule, ms) {
+  const end = performance.now() + ms;
+  const step = (now) => {
+    markPinnedMonth(schedule);
+    if (now < end) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
+window.addEventListener("resize", placeSchedule);
+
+// Scrolling down the schedule also scrolls the page so the logo and record
+// move out of the way, as iOS shrinks a large title. The schedule card is sized
+// for the page scrolled that far, so until then its last games sit below the
+// sheet; Safari won't pass one swipe from the list on to the page, so they
+// stayed hidden until a second swipe. Pulling down at the list's top still
+// brings the logo back. Scroll events don't bubble, hence capture (the list is
+// rebuilt with each team page). The page's scroll is started once, not again on
+// each of the list's scroll events, which would keep restarting it.
+let scheduleList = null;
+let scheduleTop = 0;
+let pageScrollAt = -Infinity;
+teamBody.addEventListener(
+  "scroll",
+  (e) => {
+    const list = e.target;
+    if (list === teamBody) return placeSchedule();
+    if (list.id !== "team-schedule") return;
+    markPinnedMonth(list);
+    if (list !== scheduleList) {
+      scheduleList = list;
+      scheduleTop = 0;
+    }
+    const down = list.scrollTop > scheduleTop;
+    scheduleTop = list.scrollTop;
+    const pageEnd = teamBody.scrollHeight - teamBody.clientHeight;
+    if (down && teamBody.scrollTop < pageEnd - 1 && e.timeStamp - pageScrollAt > 600) {
+      pageScrollAt = e.timeStamp;
+      teamBody.scrollTo({ top: pageEnd, behavior: "smooth" });
+    }
+  },
+  { capture: true, passive: true }
+);
 
 // ---- Swipe down to close ----
 // The grabber always drags the sheet. Anywhere else, a downward swipe drags it
@@ -1334,3 +1461,69 @@ document.addEventListener("keydown", (e) => {
   if (sheet.classList.contains("is-open")) setSheetOpen(false);
   else setMenuOpen(false);
 });
+
+// ---------- Tips ----------
+// One-time tips that point out team pages, in the style of iOS inline tips
+// (TipKit):
+//   - on launch, above the scores: tap a team's logo, or pick it in the menu
+//   - in a game's card, under the matchup: tap a team's logo
+// Each stays until it's closed with its ×, or until the user does what it
+// suggests (opens a team page; for the game card's, from that card's logo).
+// Unlike real tips, they come back whenever the page is loaded again, so
+// every test session (and every "reload to start over") starts with them.
+const tipsDone = {};
+
+function retireTip(name) {
+  tipsDone[name] = true;
+}
+
+const CARD_TIP = `
+  <div class="tip-slot">
+    <aside class="tip tip--inline" aria-label="Tip">
+      <h2 class="tip-title">Discover Team Pages</h2>
+      <p class="tip-message">Tap on the team logo to explore upcoming and previous games.</p>
+      <button class="tip-close" type="button" aria-label="Close tip">
+        <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">
+          <path d="M1.4 1.4l7.2 7.2M8.6 1.4L1.4 8.6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+        </svg>
+      </button>
+    </aside>
+  </div>`;
+
+// Shrinks a tip's slot away. The slot holds the tip's top margin and the next
+// card's margin is smaller while the tip is there, so the slot ends at the
+// difference: once it's gone, the gap is the next card's usual margin.
+function collapseTip(slot) {
+  if (!slot || slot.hidden) return;
+  const tipMargin = parseFloat(getComputedStyle(slot.firstElementChild).marginTop);
+  const nextMargin = parseFloat(getComputedStyle(slot.nextElementSibling).marginTop);
+  const done = () => (slot.id ? (slot.hidden = true) : slot.remove());
+  if (reduceMotion.matches) return done();
+  slot.style.overflow = "hidden";
+  const shrink = slot.animate(
+    [
+      { height: `${slot.getBoundingClientRect().height}px`, opacity: 1 },
+      { height: `${tipMargin - nextMargin}px`, opacity: 0 },
+    ],
+    { duration: SECTION_DURATION, easing: IOS_EASE_IN_OUT, fill: "forwards" }
+  );
+  shrink.finished.then(() => {
+    done();
+    shrink.cancel();
+    slot.style.overflow = "";
+  }, () => {});
+}
+
+function collapseCardTip() {
+  collapseTip(sheetBody.querySelector(".tip-slot"));
+}
+
+const launchTip = document.getElementById("launch-tip");
+launchTip.hidden = false;
+
+function dismissLaunchTip({ retire = false } = {}) {
+  if (retire) retireTip("launch");
+  collapseTip(launchTip);
+}
+
+launchTip.querySelector(".tip-close").addEventListener("click", () => dismissLaunchTip({ retire: true }));
