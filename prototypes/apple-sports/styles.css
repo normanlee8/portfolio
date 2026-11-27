@@ -1265,11 +1265,21 @@ img.menu-icon--league {
 
 /* ---------- Tips ---------- */
 /* One-time hints in the style of iOS tips (TipKit): a bold title, a short
-   message and a close button. Sizes and colors from the Figma mockups. */
+   message and a close button. The same 16px on every side keeps the text
+   centered in the card; its lines stay left-aligned. Type sizes and colors
+   from the Figma mockups. */
 .tip {
   position: relative;
-  padding: 9.5px 34px 11.5px 16px;
+  padding: 16px;
   border: 1px solid rgba(255, 255, 255, 0.22);
+  /* a tap anywhere on it closes it (app.js); it dims while pressed */
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.15s ease;
+}
+
+.tip:active {
+  opacity: 0.7;
 }
 
 .tip-title {
@@ -1279,16 +1289,17 @@ img.menu-icon--league {
 }
 
 .tip-message {
-  margin-top: 3.5px;
+  margin-top: 4px;
   font-size: 12px;
   line-height: 15px;
   color: rgba(255, 255, 255, 0.6);
 }
 
-/* A 44px tap area centered 21px in from the tip's top and right edges */
+/* A 44px tap area level with the title, its × about 16px in from the right
+   edge; it ends where the message begins, so the two never overlap */
 .tip-close {
   position: absolute;
-  top: -2px;
+  top: 4px;
   right: -1.5px;
   display: grid;
   place-items: center;

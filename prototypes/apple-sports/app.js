@@ -1099,7 +1099,6 @@ function scheduleWithout(teamId, shown) {
 }
 
 function showTeamPage(teamId, opened = null) {
-  dismissLaunchTip({ retire: true }); // they've found team pages
   teamTitle.textContent = TEAM_PAGES[teamId].fullName;
   teamPage.dataset.team = teamId; // per-team styling hooks
   Object.entries(TEAM_PAGES[teamId].theme).forEach(([name, value]) =>
@@ -1183,14 +1182,13 @@ function headerLogo(teamId) {
 }
 
 sheetBody.addEventListener("click", (e) => {
-  if (e.target.closest(".tip-close")) {
+  if (e.target.closest(".tip")) {
     retireTip("card");
     collapseCardTip();
     return;
   }
   const team = e.target.closest(".sheet-team[data-team]");
   if (!team) return;
-  retireTip("card"); // they've found the logo; the tip goes once they're back
   showTeamPage(team.dataset.team, sheetGame);
   flyLogo(headerLogo(team.dataset.team), teamBody.querySelector(".team-page-logo"));
 });
@@ -1202,7 +1200,6 @@ document.getElementById("sheet-back").addEventListener("click", () => {
     flyLogo(teamLogo, headerLogo(teamBody.dataset.team));
   }
   showGamePage();
-  if (tipsDone.card) collapseCardTip();
 });
 
 // Previous Games | Upcoming
@@ -1467,9 +1464,8 @@ document.addEventListener("keydown", (e) => {
 // (TipKit):
 //   - on launch, above the scores: tap a team's logo, or pick it in the menu
 //   - in a game's card, under the matchup: tap a team's logo
-// Each stays until it's closed with its ×, or until the user does what it
-// suggests (opens a team page; for the game card's, from that card's logo).
-// Unlike real tips, they come back whenever the page is loaded again, so
+// Each stays until it's tapped (anywhere on it, not only its ×); nothing else
+// closes it, not even opening a team page. Unlike real tips, they come back whenever the page is loaded again, so
 // every test session (and every "reload to start over") starts with them.
 const tipsDone = {};
 
@@ -1521,9 +1517,7 @@ function collapseCardTip() {
 const launchTip = document.getElementById("launch-tip");
 launchTip.hidden = false;
 
-function dismissLaunchTip({ retire = false } = {}) {
-  if (retire) retireTip("launch");
+launchTip.addEventListener("click", () => {
+  retireTip("launch");
   collapseTip(launchTip);
-}
-
-launchTip.querySelector(".tip-close").addEventListener("click", () => dismissLaunchTip({ retire: true }));
+});
