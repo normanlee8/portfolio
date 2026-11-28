@@ -184,6 +184,7 @@
                 <span class="pill-tag">VISUAL DESIGN</span>
                 <span class="pill-tag">COMPETITIVE ANALYSIS</span>
                 <span class="pill-tag">PROTOTYPING</span>
+                <span class="pill-tag">USER TESTING</span>
                 <span class="pill-tag">MOBILE</span>
             </div>
             <dl class="project-details">
@@ -397,6 +398,7 @@
                 <li>
                     <p class="case-moment-label">A third entry point</p>
                     <p><span class="case-em">Tapping a logo right in the list of games.</span> It would shrink the area that opens a game's card, as shown below.</p>
+                    <p><span class="case-em">Note:</span> I reversed this decision after user testing.</p>
                 </li>
                 <li>
                     <p class="case-moment-label">A single entry point</p>
@@ -466,6 +468,7 @@
                 </div>
                 <figcaption>Row layouts I tried before the final design.</figcaption>
             </figure>
+            <p class="section-content">Early versions kept both teams' logos and stacked the date on top, which wasted space on a page that's already about one team. Dropping the team's own logo freed up room for the date on the left, the opponent in the middle, and the time and shortened network on the right.</p>
             <figure class="case-figure">
                 <div class="case-rows">
                     <div class="case-row-group">
@@ -549,8 +552,10 @@
                 <div class="case-aside-text">
                     <p class="case-aside-label">Menu</p>
                     <p class="case-aside-title">Favorite teams in the menu</p>
-                    <p>The menu listed My Teams but not the teams in it. Each favorite team now has its own entry, which also makes the menu the second way into a team page.</p>
+                    <p>The menu listed My Teams but not the teams in it. Each favorite team now has its own entry, which also makes the menu another way into a team page.</p>
                 </div>
+                <!-- SHOT 3e: Figma, the open menu with favorite teams (Warriors, Heat) listed under NBA -->
+                <img class="shot is-actual" src="/images/apple-sports/03e-menu-open.webp" alt="Apple Sports' open menu listing Search, Home, My Teams, NBA, and favorite teams Warriors and Heat" width="645" height="1113" loading="lazy" decoding="async">
             </div>
             <div class="case-aside">
                 <div class="case-aside-text">
@@ -564,10 +569,79 @@
             </div>
         </div>
 
+        <!-- User testing -->
+        <div class="section-item">
+            <h2 class="section-header">User Testing</h2>
+            <p class="case-lede">Five people, two rounds, on their own iPhones.</p>
+            <p class="section-content">I tested the interactive prototype in Safari with five people: two sports fans and three casual or non-fans. Each person thought aloud through four tasks and rated each from 1 to 7 for ease:</p>
+            <ol class="case-tasks">
+                <li>Count how many of the Warriors' last five games they won.</li>
+                <li>Check whether the Warriors won a specific past game.</li>
+                <li>Find the Warriors' next game against the Lakers.</li>
+                <li>Find where to watch that game.</li>
+            </ol>
+            <p class="section-content">All five participants completed every task. Five people is a small sample, so the takeaways are directional, but fans moved through the team page quickly:</p>
+            <div class="case-quotes">
+                <figure class="case-quote">
+                    <blockquote>
+                        <p>“I think this makes it a lot easier to check schedules cause it's a lot quicker and I think it's less taps. Everything kind of flows in on the same screen.”</p>
+                    </blockquote>
+                    <figcaption>Round 2 participant · Apple Sports &amp; Yahoo Sports user</figcaption>
+                </figure>
+            </div>
+            <div class="case-rounds">
+                <div class="case-round-group">
+                    <p class="case-round-title">Finding the team page</p>
+                    <dl class="case-round-steps">
+                        <div class="case-round-step">
+                            <dt>Round 1</dt>
+                            <dd>All three testers had trouble opening a team page. One saw no sign that team logos were tappable, one needed a hint, and one tapped the Warriors right in the list of games expecting its team page.</dd>
+                        </div>
+                        <div class="case-round-step is-after">
+                            <dt>Round 2</dt>
+                            <dd>I reversed my earlier decision and made each team logo in the list of games tappable (tapping the middle of the row still opens the game card), and added one-time tips on the main screen and in the game card. Both Round 2 testers went straight from the list of games to the team page on every task with no help. Neither tapped or mentioned the tips, so the tappable team logo is the likelier reason.</dd>
+                        </div>
+                    </dl>
+                </div>
+                <div class="case-round-group">
+                    <p class="case-round-title">Keeping your place in the schedule</p>
+                    <dl class="case-round-steps">
+                        <div class="case-round-step">
+                            <dt>Round 1</dt>
+                            <dd>Two testers missed that date sections can collapse, or lost track of which month they were viewing while scrolling.</dd>
+                        </div>
+                        <div class="case-round-step is-after">
+                            <dt>Round 2</dt>
+                            <dd>I pinned month headers to the top while scrolling and enlarged the collapse arrows so they are easier to notice.</dd>
+                        </div>
+                    </dl>
+                </div>
+            </div>
+            <figure class="case-figure">
+                <div class="case-stage">
+                    <!-- SHOTS 7, 7b: Figma, the one-time tip on launch and in a game's card -->
+                    <div class="phone"><img src="/images/apple-sports/07-launch-tip.webp?v=3" alt="Apple Sports' NBA screen with a tip that reads Discover Team Pages: tap a team's logo or find your team in the NBA menu to explore upcoming and previous games" width="624" height="1353" loading="lazy" decoding="async"></div>
+                    <div class="phone"><img src="/images/apple-sports/07b-game-card-tip.webp?v=2" alt="A game's card with a tip that reads Discover Team Pages: tap on the team logo to explore upcoming and previous games" width="624" height="1353" loading="lazy" decoding="async"></div>
+                </div>
+                <figcaption>The one-time tips added for Round 2: on the main screen, and in a game card.</figcaption>
+            </figure>
+            <p class="case-round-title">Two things stood out after Round 2:</p>
+            <dl class="case-specs">
+                <div>
+                    <dt>Month headers</dt>
+                    <dd>Finding the next Lakers game (task 3) was the lowest-rated task for four of five testers. Scrolling only took a few seconds, but the small, dim month headers forced both Round 2 testers to scroll back and forth to confirm the month.</dd>
+                </div>
+                <div>
+                    <dt>Who it fits</dt>
+                    <dd>Three of five testers said they would stick with ESPN or Google. Only the participant who already uses Apple Sports said team pages would change how they check, suggesting the concept fits fans who already want a fast, minimal tracker.</dd>
+                </div>
+            </dl>
+        </div>
+
         <!-- Success -->
         <div class="section-item">
             <h2 class="section-header">Measuring Success</h2>
-            <dl class="case-specs">
+            <dl class="case-metrics">
                 <div>
                     <dt>Usage</dt>
                     <dd>How often team pages are opened.</dd>
@@ -585,23 +659,14 @@
                     <dd>Whether people open the game card's Series section, to test the assumption behind it.</dd>
                 </div>
             </dl>
-            <p class="case-tradeoff"><span>Biggest risk</span>Discoverability. Team pages only open from a logo or the menu, so users may never find them. A one-time tip when the app opens, like the built-in tips iOS already uses, would point them out without cluttering the interface.</p>
-            <figure class="case-figure">
-                <div class="case-stage">
-                    <!-- SHOTS 7, 7b: Figma, the one-time tip on launch and in a game's card -->
-                    <div class="phone"><img src="/images/apple-sports/07-launch-tip.webp?v=2" alt="Apple Sports' NBA screen with a tip that reads Discover Team Pages: explore upcoming and previous games for your team" width="624" height="1353" loading="lazy" decoding="async"></div>
-                    <div class="phone"><img src="/images/apple-sports/07b-game-card-tip.webp?v=2" alt="A game's card with a tip that reads Discover Team Pages: tap on the team logo to explore upcoming and previous games" width="624" height="1353" loading="lazy" decoding="async"></div>
-                </div>
-                <figcaption>A one-time tip: on launch, and in a game's card.</figcaption>
-            </figure>
         </div>
 
         <!-- Next steps -->
         <div class="section-item">
             <h2 class="section-header">Next Steps</h2>
-            <p class="case-lede">Test it with fans, then bring team pages to every sport.</p>
-            <p class="section-content">First, I'd test the design with Apple Sports users: whether they find team pages from a logo or the menu, whether the new rows read at a glance, and whether the Series section earns its space.</p>
-            <p class="section-content">This concept covers the NBA only. After testing, I'd extend it to every sport in the app and make sure the layout holds up to each sport's differences. In some sports, for example, a game has no single opponent, or no opponent record to show, so the row would need to adapt.</p>
+            <p class="case-lede">Make the month headers easier to scan, then bring team pages to every sport.</p>
+            <p class="section-content">From Round 2, the clearest fix is making the month headers larger and easier to read at a glance so fans don't have to scroll back to confirm the month.</p>
+            <p class="section-content">This concept covers the NBA only. From there, I'd extend it to every sport in the app and make sure the layout holds up to each sport's differences. In some sports, for example, a game has no single opponent, or no opponent record to show, so the row would need to adapt.</p>
         </div>
 
         <!-- Reflection -->
@@ -609,6 +674,7 @@
             <h2 class="section-header">What I Learned</h2>
             <p class="case-lede">Most of the work was in the decisions: where the page lives, what it leaves out, and how far to move from the existing design.</p>
             <p class="section-content">A small, well-placed addition can solve a real problem without changing what makes a product good.</p>
+            <p class="section-content">Testing also overturned an early assumption I felt sure about (keeping team logos untappable in the list of games) and showed that small legibility details, like dim month headers, can hurt confidence more than big layout choices.</p>
         </div>
     </div>
 

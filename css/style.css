@@ -2082,19 +2082,50 @@ a.work-thumbnail:active {
     color: var(--text-primary);
 }
 
-/* label | text rows: TL;DR, specs, metrics */
+/* label | text rows: TL;DR, specs (dividers only between rows, never on outer edges) */
 .case-tldr > div,
 .case-specs > div {
     display: grid;
     grid-template-columns: 7rem minmax(0, 1fr);
     column-gap: var(--space-sm);
     padding: var(--space-sm) 0;
+}
+
+.case-tldr > div + div,
+.case-specs > div + div {
     border-top: 1px solid var(--line-faint);
 }
 
-.case-tldr > div:last-child,
-.case-specs > div:last-child {
-    border-bottom: 1px solid var(--line-faint);
+/* 2-column borderless editorial grid for short metrics (Measuring Success): always 2x2 above mobile */
+.case-metrics {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-lg) var(--space-xl);
+}
+
+@media (max-width: 560px) {
+    .case-metrics {
+        grid-template-columns: 1fr;
+    }
+}
+
+.case-metrics > div {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.case-metrics dt {
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--text-primary);
+}
+
+.case-metrics dd {
+    font-size: var(--text-md);
+    color: var(--text-secondary);
 }
 
 .case-tldr dt,
@@ -2463,6 +2494,89 @@ html:has(.proto-dialog[open]) {
     text-decoration-color: color-mix(in srgb, var(--text-secondary) 60%, transparent);
 }
 
+/* numbered testing tasks: quiet editorial list */
+.case-tasks {
+    list-style: none;
+    counter-reset: task;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    padding-left: var(--space-xs);
+}
+
+.case-tasks li {
+    counter-increment: task;
+    display: grid;
+    grid-template-columns: 1.5rem 1fr;
+    align-items: baseline;
+    gap: var(--space-xs);
+    font-size: var(--text-base);
+    color: var(--text-secondary);
+}
+
+.case-tasks li::before {
+    content: counter(task) ".";
+    font-size: var(--text-base);
+    font-weight: var(--weight-medium);
+    font-variant-numeric: tabular-nums;
+    color: var(--text-primary);
+}
+
+/* Round 1 to Round 2 iteration rows: two-tone editorial blocks */
+.case-rounds {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+}
+
+.case-round-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.case-round-group + .case-round-group {
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--line-faint);
+}
+
+.case-round-title {
+    font-size: var(--text-lg);
+    font-weight: var(--weight-medium);
+    line-height: var(--leading-snug);
+    color: var(--text-primary);
+}
+
+.case-round-steps {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.case-round-step {
+    display: grid;
+    grid-template-columns: 5.5rem 1fr;
+    align-items: baseline;
+    gap: var(--space-md);
+    font-size: var(--text-base);
+    color: var(--text-secondary);
+}
+
+.case-round-step dt {
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--text-secondary);
+}
+
+@media (max-width: 560px) {
+    .case-round-step {
+        grid-template-columns: 1fr;
+        gap: var(--space-xs);
+    }
+}
+
 /* a side note with its screenshot beside it, in one panel. The text needs about 16rem, so on narrow
    screens the phone wraps below it, centered */
 .case-aside {
@@ -2501,11 +2615,16 @@ html:has(.proto-dialog[open]) {
     color: var(--text-primary);
 }
 
-.case-aside > .phone {
+.case-aside > .phone,
+.case-aside > .shot {
     flex: 0 0 auto;
     width: 11rem;
     max-width: none;
     margin-inline: auto; /* centered when it sits on its own line */
+}
+
+.case-aside > img.shot {
+    outline: none;
 }
 
 /* tradeoff / risk callout */
@@ -2979,6 +3098,14 @@ img.shot {
         0 3px 6px rgb(0 0 0 / calc(0.1 * var(--object-shadow))),
         0 12px 24px -4px rgb(0 0 0 / calc(0.16 * var(--object-shadow))),
         0 32px 56px -16px rgb(0 0 0 / calc(0.28 * var(--object-shadow)));
+}
+
+/* transparent-corner UI cutouts inside an aside: drop-shadow follows the real shape instead of a rectangular box */
+.case-aside > img.shot.is-actual {
+    outline: none;
+    border-radius: 0;
+    box-shadow: none;
+    filter: drop-shadow(0 12px 24px rgb(0 0 0 / calc(0.22 * var(--object-shadow))));
 }
 
 /* labeled screenshots of other apps, sized by the figure's own width so they stay readable:
