@@ -26,7 +26,7 @@ CHROME_PATHS = [
 ]
 CSS_W, CSS_H = 1000, 500  # the picture's shape, in CSS pixels; each size is this at a different pixel density
 HEIGHTS = (640, 960, 1320)  # pages ask for about 1.3x what they show, so each is drawn smaller than rendered: sharp
-COVERS = {"apple-sports": ".cover-screens", "portfolio": ".cover-wall"}
+COVERS = {"apple-sports": ".cover-screens"}
 QUALITY = 90
 
 # The page, reduced to one cover at the picture's size, on nothing
